@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Judul"
+        android:textColor="?attr/colorOnSurface"
+        android:textColorHint="?attr/colorOnSurfaceVariant"
         android:textSize="20sp"
         android:textStyle="bold"
         android:background="@null" />
@@ -18,6 +20,7 @@
         android:id="@+id/counter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="12sp" />
 
     <EditText
@@ -26,6 +29,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:hint="Tulis ide sebelum lupa..."
+        android:textColor="?attr/colorOnSurface"
+        android:textColorHint="?attr/colorOnSurfaceVariant"
         android:gravity="top"
         android:inputType="textMultiLine"
         android:scrollbars="vertical"

@@ -20,9 +20,13 @@ class MainActivity : AppCompatActivity() {
     private var query = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         dao = AppDatabase.get(this).noteDao()
+        findViewById<android.widget.ImageButton>(R.id.settings).setOnClickListener {
+            showThemeDialog()
+        }
 
         adapter = NoteAdapter(
             onOpen = { note -> openEditor(note.id) },
@@ -72,5 +76,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun openEditor(id: Long) {
         startActivity(Intent(this, EditorActivity::class.java).putExtra("note_id", id))
+    }
+
+    private fun showThemeDialog() {
+        val current = ThemePref.get(this)
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Tema")
+            .setSingleChoiceItems(ThemePref.NAMES, current) { dialog, which ->
+                if (which != current) {
+                    ThemePref.set(this, which)
+                    recreate()
+                }
+                dialog.dismiss()
+            }
+            .show()
     }
 }

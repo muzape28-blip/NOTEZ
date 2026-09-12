@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- OLED (identitas, default) -->
     <style name="Theme.NOTEZ" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorOnPrimary">@color/on_accent</item>
-        <item name="colorPrimaryContainer">@color/accent</item>
-        <item name="colorOnPrimaryContainer">@color/on_accent</item>
-        <item name="android:windowBackground">@color/bg_page</item>
-        <item name="colorSurface">@color/bg_surface</item>
+        <item name="colorPrimary">@color/oled_accent</item>
+        <item name="colorOnPrimary">@color/oled_on_accent</item>
+        <item name="colorPrimaryContainer">@color/oled_accent</item>
+        <item name="colorOnPrimaryContainer">@color/oled_on_accent</item>
+        <item name="android:windowBackground">@color/oled_bg</item>
+        <item name="colorSurface">@color/oled_surface</item>
+        <item name="colorOnSurface">@color/oled_text</item>
+        <item name="colorSurfaceVariant">@color/oled_surface</item>
+        <item name="colorOnSurfaceVariant">@color/oled_secondary</item>
+        <item name="colorError">@color/oled_danger</item>
+    </style>
+    <!-- GitHub Dark (palet ZCODE) -->
+    <style name="Theme.NOTEZ.GithubDark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/github_accent</item>
+        <item name="colorOnPrimary">@color/github_on_accent</item>
+        <item name="colorPrimaryContainer">@color/github_accent</item>
+        <item name="colorOnPrimaryContainer">@color/github_on_accent</item>
+        <item name="android:windowBackground">@color/github_bg</item>
+        <item name="colorSurface">@color/github_surface</item>
+        <item name="colorOnSurface">@color/github_text</item>
+        <item name="colorSurfaceVariant">@color/github_surface</item>
+        <item name="colorOnSurfaceVariant">@color/github_secondary</item>
+        <item name="colorError">@color/github_danger</item>
+    </style>
+    <!-- Cobalt2 (palet ZCODE) -->
+    <style name="Theme.NOTEZ.Cobalt2" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/cobalt_accent</item>
+        <item name="colorOnPrimary">@color/cobalt_on_accent</item>
+        <item name="colorPrimaryContainer">@color/cobalt_accent</item>
+        <item name="colorOnPrimaryContainer">@color/cobalt_on_accent</item>
+        <item name="android:windowBackground">@color/cobalt_bg</item>
+        <item name="colorSurface">@color/cobalt_surface</item>
+        <item name="colorOnSurface">@color/cobalt_text</item>
+        <item name="colorSurfaceVariant">@color/cobalt_surface</item>
+        <item name="colorOnSurfaceVariant">@color/cobalt_secondary</item>
+        <item name="colorError">@color/cobalt_danger</item>
     </style>
 </resources>

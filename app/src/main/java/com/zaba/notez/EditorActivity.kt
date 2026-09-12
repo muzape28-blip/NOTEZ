@@ -20,6 +20,7 @@ class EditorActivity : AppCompatActivity() {
     private var saveTask: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
         dao = AppDatabase.get(this).noteDao()
