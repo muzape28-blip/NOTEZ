@@ -8,6 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -30,16 +32,23 @@ class MainActivity : AppCompatActivity() {
 
         adapter = NoteAdapter(
             onOpen = { note -> openEditor(note.id) },
-            onDelete = { note -> lifecycleScope.launch { dao.delete(note) } }
+            onDelete = { note ->
+                lifecycleScope.launch(Dispatchers.IO) { dao.delete(note) }
+                Snackbar.make(findViewById(R.id.list), "Catatan dihapus", Snackbar.LENGTH_LONG)
+                    .setAction("URUNGKAN") {
+                        lifecycleScope.launch(Dispatchers.IO) { dao.upsert(note) }
+                    }
+                    .show()
+            }
         )
         findViewById<RecyclerView>(R.id.list).apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
         }
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 val id = dao.upsert(Note(title = "Catatan baru"))
-                openEditor(id)
+                launch(Dispatchers.Main) { openEditor(id) }
             }
         }
         findViewById<SearchView>(R.id.search).setOnQueryTextListener(

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /** Editor tanpa batas karakter + autosave 800ms. */
@@ -50,11 +51,14 @@ class EditorActivity : AppCompatActivity() {
     }
 
     private fun save(title: String, body: String) {
-        lifecycleScope.launch {
+        // Tulis DB di IO thread — jangan block UI (penyebab scroll tersendat)
+        lifecycleScope.launch(Dispatchers.IO) {
             dao.getById(noteId)?.let {
                 dao.update(it.copy(title = title, content = body, updatedAt = System.currentTimeMillis()))
-                findViewById<TextView>(R.id.counter).text =
-                    "${body.length} karakter (tanpa batas) • tersimpan"
+                launch(Dispatchers.Main) {
+                    findViewById<TextView>(R.id.counter).text =
+                        "${body.length} karakter (tanpa batas) • tersimpan"
+                }
             }
         }
     }
