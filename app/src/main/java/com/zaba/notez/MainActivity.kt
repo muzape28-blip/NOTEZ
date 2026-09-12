@@ -33,7 +33,12 @@ class MainActivity : AppCompatActivity() {
         adapter = NoteAdapter(
             onOpen = { note -> openEditor(note.id) },
             onDelete = { note ->
-                lifecycleScope.launch(Dispatchers.IO) { dao.delete(note) }
+                lifecycleScope.launch(Dispatchers.IO) {
+                    dao.delete(note)
+                    // Hapus fisik sisa forensik SQLite (freelist) — DB kecil, murah
+                    AppDatabase.get(this@MainActivity).openHelper.writableDatabase
+                        .execSQL("VACUUM")
+                }
                 Snackbar.make(findViewById(R.id.list), "Catatan dihapus", Snackbar.LENGTH_LONG)
                     .setAction("URUNGKAN") {
                         lifecycleScope.launch(Dispatchers.IO) { dao.upsert(note) }
