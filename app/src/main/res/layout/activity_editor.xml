@@ -12,6 +12,7 @@
         android:hint="Judul"
         android:textColor="?attr/colorOnSurface"
         android:textColorHint="?attr/colorOnSurfaceVariant"
+        android:inputType="text|textNoSuggestions"
         android:textSize="20sp"
         android:textStyle="bold"
         android:background="@null" />
@@ -32,7 +33,7 @@
         android:textColor="?attr/colorOnSurface"
         android:textColorHint="?attr/colorOnSurfaceVariant"
         android:gravity="top"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textNoSuggestions"
         android:scrollbars="vertical"
         android:background="@null" />
 </LinearLayout>

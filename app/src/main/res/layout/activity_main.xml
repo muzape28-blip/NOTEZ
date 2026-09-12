@@ -51,5 +51,6 @@
         android:layout_gravity="end"
         android:layout_margin="16dp"
         android:contentDescription="Catatan baru"
+        android:filterTouchesWhenObscured="true"
         android:src="@android:drawable/ic_input_add" />
 </LinearLayout>
