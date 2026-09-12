@@ -19,8 +19,29 @@ android {
         this.versionName = versionName
     }
 
+    signingConfigs {
+        create("release") {
+            // Fail-closed HANYA saat task Release diminta (build debug/CI tetap jalan).
+            val releaseRequested = gradle.startParameter.taskNames.any {
+                it.contains("Release", ignoreCase = true)
+            }
+            fun need(name: String): String =
+                System.getenv(name) ?: if (releaseRequested)
+                    throw GradleException("$name belum diset")
+                else ""
+            val ks = need("NOTEZ_KEYSTORE")
+            if (ks.isNotEmpty()) {
+                storeFile = file(ks)
+                storePassword = need("NOTEZ_STORE_PASS")
+                keyAlias = need("NOTEZ_KEY_ALIAS")
+                keyPassword = need("NOTEZ_KEY_PASS")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
