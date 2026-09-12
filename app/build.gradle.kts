@@ -19,8 +19,28 @@ android {
         this.versionName = versionName
     }
 
+    signingConfigs {
+        create("release") {
+            // Fail-closed: tanpa 4 env ini, build release GAGAL dengan pesan jelas.
+            // Lokal: export dari ~/.keystores. CI: GitHub secrets (NOTEZ_*).
+            val ks = System.getenv("NOTEZ_KEYSTORE")
+                ?: throw GradleException("NOTEZ_KEYSTORE belum diset (path keystore rilis)")
+            val sp = System.getenv("NOTEZ_STORE_PASS")
+                ?: throw GradleException("NOTEZ_STORE_PASS belum diset")
+            val ka = System.getenv("NOTEZ_KEY_ALIAS")
+                ?: throw GradleException("NOTEZ_KEY_ALIAS belum diset")
+            val kp = System.getenv("NOTEZ_KEY_PASS")
+                ?: throw GradleException("NOTEZ_KEY_PASS belum diset")
+            storeFile = file(ks)
+            storePassword = sp
+            keyAlias = ka
+            keyPassword = kp
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
