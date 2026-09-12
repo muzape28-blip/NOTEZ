@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- OLED (identitas, default) -->
-    <style name="Theme.NOTEZ" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Notez" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/oled_accent</item>
         <item name="colorOnPrimary">@color/oled_on_accent</item>
         <item name="colorPrimaryContainer">@color/oled_accent</item>
@@ -14,7 +14,7 @@
         <item name="colorError">@color/oled_danger</item>
     </style>
     <!-- GitHub Dark (palet ZCODE) -->
-    <style name="Theme.NOTEZ.GithubDark" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Notez.GithubDark" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/github_accent</item>
         <item name="colorOnPrimary">@color/github_on_accent</item>
         <item name="colorPrimaryContainer">@color/github_accent</item>
@@ -27,7 +27,7 @@
         <item name="colorError">@color/github_danger</item>
     </style>
     <!-- Cobalt2 (palet ZCODE) -->
-    <style name="Theme.NOTEZ.Cobalt2" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Notez.Cobalt2" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/cobalt_accent</item>
         <item name="colorOnPrimary">@color/cobalt_on_accent</item>
         <item name="colorPrimaryContainer">@color/cobalt_accent</item>

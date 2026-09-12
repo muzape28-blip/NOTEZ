@@ -22,8 +22,8 @@ object ThemePref {
     }
 
     fun styleOf(value: Int): Int = when (value) {
-        GITHUB_DARK -> R.style.Theme_NOTE_Z_GithubDark
-        COBALT2 -> R.style.Theme_NOTE_Z_Cobalt2
-        else -> R.style.Theme_NOTE_Z
+        GITHUB_DARK -> R.style.Theme_Notez_GithubDark
+        COBALT2 -> R.style.Theme_Notez_Cobalt2
+        else -> R.style.Theme_Notez
     }
 }
