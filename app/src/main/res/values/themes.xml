@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.NOTEZ" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#39FF14</item>
+    <style name="Theme.NOTEZ" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/on_accent</item>
+        <item name="colorPrimaryContainer">@color/accent</item>
+        <item name="colorOnPrimaryContainer">@color/on_accent</item>
+        <item name="android:windowBackground">@color/bg_page</item>
+        <item name="colorSurface">@color/bg_surface</item>
     </style>
 </resources>

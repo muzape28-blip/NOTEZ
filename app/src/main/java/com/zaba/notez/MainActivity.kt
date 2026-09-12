@@ -59,7 +59,14 @@ class MainActivity : AppCompatActivity() {
         collectJob?.cancel()
         val flow = if (query.isBlank()) dao.observeAll() else dao.search(query)
         collectJob = lifecycleScope.launch {
-            flow.collectLatest { adapter.submit(it) }
+            flow.collectLatest {
+                adapter.submit(it)
+                val empty = it.isEmpty()
+                findViewById<RecyclerView>(R.id.list).visibility =
+                    if (empty) android.view.View.GONE else android.view.View.VISIBLE
+                findViewById<android.widget.TextView>(R.id.empty).visibility =
+                    if (empty) android.view.View.VISIBLE else android.view.View.GONE
+            }
         }
     }
 
