@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- OLED (identitas, default) -->
+    <!-- GitHub Dark (default) -->
     <style name="Theme.Notez" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/oled_accent</item>
         <item name="colorOnPrimary">@color/oled_on_accent</item>
