@@ -14,7 +14,7 @@ object ThemePref {
     val NAMES = arrayOf("OLED Hijau", "GitHub Dark", "Cobalt2")
 
     fun get(context: Context): Int =
-        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getInt(KEY, OLED)
+        context.getSharedPreferences(PREF, Context.MODE_PRIVATE).getInt(KEY, GITHUB_DARK)
 
     fun set(context: Context, value: Int) {
         context.getSharedPreferences(PREF, Context.MODE_PRIVATE)
