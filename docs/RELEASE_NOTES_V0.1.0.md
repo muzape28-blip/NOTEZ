@@ -33,7 +33,8 @@
 
 - Debug CI after changes: user reported green.
 - Production workflow `Build NOTEZ Production — v0.1.0`: run `36109540939`, conclusion `success`.
-- Signed release artifact: `notez-v0.1.0-release`, size `1,961,686` bytes.
+- Signed release artifact from production workflow: `notez-v0.1.0-release`, size `1,961,686` bytes.
+- Published GitHub Release asset: `NOTEZv0.1.0-release.apk`, size `2,886,072` bytes.
 - User UAT reported local music drawer, Add Music, Main/Editor controls, and background behavior working without found issues.
 
 ## Known limits
