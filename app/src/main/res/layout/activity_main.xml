@@ -16,6 +16,7 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/cd_open_search"
+            android:tint="?attr/colorOnSurface"
             android:src="@android:drawable/ic_menu_search" />
 
         <EditText
@@ -40,7 +41,8 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Tema"
-            android:src="@android:drawable/ic_menu_preferences" />
+            android:tint="?attr/colorOnSurface"
+            android:src="@drawable/ic_settings_gear" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
