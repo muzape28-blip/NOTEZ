@@ -1,1 +1,39 @@
+# Gradle / Android build outputs
+.gradle/
+build/
+*/build/
+.kotlin/
 
+# Android local machine config
+local.properties
+.externalNativeBuild/
+.cxx/
+captures/
+
+# Android packaged artifacts
+*.apk
+*.ap_
+*.aab
+*.dex
+
+# IDE/editor files
+.idea/
+*.iml
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Signing keys and local secrets
+*.jks
+*.keystore
+*.p12
+*.pem
+keystore.properties
+release.properties
+.env
+.env.*
