@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val id = dao.upsert(Note(title = "Catatan baru"))
-                launch(Dispatchers.Main) { openEditor(id) }
+                launch(Dispatchers.Main) { openEditor(id, isNew = true) }
             }
         }
         findViewById<SearchView>(R.id.search).setOnQueryTextListener(
@@ -128,8 +128,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openEditor(id: Long) {
-        startActivity(Intent(this, EditorActivity::class.java).putExtra("note_id", id))
+    private fun openEditor(id: Long, isNew: Boolean = false) {
+        startActivity(
+            Intent(this, EditorActivity::class.java)
+                .putExtra("note_id", id)
+                .putExtra("is_new", isNew)
+        )
     }
 
     private fun showSettingsMenu() {

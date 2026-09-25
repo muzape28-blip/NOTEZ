@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NOTEZ</string>
+    <string name="untitled_note">(Tanpa judul)</string>
+    <string name="empty_note_hint">Catatan kosong.\nKetuk pensil untuk mulai menulis.</string>
+    <string name="cd_edit_note">Edit catatan</string>
+    <string name="cd_done_editing">Selesai edit</string>
 </resources>
