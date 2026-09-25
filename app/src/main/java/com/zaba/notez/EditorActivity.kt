@@ -18,6 +18,9 @@ import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 
 /**
  * Editor tanpa batas karakter + autosave 800ms.
@@ -52,6 +55,8 @@ class EditorActivity : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var saveTask: Runnable? = null
+    private val saveMutex = Mutex()
+    @Volatile private var saveGeneration = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
@@ -104,6 +109,7 @@ class EditorActivity : AppCompatActivity() {
 
     private fun switchToView() {
         saveTask?.let(handler::removeCallbacks)
+        saveTask = null
         currentTitle = titleEdit.text.toString()
         currentContent = bodyEdit.text.toString()
         save(currentTitle, currentContent)
@@ -150,14 +156,53 @@ class EditorActivity : AppCompatActivity() {
         counter.text = "$bodyLength karakter (tanpa batas)$suffix"
     }
 
+    @Synchronized
+    private fun nextSaveGeneration(): Long {
+        saveGeneration += 1
+        return saveGeneration
+    }
+
     private fun save(title: String, body: String) {
-        // Tulis DB di IO thread — jangan block UI (penyebab scroll tersendat)
+        val generation = nextSaveGeneration()
+        // Tulis DB di IO thread — jangan block UI (penyebab scroll tersendat).
+        // Generasi + mutex mencegah save lama menimpa snapshot yang lebih baru.
         lifecycleScope.launch(Dispatchers.IO) {
-            dao.getById(noteId)?.let {
-                dao.update(it.copy(title = title, content = body, updatedAt = System.currentTimeMillis()))
-                launch(Dispatchers.Main) {
-                    if (isEditing) updateCounter(body.length, " • tersimpan")
+            saveSnapshot(title, body, generation, updateUi = true)
+        }
+    }
+
+    private fun saveBlocking(title: String, body: String) {
+        val generation = nextSaveGeneration()
+        // onPause adalah batas persistence terakhir Activity. Save ini sengaja
+        // menunggu DB write selesai agar snapshot terakhir tidak ikut tercancel
+        // bersama lifecycleScope saat Activity dihancurkan.
+        runBlocking(Dispatchers.IO) {
+            saveSnapshot(title, body, generation, updateUi = false)
+        }
+    }
+
+    private suspend fun saveSnapshot(
+        title: String,
+        body: String,
+        generation: Long,
+        updateUi: Boolean
+    ) {
+        var saved = false
+        saveMutex.lock()
+        try {
+            if (generation == saveGeneration) {
+                val existing = dao.getById(noteId)
+                if (existing != null && generation == saveGeneration) {
+                    dao.update(existing.copy(title = title, content = body, updatedAt = System.currentTimeMillis()))
+                    saved = true
                 }
+            }
+        } finally {
+            saveMutex.unlock()
+        }
+        if (saved && updateUi && generation == saveGeneration) {
+            withContext(Dispatchers.Main) {
+                if (isEditing && generation == saveGeneration) updateCounter(body.length, " • tersimpan")
             }
         }
     }
@@ -174,9 +219,12 @@ class EditorActivity : AppCompatActivity() {
 
     override fun onPause() {
         saveTask?.let(handler::removeCallbacks)
+        saveTask = null
         val title = if (isEditing) titleEdit.text.toString() else currentTitle
         val body = if (isEditing) bodyEdit.text.toString() else currentContent
-        save(title, body)
+        currentTitle = title
+        currentContent = body
+        saveBlocking(title, body)
         super.onPause()
     }
 }

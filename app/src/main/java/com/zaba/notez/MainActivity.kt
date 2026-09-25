@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -78,19 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         adapter = NoteAdapter(
             onOpen = { note -> openEditor(note.id) },
-            onDelete = { note ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    dao.delete(note)
-                    // Hapus fisik sisa forensik SQLite (freelist) — DB kecil, murah
-                    AppDatabase.get(this@MainActivity).openHelper.writableDatabase
-                        .execSQL("VACUUM")
-                }
-                Snackbar.make(findViewById(R.id.list), "Catatan dihapus", Snackbar.LENGTH_LONG)
-                    .setAction("URUNGKAN") {
-                        lifecycleScope.launch(Dispatchers.IO) { dao.upsert(note) }
-                    }
-                    .show()
-            }
+            onDelete = { note -> deleteWithUndo(note) }
         )
         findViewById<RecyclerView>(R.id.list).apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -149,6 +138,41 @@ class MainActivity : AppCompatActivity() {
             drawer.closeDrawer(GravityCompat.START)
         } else {
             action()
+        }
+    }
+
+    private fun deleteWithUndo(note: Note) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            dao.delete(note)
+            launch(Dispatchers.Main) {
+                showUndoDeleteSnackbar(note)
+            }
+        }
+    }
+
+    private fun showUndoDeleteSnackbar(note: Note) {
+        var undone = false
+        Snackbar.make(findViewById(R.id.drawer), "Catatan dihapus", Snackbar.LENGTH_LONG)
+            .setAction("URUNGKAN") {
+                undone = true
+                lifecycleScope.launch(Dispatchers.IO) { dao.upsert(note) }
+            }
+            .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    if (!undone && event != BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION) {
+                        lifecycleScope.launch(Dispatchers.IO) { vacuumDeletedNotes() }
+                    }
+                }
+            })
+            .show()
+    }
+
+    private fun vacuumDeletedNotes() {
+        try {
+            AppDatabase.get(this).openHelper.writableDatabase.execSQL("VACUUM")
+        } catch (_: Exception) {
+            // VACUUM is best-effort cleanup after the undo window; data correctness
+            // already comes from the delete/undo writes above.
         }
     }
 
