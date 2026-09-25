@@ -9,12 +9,30 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <SearchView
-            android:id="@+id/search"
+        <ImageButton
+            android:id="@+id/search_toggle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_open_search"
+            android:tint="?attr/colorOnSurface"
+            android:src="@android:drawable/ic_menu_search" />
+
+        <EditText
+            android:id="@+id/search_input"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:queryHint="Cari catatan..." />
+            android:layout_gravity="center_vertical"
+            android:visibility="invisible"
+            android:hint="Cari catatan..."
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant"
+            android:inputType="text|textNoSuggestions"
+            android:imeOptions="actionSearch"
+            android:maxLines="1"
+            android:background="@null" />
 
         <ImageButton
             android:id="@+id/settings"
@@ -23,7 +41,8 @@
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Tema"
-            android:src="@android:drawable/ic_menu_preferences" />
+            android:tint="?attr/colorOnSurface"
+            android:src="@drawable/ic_settings_gear" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

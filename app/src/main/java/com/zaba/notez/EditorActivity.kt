@@ -1,22 +1,55 @@
 package com.zaba.notez
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tasklist.TaskListPlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/** Editor tanpa batas karakter + autosave 800ms. */
+/**
+ * Editor tanpa batas karakter + autosave 800ms.
+ *
+ * Dua mode:
+ * - VIEW (default untuk catatan lama): judul & isi ditampilkan read-only, isi
+ *   di-render sebagai Markdown (heading, bold, list, code, dst).
+ * - EDIT (default untuk catatan baru, atau setelah tombol pensil ditekan):
+ *   judul & isi jadi EditText biasa berisi teks Markdown mentah.
+ */
 class EditorActivity : AppCompatActivity() {
 
     private lateinit var dao: NoteDao
+    private lateinit var markwon: Markwon
+
+    private lateinit var titleEdit: EditText
+    private lateinit var titleView: TextView
+    private lateinit var bodyEdit: EditText
+    private lateinit var bodyView: TextView
+    private lateinit var bodyViewScroll: ScrollView
+    private lateinit var counter: TextView
+    private lateinit var editToggle: ImageButton
+
     private var noteId: Long = -1
     private var loaded = false
+    private var isEditing = false
+    private var suppressAutosave = false
+
+    // Nilai terakhir yang tersimpan/valid, dipakai saat render mode view.
+    private var currentTitle = ""
+    private var currentContent = ""
+
     private val handler = Handler(Looper.getMainLooper())
     private var saveTask: Runnable? = null
 
@@ -25,29 +58,96 @@ class EditorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
         dao = AppDatabase.get(this).noteDao()
-        noteId = intent.getLongExtra("note_id", -1)
+        markwon = Markwon.builder(this)
+            .usePlugin(StrikethroughPlugin.create())
+            .usePlugin(TaskListPlugin.create(this))
+            .build()
 
-        val title = findViewById<EditText>(R.id.edit_title)
-        val body = findViewById<EditText>(R.id.edit_body)
-        val counter = findViewById<TextView>(R.id.counter)
+        noteId = intent.getLongExtra("note_id", -1)
+        isEditing = intent.getBooleanExtra("is_new", false)
+
+        titleEdit = findViewById(R.id.edit_title)
+        titleView = findViewById(R.id.view_title)
+        bodyEdit = findViewById(R.id.edit_body)
+        bodyView = findViewById(R.id.view_body)
+        bodyViewScroll = findViewById(R.id.view_body_scroll)
+        counter = findViewById(R.id.counter)
+        editToggle = findViewById(R.id.edit_toggle)
 
         lifecycleScope.launch {
             dao.getById(noteId)?.let {
-                title.setText(it.title)
-                body.setText(it.content)
-                counter.text = "${it.content.length} karakter (tanpa batas)"
+                currentTitle = it.title
+                currentContent = it.content
+                titleEdit.setText(it.title)
+                bodyEdit.setText(it.content)
+                updateCounter(it.content.length, "")
             }
             loaded = true
+            applyMode(isEditing)
         }
 
         val schedule = {
-            counter.text = "${body.text.length} karakter (tanpa batas) • menyimpan..."
+            currentTitle = titleEdit.text.toString()
+            currentContent = bodyEdit.text.toString()
+            updateCounter(bodyEdit.text.length, " • menyimpan...")
             saveTask?.let(handler::removeCallbacks)
-            saveTask = Runnable { save(title.text.toString(), body.text.toString()) }
+            saveTask = Runnable { save(currentTitle, currentContent) }
             handler.postDelayed(saveTask!!, 800)
         }
-        title.doAfterTextChanged { if (loaded) schedule() }
-        body.doAfterTextChanged { if (loaded) schedule() }
+        titleEdit.doAfterTextChanged { if (loaded && !suppressAutosave) schedule() }
+        bodyEdit.doAfterTextChanged { if (loaded && !suppressAutosave) schedule() }
+
+        editToggle.setOnClickListener {
+            if (isEditing) switchToView() else switchToEdit()
+        }
+    }
+
+    private fun switchToView() {
+        saveTask?.let(handler::removeCallbacks)
+        currentTitle = titleEdit.text.toString()
+        currentContent = bodyEdit.text.toString()
+        save(currentTitle, currentContent)
+        isEditing = false
+        applyMode(false)
+        hideKeyboard()
+    }
+
+    private fun switchToEdit() {
+        isEditing = true
+        suppressAutosave = true
+        titleEdit.setText(currentTitle)
+        bodyEdit.setText(currentContent)
+        titleEdit.setSelection(titleEdit.text?.length ?: 0)
+        bodyEdit.setSelection(bodyEdit.text?.length ?: 0)
+        suppressAutosave = false
+        applyMode(true)
+        bodyEdit.requestFocus()
+        showKeyboard(bodyEdit)
+    }
+
+    /** Tampilkan set view yang sesuai mode, dan render Markdown saat masuk mode view. */
+    private fun applyMode(editing: Boolean) {
+        titleEdit.visibility = if (editing) View.VISIBLE else View.GONE
+        titleView.visibility = if (editing) View.GONE else View.VISIBLE
+        bodyEdit.visibility = if (editing) View.VISIBLE else View.GONE
+        bodyViewScroll.visibility = if (editing) View.GONE else View.VISIBLE
+        counter.visibility = if (editing) View.VISIBLE else View.GONE
+        editToggle.setImageResource(if (editing) R.drawable.ic_done_check else R.drawable.ic_edit_pencil)
+        editToggle.contentDescription =
+            getString(if (editing) R.string.cd_done_editing else R.string.cd_edit_note)
+
+        if (!editing) {
+            titleView.text = currentTitle.ifBlank { getString(R.string.untitled_note) }
+            if (currentContent.isBlank()) {
+                bodyView.text = getString(R.string.empty_note_hint)
+            } else {
+                markwon.setMarkdown(bodyView, currentContent)
+            }
+        }
+    }
+
+    private fun updateCounter(bodyLength: Int, suffix: String) {
+        counter.text = "$bodyLength karakter (tanpa batas)$suffix"
     }
 
     private fun save(title: String, body: String) {
@@ -56,19 +156,27 @@ class EditorActivity : AppCompatActivity() {
             dao.getById(noteId)?.let {
                 dao.update(it.copy(title = title, content = body, updatedAt = System.currentTimeMillis()))
                 launch(Dispatchers.Main) {
-                    findViewById<TextView>(R.id.counter).text =
-                        "${body.length} karakter (tanpa batas) • tersimpan"
+                    if (isEditing) updateCounter(body.length, " • tersimpan")
                 }
             }
         }
     }
 
+    private fun showKeyboard(view: View) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(titleEdit.windowToken, 0)
+    }
+
     override fun onPause() {
         saveTask?.let(handler::removeCallbacks)
-        save(
-            findViewById<EditText>(R.id.edit_title).text.toString(),
-            findViewById<EditText>(R.id.edit_body).text.toString()
-        )
+        val title = if (isEditing) titleEdit.text.toString() else currentTitle
+        val body = if (isEditing) bodyEdit.text.toString() else currentContent
+        save(title, body)
         super.onPause()
     }
 }

@@ -5,17 +5,45 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <EditText
-        android:id="@+id/edit_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Judul"
-        android:textColor="?attr/colorOnSurface"
-        android:textColorHint="?attr/colorOnSurfaceVariant"
-        android:inputType="text|textNoSuggestions"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:background="@null" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/edit_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Judul"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant"
+            android:inputType="text|textNoSuggestions"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="@null" />
+
+        <TextView
+            android:id="@+id/view_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textIsSelectable="true"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/edit_toggle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_edit_note"
+            android:tint="?attr/colorOnSurface"
+            android:src="@drawable/ic_edit_pencil" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/counter"
@@ -24,16 +52,38 @@
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="12sp" />
 
-    <EditText
-        android:id="@+id/edit_body"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:hint="Tulis ide sebelum lupa..."
-        android:textColor="?attr/colorOnSurface"
-        android:textColorHint="?attr/colorOnSurfaceVariant"
-        android:gravity="top"
-        android:inputType="textMultiLine|textNoSuggestions"
-        android:scrollbars="vertical"
-        android:background="@null" />
+        android:layout_weight="1">
+
+        <EditText
+            android:id="@+id/edit_body"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Tulis ide sebelum lupa..."
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="?attr/colorOnSurfaceVariant"
+            android:gravity="top"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:scrollbars="vertical"
+            android:background="@null" />
+
+        <ScrollView
+            android:id="@+id/view_body_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:fillViewport="true"
+            android:scrollbars="vertical">
+
+            <TextView
+                android:id="@+id/view_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnSurface"
+                android:textIsSelectable="true"
+                android:lineSpacingExtra="4dp" />
+        </ScrollView>
+    </FrameLayout>
 </LinearLayout>

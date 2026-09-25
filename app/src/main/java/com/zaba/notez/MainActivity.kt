@@ -1,10 +1,15 @@
 package com.zaba.notez
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.SearchView
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageButton
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.doAfterTextChanged
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private var collectJob: Job? = null
     private var query = ""
     private var pendingExport: String? = null
+    private var searchOpen = false
 
     private val createDoc = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
         val data = pendingExport ?: return@registerForActivityResult
@@ -61,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         dao = AppDatabase.get(this).noteDao()
-        findViewById<android.widget.ImageButton>(R.id.settings).setOnClickListener {
+        findViewById<ImageButton>(R.id.settings).setOnClickListener {
             showSettingsMenu()
         }
 
@@ -88,19 +94,46 @@ class MainActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val id = dao.upsert(Note(title = "Catatan baru"))
-                launch(Dispatchers.Main) { openEditor(id) }
+                launch(Dispatchers.Main) { openEditor(id, isNew = true) }
             }
         }
-        findViewById<SearchView>(R.id.search).setOnQueryTextListener(
-            object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(q: String?) = false
-                override fun onQueryTextChange(q: String?): Boolean {
-                    query = q.orEmpty()
-                    observe()
-                    return true
-                }
-            }
-        )
+        val searchToggle = findViewById<ImageButton>(R.id.search_toggle)
+        val searchInput = findViewById<EditText>(R.id.search_input)
+        searchToggle.setOnClickListener {
+            if (searchOpen) closeSearch(searchToggle, searchInput) else openSearch(searchToggle, searchInput)
+        }
+        searchInput.doAfterTextChanged {
+            query = it?.toString().orEmpty()
+            observe()
+        }
+    }
+
+    private fun openSearch(toggle: ImageButton, input: EditText) {
+        searchOpen = true
+        input.visibility = View.VISIBLE
+        toggle.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+        toggle.contentDescription = getString(R.string.cd_close_search)
+        input.requestFocus()
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun closeSearch(toggle: ImageButton, input: EditText) {
+        searchOpen = false
+        input.setText("")
+        input.visibility = View.INVISIBLE
+        toggle.setImageResource(android.R.drawable.ic_menu_search)
+        toggle.contentDescription = getString(R.string.cd_open_search)
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(input.windowToken, 0)
+    }
+
+    override fun onBackPressed() {
+        if (searchOpen) {
+            closeSearch(findViewById(R.id.search_toggle), findViewById(R.id.search_input))
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onResume() {
@@ -128,8 +161,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun openEditor(id: Long) {
-        startActivity(Intent(this, EditorActivity::class.java).putExtra("note_id", id))
+    private fun openEditor(id: Long, isNew: Boolean = false) {
+        startActivity(
+            Intent(this, EditorActivity::class.java)
+                .putExtra("note_id", id)
+                .putExtra("is_new", isNew)
+        )
     }
 
     private fun showSettingsMenu() {
