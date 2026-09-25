@@ -1,6 +1,7 @@
 package com.zaba.notez
 
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,9 +11,13 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import com.zaba.notez.music.MusicDrawerController
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
@@ -35,6 +40,8 @@ class EditorActivity : AppCompatActivity() {
 
     private lateinit var dao: NoteDao
     private lateinit var markwon: Markwon
+    private lateinit var drawer: DrawerLayout
+    private lateinit var musicDrawer: MusicDrawerController
 
     private lateinit var titleEdit: EditText
     private lateinit var titleView: TextView
@@ -58,11 +65,21 @@ class EditorActivity : AppCompatActivity() {
     private val saveMutex = Mutex()
     @Volatile private var saveGeneration = 0L
 
+    private val openMusic = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
+        if (::musicDrawer.isInitialized) musicDrawer.onMusicPicked(uris)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
         dao = AppDatabase.get(this).noteDao()
+        drawer = findViewById(R.id.drawer)
+        musicDrawer = MusicDrawerController(
+            activity = this,
+            root = drawer,
+            onAddMusicRequested = { openMusic.launch(arrayOf("audio/*")) }
+        )
         markwon = Markwon.builder(this)
             .usePlugin(StrikethroughPlugin.create())
             .usePlugin(TaskListPlugin.create(this))
@@ -217,6 +234,14 @@ class EditorActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(titleEdit.windowToken, 0)
     }
 
+    override fun onBackPressed() {
+        if (::drawer.isInitialized && drawer.isDrawerVisible(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     override fun onPause() {
         saveTask?.let(handler::removeCallbacks)
         saveTask = null
@@ -226,5 +251,10 @@ class EditorActivity : AppCompatActivity() {
         currentContent = body
         saveBlocking(title, body)
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        if (::musicDrawer.isInitialized) musicDrawer.destroy()
+        super.onDestroy()
     }
 }

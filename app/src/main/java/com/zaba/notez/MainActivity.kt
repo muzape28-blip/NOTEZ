@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.zaba.notez.music.MusicDrawerController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dao: NoteDao
     private lateinit var adapter: NoteAdapter
     private lateinit var drawer: DrawerLayout
+    private lateinit var musicDrawer: MusicDrawerController
     private var collectJob: Job? = null
     private var query = ""
     private var pendingExport: String? = null
@@ -69,6 +71,10 @@ class MainActivity : AppCompatActivity() {
         toast("Folder backup otomatis aktif")
     }
 
+    private val openMusic = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (::musicDrawer.isInitialized) musicDrawer.onMusicPicked(uris)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
@@ -76,6 +82,11 @@ class MainActivity : AppCompatActivity() {
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
         setupDrawer()
+        musicDrawer = MusicDrawerController(
+            activity = this,
+            root = drawer,
+            onAddMusicRequested = { openMusic.launch(arrayOf("audio/*")) }
+        )
 
         adapter = NoteAdapter(
             onOpen = { note -> openEditor(note.id) },
@@ -215,6 +226,11 @@ class MainActivity : AppCompatActivity() {
                 launch(Dispatchers.Main) { toast("Backup otomatis tersimpan") }
             }
         }
+    }
+
+    override fun onDestroy() {
+        if (::musicDrawer.isInitialized) musicDrawer.destroy()
+        super.onDestroy()
     }
 
     private fun observe() {
