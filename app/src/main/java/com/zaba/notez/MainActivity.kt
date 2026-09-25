@@ -8,9 +8,12 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.widget.doAfterTextChanged
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.core.widget.doAfterTextChanged
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,10 +28,13 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var dao: NoteDao
     private lateinit var adapter: NoteAdapter
+    private lateinit var drawer: DrawerLayout
     private var collectJob: Job? = null
     private var query = ""
     private var pendingExport: String? = null
+    private var pendingDrawerAction: (() -> Unit)? = null
     private var searchOpen = false
+    private var settingsExpanded = false
 
     private val createDoc = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
         val data = pendingExport ?: return@registerForActivityResult
@@ -40,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val openDoc = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+    private val openDoc = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@registerForActivityResult
         lifecycleScope.launch(Dispatchers.IO) {
             val raw = contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
@@ -67,9 +73,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         dao = AppDatabase.get(this).noteDao()
-        findViewById<ImageButton>(R.id.settings).setOnClickListener {
-            showSettingsMenu()
-        }
+        drawer = findViewById(R.id.drawer)
+        setupDrawer()
 
         adapter = NoteAdapter(
             onOpen = { note -> openEditor(note.id) },
@@ -108,10 +113,49 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupDrawer() {
+        val submenu = findViewById<View>(R.id.settings_submenu)
+        findViewById<TextView>(R.id.drawer_settings).setOnClickListener {
+            settingsExpanded = !settingsExpanded
+            submenu.visibility = if (settingsExpanded) View.VISIBLE else View.GONE
+        }
+        findViewById<View>(R.id.menu_theme).setOnClickListener {
+            closeDrawerThen { showThemeDialog() }
+        }
+        findViewById<View>(R.id.menu_export_json).setOnClickListener {
+            closeDrawerThen { exportJson() }
+        }
+        findViewById<View>(R.id.menu_export_txt).setOnClickListener {
+            closeDrawerThen { exportTxt() }
+        }
+        findViewById<View>(R.id.menu_import_json).setOnClickListener {
+            closeDrawerThen { openDoc.launch(arrayOf("application/json")) }
+        }
+        findViewById<View>(R.id.menu_auto_backup_folder).setOnClickListener {
+            closeDrawerThen { openTree.launch(null) }
+        }
+        drawer.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerClosed(drawerView: View) {
+                val action = pendingDrawerAction ?: return
+                pendingDrawerAction = null
+                action()
+            }
+        })
+    }
+
+    private fun closeDrawerThen(action: () -> Unit) {
+        if (drawer.isDrawerVisible(GravityCompat.START)) {
+            pendingDrawerAction = action
+            drawer.closeDrawer(GravityCompat.START)
+        } else {
+            action()
+        }
+    }
+
     private fun openSearch(toggle: ImageButton, input: EditText) {
         searchOpen = true
         input.visibility = View.VISIBLE
-        toggle.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+        toggle.setImageResource(R.drawable.ic_eye)
         toggle.contentDescription = getString(R.string.cd_close_search)
         input.requestFocus()
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -122,14 +166,17 @@ class MainActivity : AppCompatActivity() {
         searchOpen = false
         input.setText("")
         input.visibility = View.INVISIBLE
-        toggle.setImageResource(android.R.drawable.ic_menu_search)
+        toggle.setImageResource(R.drawable.ic_eye)
         toggle.contentDescription = getString(R.string.cd_open_search)
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(input.windowToken, 0)
     }
 
     override fun onBackPressed() {
-        if (searchOpen) {
+        if (drawer.isDrawerVisible(GravityCompat.START)) {
+            pendingDrawerAction = null
+            drawer.closeDrawer(GravityCompat.START)
+        } else if (searchOpen) {
             closeSearch(findViewById(R.id.search_toggle), findViewById(R.id.search_input))
         } else {
             super.onBackPressed()
@@ -154,9 +201,9 @@ class MainActivity : AppCompatActivity() {
                 adapter.submit(it)
                 val empty = it.isEmpty()
                 findViewById<RecyclerView>(R.id.list).visibility =
-                    if (empty) android.view.View.GONE else android.view.View.VISIBLE
-                findViewById<android.widget.TextView>(R.id.empty).visibility =
-                    if (empty) android.view.View.VISIBLE else android.view.View.GONE
+                    if (empty) View.GONE else View.VISIBLE
+                findViewById<TextView>(R.id.empty).visibility =
+                    if (empty) View.VISIBLE else View.GONE
             }
         }
     }
@@ -169,31 +216,30 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun showSettingsMenu() {
-        val items = arrayOf("Tema", "Ekspor JSON", "Ekspor TXT", "Impor JSON", "Folder backup otomatis")
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Pengaturan")
-            .setItems(items) { _, which ->
-                when (which) {
-                    0 -> showThemeDialog()
-                    1 -> lifecycleScope.launch(Dispatchers.IO) {
-                        pendingExport = BackupHelper.toJson(dao.getAllNow())
-                        launch(Dispatchers.Main) { createDoc.launch(BackupHelper.fileName("json")) }
-                    }
-                    2 -> lifecycleScope.launch(Dispatchers.IO) {
-                        pendingExport = BackupHelper.toTxt(dao.getAllNow())
-                        launch(Dispatchers.Main) { createDoc.launch(BackupHelper.fileName("txt")) }
-                    }
-                    3 -> openDoc.launch(arrayOf("application/json"))
-                    4 -> openTree.launch(null)
-                }
+    private fun exportJson() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val data = BackupHelper.toJson(dao.getAllNow())
+            launch(Dispatchers.Main) {
+                pendingExport = data
+                createDoc.launch(BackupHelper.fileName("json"))
             }
-            .show()
+        }
+    }
+
+    private fun exportTxt() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val data = BackupHelper.toTxt(dao.getAllNow())
+            launch(Dispatchers.Main) {
+                pendingExport = data
+                createDoc.launch(BackupHelper.fileName("txt"))
+            }
+        }
     }
 
     private fun toast(msg: String) {
         android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_SHORT).show()
     }
+
     private fun showThemeDialog() {
         val current = ThemePref.get(this)
         androidx.appcompat.app.AlertDialog.Builder(this)
