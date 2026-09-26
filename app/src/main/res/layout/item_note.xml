@@ -53,9 +53,9 @@
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Hapus catatan"
+            android:contentDescription="@string/cd_delete_note"
             android:filterTouchesWhenObscured="true"
-            android:src="@android:drawable/ic_delete"
+            android:src="@drawable/ic_notez_trash"
             app:tint="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

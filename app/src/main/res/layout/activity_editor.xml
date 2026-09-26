@@ -74,22 +74,24 @@
                 android:scrollbars="vertical"
                 android:background="@null" />
 
-            <ScrollView
-                android:id="@+id/view_body_scroll"
+            <android.webkit.WebView
+                android:id="@+id/view_body_web"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"
-                android:fillViewport="true"
-                android:scrollbars="vertical">
+                android:background="@android:color/transparent"
+                android:overScrollMode="ifContentScrolls"
+                android:scrollbars="vertical" />
 
-                <TextView
-                    android:id="@+id/view_body"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textIsSelectable="true"
-                    android:lineSpacingExtra="4dp" />
-            </ScrollView>
+            <TextView
+                android:id="@+id/view_body_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/empty_note_hint"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="15sp"
+                android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
 

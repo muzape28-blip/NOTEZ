@@ -8,8 +8,8 @@ import android.os.Looper
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.webkit.WebView
 import android.widget.ImageButton
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -17,10 +17,8 @@ import androidx.core.view.GravityCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import com.zaba.notez.markdown.MarkdownPreviewRenderer
 import com.zaba.notez.music.MusicDrawerController
-import io.noties.markwon.Markwon
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.ext.tasklist.TaskListPlugin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -32,22 +30,22 @@ import kotlinx.coroutines.withContext
  *
  * Dua mode:
  * - VIEW (default untuk catatan lama): judul & isi ditampilkan read-only, isi
- *   di-render sebagai Markdown (heading, bold, list, code, dst).
+ *   di-render sebagai Markdown lokal via WebView Reading View.
  * - EDIT (default untuk catatan baru, atau setelah tombol pensil ditekan):
  *   judul & isi jadi EditText biasa berisi teks Markdown mentah.
  */
 class EditorActivity : AppCompatActivity() {
 
     private lateinit var dao: NoteDao
-    private lateinit var markwon: Markwon
     private lateinit var drawer: DrawerLayout
     private lateinit var musicDrawer: MusicDrawerController
+    private lateinit var markdownPreview: MarkdownPreviewRenderer
 
     private lateinit var titleEdit: EditText
     private lateinit var titleView: TextView
     private lateinit var bodyEdit: EditText
-    private lateinit var bodyView: TextView
-    private lateinit var bodyViewScroll: ScrollView
+    private lateinit var bodyWebView: WebView
+    private lateinit var bodyEmptyView: TextView
     private lateinit var counter: TextView
     private lateinit var editToggle: ImageButton
 
@@ -80,21 +78,17 @@ class EditorActivity : AppCompatActivity() {
             root = drawer,
             onAddMusicRequested = { openMusic.launch(arrayOf("audio/*")) }
         )
-        markwon = Markwon.builder(this)
-            .usePlugin(StrikethroughPlugin.create())
-            .usePlugin(TaskListPlugin.create(this))
-            .build()
-
         noteId = intent.getLongExtra("note_id", -1)
         isEditing = intent.getBooleanExtra("is_new", false)
 
         titleEdit = findViewById(R.id.edit_title)
         titleView = findViewById(R.id.view_title)
         bodyEdit = findViewById(R.id.edit_body)
-        bodyView = findViewById(R.id.view_body)
-        bodyViewScroll = findViewById(R.id.view_body_scroll)
+        bodyWebView = findViewById(R.id.view_body_web)
+        bodyEmptyView = findViewById(R.id.view_body_empty)
         counter = findViewById(R.id.counter)
         editToggle = findViewById(R.id.edit_toggle)
+        markdownPreview = MarkdownPreviewRenderer(this, bodyWebView)
 
         lifecycleScope.launch {
             dao.getById(noteId)?.let {
@@ -150,10 +144,12 @@ class EditorActivity : AppCompatActivity() {
 
     /** Tampilkan set view yang sesuai mode, dan render Markdown saat masuk mode view. */
     private fun applyMode(editing: Boolean) {
+        val hasContent = currentContent.isNotBlank()
         titleEdit.visibility = if (editing) View.VISIBLE else View.GONE
         titleView.visibility = if (editing) View.GONE else View.VISIBLE
         bodyEdit.visibility = if (editing) View.VISIBLE else View.GONE
-        bodyViewScroll.visibility = if (editing) View.GONE else View.VISIBLE
+        bodyWebView.visibility = if (!editing && hasContent) View.VISIBLE else View.GONE
+        bodyEmptyView.visibility = if (!editing && !hasContent) View.VISIBLE else View.GONE
         counter.visibility = if (editing) View.VISIBLE else View.GONE
         editToggle.setImageResource(if (editing) R.drawable.ic_done_check else R.drawable.ic_edit_pencil)
         editToggle.contentDescription =
@@ -161,10 +157,8 @@ class EditorActivity : AppCompatActivity() {
 
         if (!editing) {
             titleView.text = currentTitle.ifBlank { getString(R.string.untitled_note) }
-            if (currentContent.isBlank()) {
-                bodyView.text = getString(R.string.empty_note_hint)
-            } else {
-                markwon.setMarkdown(bodyView, currentContent)
+            if (hasContent) {
+                markdownPreview.render(currentContent)
             }
         }
     }
@@ -255,6 +249,7 @@ class EditorActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         if (::musicDrawer.isInitialized) musicDrawer.destroy()
+        if (::markdownPreview.isInitialized) markdownPreview.destroy()
         super.onDestroy()
     }
 }
