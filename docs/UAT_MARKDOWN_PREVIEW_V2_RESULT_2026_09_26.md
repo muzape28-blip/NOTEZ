@@ -1,12 +1,13 @@
 # UAT Result — Markdown Preview v2 + Trash Glyph
 
 **Tanggal:** 2026-09-26
-**Status:** DEVICE UAT PASS — debug APK + signed release APK
+**Status:** DEVICE UAT PASS — debug APK + signed release APK + GitHub Release published
 **Tested feature commit:** `58ab61e` (`fix: resolve markdown preview theme colors`)
-**Release prep commit:** `9fdb1e5` (`docs: prepare v0.1.1 markdown preview release`)
+**Release commit:** `ef31d50ce94d355706d266e2c63a5998330e750a`
 **Tester:** User/device UAT
 **Build types tested:** Debug APK from CI and signed release APK from production workflow
-**Release status:** Signed release APK lulus UAT; GitHub Release `v0.1.1` belum dipublish karena user ingin diskusi polish icon/UI kecil dulu.
+**Release status:** GitHub Release `v0.1.1` published.
+**Release URL:** https://github.com/muzape28-blip/NOTEZ/releases/tag/v0.1.1
 
 ---
 
@@ -55,20 +56,24 @@ IMPLEMENTED                 : YES — commit 58ab61e
 LOCAL STATIC VERIFIED       : YES — XML/source guards/JS parser smoke
 CI DEBUG VERIFIED           : YES — CI debug green after fix 58ab61e
 DEVICE DEBUG VERIFIED       : YES — user installed debug APK and reported PASS
-PRODUCTION BUILD VERIFIED   : YES — workflow run 36246838081 success
+PRODUCTION BUILD VERIFIED   : YES — workflow run 36250304432 success
 SIGNED APK DEVICE VERIFIED  : YES — user installed release APK and reported PASS
-GITHUB RELEASE PUBLISHED    : NO — intentionally held for icon/UI polish discussion
+GITHUB RELEASE PUBLISHED    : YES — v0.1.1 published with APK asset
 ```
 
 Production workflow evidence:
 
 ```text
-Workflow run : 36246838081
-Status       : success
-Artifact     : notez-v0.1.1-release
-Artifact size: 1,983,005 bytes
-Head SHA     : 9fdb1e5941a20d6bc2241368aecbc4222a78619f
-URL          : https://github.com/muzape28-blip/NOTEZ/actions/runs/36246838081
+Workflow run        : 36250304432
+Status              : success
+Artifact            : notez-v0.1.1-release
+Workflow artifact   : 1,982,985 bytes
+Release APK asset   : NOTEZv0.1.1-release.apk
+Release APK size    : 2,906,652 bytes
+Release APK SHA-256 : 365dab81c540422aa17bb7b8801aa8d16d1ef40165d53d849fbff6026c88420e
+Head SHA            : ef31d50ce94d355706d266e2c63a5998330e750a
+Workflow URL        : https://github.com/muzape28-blip/NOTEZ/actions/runs/36250304432
+Release URL         : https://github.com/muzape28-blip/NOTEZ/releases/tag/v0.1.1
 ```
 
 ---
@@ -79,8 +84,9 @@ URL          : https://github.com/muzape28-blip/NOTEZ/actions/runs/36246838081
 | --- | --- | --- |
 | CI debug build | PASS | User reported CI green |
 | Debug APK install | PASS | User installed debug APK |
-| Signed release build | PASS | Production workflow `36246838081` success |
+| Signed release build | PASS | Production workflow `36250304432` success |
 | Signed release APK install | PASS | User reported all pass |
+| GitHub Release publish | PASS | Release `v0.1.1` published with APK asset |
 | Home trash glyph | PASS | User reported all features safe; screenshots cover UAT note view |
 | Editor edit/view toggle | PASS | User reported all features safe |
 | Headings | PASS | Screenshot shows H1/H2 styling |
@@ -100,33 +106,20 @@ URL          : https://github.com/muzape28-blip/NOTEZ/actions/runs/36246838081
 
 ## 4. Known limitations / follow-up
 
-- GitHub Release `v0.1.1` is not published yet by deliberate user choice.
 - Raw HTML allowlist remains out of MVP by decision; raw HTML stays disabled/escaped.
 - Remote images remain placeholders because NOTEZ keeps no `INTERNET` permission.
 - Table text alignment follows Markdown/GFM syntax; users should use `:---`/`---` for prose columns and `---:` for numeric/right-aligned columns.
-- User wants a small discussion before publish, mostly around icon/UI polish ideas.
+- User wants to continue a small discussion around future icon/UI polish after release.
 
 ---
 
-## 5. Recommended next step
+## 5. Next discussion candidates
 
-Before publishing `v0.1.1`, decide whether to keep the current trash glyph/UI as-is or make one small polish pass.
-
-If no further visual change is requested:
+Potential future polish for `v0.1.2` or later:
 
 ```text
-1. Tag commit 9fdb1e5 as v0.1.1.
-2. Create GitHub Release v0.1.1.
-3. Upload signed APK from artifact notez-v0.1.1-release.
-4. Use docs/RELEASE_NOTES_V0.1.1.md as release body.
-```
-
-If visual polish is requested:
-
-```text
-1. Make the smallest icon/UI patch.
-2. Run debug CI.
-3. Trigger production build again.
-4. Install signed release APK again for compact UAT.
-5. Publish after PASS.
+- Home card visual polish without changing flow.
+- Optional custom trash glyph refinement if the current icon ever feels too generic.
+- Possible future real Trash/Recently Deleted RFC, if user wants restore beyond snackbar undo.
+- Markdown preview v2.1 safe HTML allowlist discussion, if needed later.
 ```

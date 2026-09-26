@@ -1,8 +1,12 @@
 # NOTEZ v0.1.1
 
-**Status:** Release candidate notes — signed release APK sudah UAT PASS; publish ditahan sementara untuk diskusi icon/UI polish kecil.
-**Tanggal target:** 2026-09-26
-**Basis:** Markdown Preview v2 + trash glyph polish setelah v0.1.0.
+**Status:** Published — signed release APK lulus CI production + device UAT.
+**Tanggal publish:** 2026-09-26
+**Release URL:** https://github.com/muzape28-blip/NOTEZ/releases/tag/v0.1.1
+**Release commit:** `ef31d50ce94d355706d266e2c63a5998330e750a`
+**APK asset:** `NOTEZv0.1.1-release.apk` (2,906,652 bytes)
+**APK SHA-256:** `365dab81c540422aa17bb7b8801aa8d16d1ef40165d53d849fbff6026c88420e`
+**Production workflow:** `36250304432` — https://github.com/muzape28-blip/NOTEZ/actions/runs/36250304432
 
 ---
 
@@ -54,10 +58,11 @@ NOTEZ tetap local-first dan offline-friendly:
 
 ## UAT evidence
 
-Debug APK sudah lulus UAT device oleh user:
+Debug APK dan signed release APK sudah lulus UAT device oleh user:
 
 - CI debug green;
 - debug APK installed on real Android phone;
+- signed release APK installed on real Android phone;
 - Markdown table/link/code/task/callout/raw HTML/image placeholder behavior PASS;
 - existing features reported safe.
 
@@ -66,8 +71,6 @@ Detail UAT:
 ```text
 docs/UAT_MARKDOWN_PREVIEW_V2_RESULT_2026_09_26.md
 ```
-
-Release APK tetap perlu compact UAT sebelum GitHub Release dipublish.
 
 ---
 
@@ -82,16 +85,16 @@ Release APK tetap perlu compact UAT sebelum GitHub Release dipublish.
 
 ---
 
-## Suggested release UAT checklist
+## Release verification summary
 
 ```text
-App opens                                  : PASS/FAIL
-Open UAT note                             : PASS/FAIL
-Table + horizontal scroll                 : PASS/FAIL
-Bare URL opens external browser           : PASS/FAIL
-Raw HTML does not execute                 : PASS/FAIL
-Remote image placeholder appears          : PASS/FAIL
-Trash glyph visible                       : PASS/FAIL
-Music drawer still works                  : PASS/FAIL
-No INTERNET permission in release APK     : PASS/FAIL
+Debug CI run                              : PASS
+Production workflow run 36250304432       : PASS
+Signed release APK device UAT             : PASS
+GitHub Release v0.1.1                     : PUBLISHED
+Asset count                               : 1
+APK asset                                 : NOTEZv0.1.1-release.apk
+APK size                                  : 2,906,652 bytes
+APK SHA-256                               : 365dab81c540422aa17bb7b8801aa8d16d1ef40165d53d849fbff6026c88420e
+No INTERNET permission added              : YES
 ```
