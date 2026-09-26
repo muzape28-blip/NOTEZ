@@ -1,6 +1,6 @@
 # NOTEZ v0.1.1
 
-**Status:** Release candidate notes — publish setelah signed release APK lulus UAT.
+**Status:** Release candidate notes — signed release APK sudah UAT PASS; publish ditahan sementara untuk diskusi icon/UI polish kecil.
 **Tanggal target:** 2026-09-26
 **Basis:** Markdown Preview v2 + trash glyph polish setelah v0.1.0.
 
