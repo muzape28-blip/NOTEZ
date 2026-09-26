@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
-import android.util.TypedValue
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
@@ -15,6 +14,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.zaba.notez.R
+import com.zaba.notez.ThemePref
 import java.io.ByteArrayInputStream
 import java.util.Locale
 import org.json.JSONObject
@@ -424,13 +424,29 @@ class MarkdownPreviewRenderer(
         val danger: String
     ) {
         companion object {
-            fun from(activity: Activity): PreviewColors = PreviewColors(
-                surface = activity.themeColor(R.attr.colorSurface),
-                text = activity.themeColor(R.attr.colorOnSurface),
-                muted = activity.themeColor(R.attr.colorOnSurfaceVariant),
-                accent = activity.themeColor(R.attr.colorPrimary),
-                danger = activity.themeColor(R.attr.colorError)
-            )
+            fun from(activity: Activity): PreviewColors = when (ThemePref.get(activity)) {
+                ThemePref.OLED -> PreviewColors(
+                    surface = activity.colorResource(R.color.oled_surface),
+                    text = activity.colorResource(R.color.oled_text),
+                    muted = activity.colorResource(R.color.oled_secondary),
+                    accent = activity.colorResource(R.color.oled_accent),
+                    danger = activity.colorResource(R.color.oled_danger)
+                )
+                ThemePref.COBALT2 -> PreviewColors(
+                    surface = activity.colorResource(R.color.cobalt_surface),
+                    text = activity.colorResource(R.color.cobalt_text),
+                    muted = activity.colorResource(R.color.cobalt_secondary),
+                    accent = activity.colorResource(R.color.cobalt_accent),
+                    danger = activity.colorResource(R.color.cobalt_danger)
+                )
+                else -> PreviewColors(
+                    surface = activity.colorResource(R.color.github_surface),
+                    text = activity.colorResource(R.color.github_text),
+                    muted = activity.colorResource(R.color.github_secondary),
+                    accent = activity.colorResource(R.color.github_accent),
+                    danger = activity.colorResource(R.color.github_danger)
+                )
+            }
         }
     }
 
@@ -441,8 +457,5 @@ class MarkdownPreviewRenderer(
     }
 }
 
-private fun Activity.themeColor(attr: Int): String {
-    val typedValue = TypedValue()
-    theme.resolveAttribute(attr, typedValue, true)
-    return String.format(Locale.US, "#%06X", 0xFFFFFF and typedValue.data)
-}
+private fun Activity.colorResource(colorRes: Int): String =
+    String.format(Locale.US, "#%06X", 0xFFFFFF and getColor(colorRes))
