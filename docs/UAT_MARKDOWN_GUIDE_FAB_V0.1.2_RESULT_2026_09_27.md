@@ -1,12 +1,17 @@
 # UAT Result — Markdown Guide + FAB Floating Cleanup
 
-**Tanggal:** 2026-09-27  
-**Status:** DEVICE UAT PASS — debug APK; signed release pending  
-**Tested feature commit:** `f84bc7e` (`feat: add local markdown guide`)  
-**Tester:** User/device UAT  
-**Build type tested:** Debug APK from GitHub Actions  
-**Debug workflow:** `36296562618` — https://github.com/muzape28-blip/NOTEZ/actions/runs/36296562618  
+**Tanggal:** 2026-09-27
+**Status:** DEVICE UAT PASS — debug APK; GitHub Release published; signed release device UAT not separately reported
+**Tested feature commit:** `f84bc7e` (`feat: add local markdown guide`)
+**Tester:** User/device UAT
+**Build type tested:** Debug APK from GitHub Actions
+**Debug workflow:** `36296562618` — https://github.com/muzape28-blip/NOTEZ/actions/runs/36296562618
 **Debug artifact:** `notez-debug` (`10923739450`, 7,716,621 bytes)
+**Release commit:** `7b0eff1ca354eefc5c1c3a28c9da735df9e89208`
+**Production workflow:** `36299864448` — https://github.com/muzape28-blip/NOTEZ/actions/runs/36299864448
+**Release URL:** https://github.com/muzape28-blip/NOTEZ/releases/tag/v0.1.2
+**Release APK:** `NOTEZv0.1.2-release.apk` (2,928,395 bytes)
+**Release APK SHA-256:** `e3b1938014b06137cfaedd46d556cacd5b01db57da07f151f4dd23a0f43598c1`
 
 ---
 
@@ -41,9 +46,9 @@ IMPLEMENTED               : YES — commit f84bc7e
 LOCAL STATIC VERIFIED     : YES — XML/source/Markdown/JS guards passed
 CI DEBUG VERIFIED         : YES — workflow 36296562618 success
 DEVICE DEBUG VERIFIED     : YES — user installed debug APK and reported PASS
-PRODUCTION BUILD VERIFIED : PENDING
-SIGNED APK DEVICE UAT     : PENDING
-GITHUB RELEASE PUBLISHED  : PENDING
+PRODUCTION BUILD VERIFIED : YES — workflow 36299864448 success
+SIGNED APK DEVICE UAT     : NOT SEPARATELY REPORTED BEFORE PUBLISH
+GITHUB RELEASE PUBLISHED  : YES — v0.1.2 published with APK asset
 ```
 
 ---
@@ -85,8 +90,9 @@ Markdown guide smoke:
 | Raw HTML safety | PASS | Static smoke confirmed raw `<script>` escaped |
 | FAB bottom-block cleanup | PASS | User reported all pass after debug APK |
 | Existing features | PASS | User reported all pass |
-| Signed release APK | PENDING | Needs production build + UAT |
-| GitHub Release | PENDING | Not published yet |
+| Signed release build | PASS | Production workflow `36299864448` success |
+| Signed release APK device UAT | NOT CLAIMED | Not separately reported before publish |
+| GitHub Release | PASS | Release `v0.1.2` published with APK asset |
 
 ---
 
@@ -101,4 +107,4 @@ Markdown guide smoke:
 
 ## 6. Release readiness
 
-Debug CI + device UAT are enough to prepare release docs and production workflow dispatch, but signed release APK must still be built by the production workflow and UAT-labeled honestly after install.
+Debug CI + debug device UAT passed. Production workflow `36299864448` succeeded and GitHub Release `v0.1.2` is published. Signed release APK device UAT should be recorded separately if/when user installs the published APK.

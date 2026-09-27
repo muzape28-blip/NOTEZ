@@ -1,12 +1,12 @@
 # NOTEZ v0.1.2
 
-**Status:** Prepared — debug CI + device UAT PASS; signed release pending  
-**Tanggal target:** 2026-09-27  
-**Release URL:** Pending  
-**Release commit:** Pending  
-**APK asset:** Pending  
-**APK SHA-256:** Pending  
-**Production workflow:** Pending
+**Status:** Published — debug CI + device UAT PASS; production signed APK build PASS.
+**Tanggal publish:** 2026-09-27
+**Release URL:** https://github.com/muzape28-blip/NOTEZ/releases/tag/v0.1.2
+**Release commit:** `7b0eff1ca354eefc5c1c3a28c9da735df9e89208`
+**APK asset:** `NOTEZv0.1.2-release.apk` (2,928,395 bytes)
+**APK SHA-256:** `e3b1938014b06137cfaedd46d556cacd5b01db57da07f151f4dd23a0f43598c1`
+**Production workflow:** `36299864448` — https://github.com/muzape28-blip/NOTEZ/actions/runs/36299864448
 
 ---
 
@@ -128,7 +128,7 @@ Detail UAT:
 docs/UAT_MARKDOWN_GUIDE_FAB_V0.1.2_RESULT_2026_09_27.md
 ```
 
-Signed release APK UAT masih pending sampai production build selesai dan user menguji artifact release.
+Production signed APK build sudah sukses dan APK sudah dipublish ke GitHub Release. Signed release APK device UAT belum dilaporkan terpisah sebelum publish, jadi tidak diklaim sebagai signed-device-verified di dokumen ini.
 
 ---
 
@@ -147,8 +147,11 @@ Signed release APK UAT masih pending sampai production build selesai dan user me
 Feature commit                            : f84bc7e
 Debug CI run 36296562618                  : PASS
 Debug APK device UAT                      : PASS by user report
-Production workflow                       : PENDING
-Signed release APK device UAT             : PENDING
-GitHub Release v0.1.2                     : PENDING
+Production workflow 36299864448            : PASS
+Signed release APK device UAT             : NOT SEPARATELY REPORTED BEFORE PUBLISH
+GitHub Release v0.1.2                     : PUBLISHED
+APK asset                                 : NOTEZv0.1.2-release.apk
+APK size                                  : 2,928,395 bytes
+APK SHA-256                               : e3b1938014b06137cfaedd46d556cacd5b01db57da07f151f4dd23a0f43598c1
 No INTERNET permission added              : YES
 ```
