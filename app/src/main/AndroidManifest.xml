@@ -31,5 +31,8 @@
             android:name=".EditorActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".MarkdownGuideActivity"
+            android:exported="false" />
     </application>
 </manifest>

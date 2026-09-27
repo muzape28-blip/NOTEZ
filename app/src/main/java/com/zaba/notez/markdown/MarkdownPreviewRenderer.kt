@@ -27,6 +27,7 @@ import org.json.JSONObject
  * - no CDN/external script/style/font;
  * - raw HTML is disabled by markdown-it (`html: false`);
  * - no native JavaScript bridge;
+ * - same-document #anchor links are allowed for local table-of-contents jumps;
  * - WebView navigation to remote URLs is blocked and opened externally instead;
  * - remote images are rendered as placeholders, not fetched in WebView.
  */
@@ -122,6 +123,7 @@ class MarkdownPreviewRenderer(
 
                   var source = $markdownJson;
                   var safeExternalLink = /^(https?:|mailto:|tel:)/i;
+                  var safeAnchorLink = /^#[A-Za-z0-9][A-Za-z0-9_-]*$/;
                   var md = window.markdownit({
                     html: false,
                     linkify: true,
@@ -141,9 +143,19 @@ class MarkdownPreviewRenderer(
                     });
                   }
 
-                  function safeHref(value) {
+                  function isSafeAnchor(href) {
+                    return safeAnchorLink.test(String(href || '').trim());
+                  }
+
+                  function safeExternalHref(value) {
                     var href = String(value || '').trim();
                     return safeExternalLink.test(href) ? href : '';
+                  }
+
+                  function safeHref(value) {
+                    var href = String(value || '').trim();
+                    if (isSafeAnchor(href)) return href;
+                    return safeExternalHref(href);
                   }
 
                   var defaultLinkOpen = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
@@ -165,7 +177,7 @@ class MarkdownPreviewRenderer(
                   md.renderer.rules.image = function (tokens, idx, options, env, self) {
                     var token = tokens[idx];
                     var rawSrc = token.attrGet('src') || '';
-                    var href = safeHref(rawSrc);
+                    var href = safeExternalHref(rawSrc);
                     var alt = token.content || '';
                     if (!alt && token.children) {
                       alt = self.renderInlineAsText(token.children, options, env);
@@ -184,10 +196,29 @@ class MarkdownPreviewRenderer(
 
                   var preview = document.getElementById('preview');
                   preview.innerHTML = md.render(source);
+                  addHeadingAnchors();
                   wrapTables();
                   enhanceTaskLists();
                   enhanceCallouts();
                   hardenLinks();
+
+                  function slugifyHeading(text) {
+                    var slug = String(text || '').toLowerCase()
+                      .replace(/[^a-z0-9_\-\s]+/g, '')
+                      .replace(/[\s\-]+/g, '-')
+                      .replace(/^-+|-+$/g, '');
+                    return slug || 'section';
+                  }
+
+                  function addHeadingAnchors() {
+                    var seen = Object.create(null);
+                    Array.prototype.slice.call(preview.querySelectorAll('h1,h2,h3,h4,h5,h6')).forEach(function (heading) {
+                      var base = slugifyHeading(heading.textContent || '');
+                      var count = (seen[base] || 0) + 1;
+                      seen[base] = count;
+                      heading.id = count === 1 ? base : base + '-' + count;
+                    });
+                  }
 
                   function wrapTables() {
                     Array.prototype.slice.call(preview.querySelectorAll('table')).forEach(function (table) {
@@ -258,6 +289,9 @@ class MarkdownPreviewRenderer(
           --notez-border: rgba(255, 255, 255, 0.16);
           --notez-soft: rgba(255, 255, 255, 0.06);
         }
+        html {
+          scroll-behavior: smooth;
+        }
         html, body {
           margin: 0;
           padding: 0;
@@ -276,6 +310,7 @@ class MarkdownPreviewRenderer(
           margin: 1.25em 0 .55em;
           font-weight: 700;
           color: var(--notez-text);
+          scroll-margin-top: 12px;
         }
         h1 { font-size: 1.75em; padding-bottom: .3em; border-bottom: 1px solid var(--notez-border); }
         h2 { font-size: 1.45em; padding-bottom: .25em; border-bottom: 1px solid var(--notez-border); }

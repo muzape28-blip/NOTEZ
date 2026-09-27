@@ -8,4 +8,6 @@
     <string name="cd_open_search">Cari catatan</string>
     <string name="cd_close_search">Tutup pencarian</string>
     <string name="cd_delete_note">Hapus catatan</string>
+    <string name="cd_back">Kembali</string>
+    <string name="markdown_guide_title">Panduan Markdown</string>
 </resources>

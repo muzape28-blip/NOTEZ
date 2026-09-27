@@ -115,6 +115,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupDrawer() {
         val submenu = findViewById<View>(R.id.settings_submenu)
+        findViewById<View>(R.id.menu_markdown_guide).setOnClickListener {
+            closeDrawerThen { startActivity(Intent(this, MarkdownGuideActivity::class.java)) }
+        }
         findViewById<TextView>(R.id.drawer_settings).setOnClickListener {
             settingsExpanded = !settingsExpanded
             submenu.visibility = if (settingsExpanded) View.VISIBLE else View.GONE
