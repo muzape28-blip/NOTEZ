@@ -46,6 +46,9 @@ class MainActivity : AppCompatActivity() {
     private var searchOpen = false
     private var settingsExpanded = false
     private var startupSplashAnimator: AnimatorSet? = null
+    private var startupSplashStatusBarColor: Int? = null
+    private var startupSplashNavigationBarColor: Int? = null
+    private var startupSplashSystemUiVisibility: Int? = null
 
     private val createDoc = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
         val data = pendingExport ?: return@registerForActivityResult
@@ -129,6 +132,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        prepareStartupSplashSystemBars()
         overlay.visibility = View.VISIBLE
         overlay.alpha = 1f
         overlay.isClickable = true
@@ -139,7 +143,10 @@ class MainActivity : AppCompatActivity() {
         val accent = findViewById<ImageView>(R.id.splash_accent)
 
         overlay.post {
-            if (isFinishing || isDestroyed) return@post
+            if (isFinishing || isDestroyed) {
+                hideStartupSplash(overlay)
+                return@post
+            }
 
             glow.alpha = 0f
             glow.scaleX = 1.02f
@@ -185,11 +192,34 @@ class MainActivity : AppCompatActivity() {
         interpolator = DecelerateInterpolator()
     }
 
+    private fun prepareStartupSplashSystemBars() {
+        if (startupSplashStatusBarColor == null) {
+            startupSplashStatusBarColor = window.statusBarColor
+            startupSplashNavigationBarColor = window.navigationBarColor
+            startupSplashSystemUiVisibility = window.decorView.systemUiVisibility
+        }
+        window.statusBarColor = getColor(R.color.github_bg)
+        window.navigationBarColor = getColor(R.color.github_bg)
+        window.decorView.systemUiVisibility = window.decorView.systemUiVisibility and
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() and
+            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+    }
+
+    private fun restoreStartupSplashSystemBars() {
+        startupSplashStatusBarColor?.let { window.statusBarColor = it }
+        startupSplashNavigationBarColor?.let { window.navigationBarColor = it }
+        startupSplashSystemUiVisibility?.let { window.decorView.systemUiVisibility = it }
+        startupSplashStatusBarColor = null
+        startupSplashNavigationBarColor = null
+        startupSplashSystemUiVisibility = null
+    }
+
     private fun hideStartupSplash(overlay: View) {
         overlay.visibility = View.GONE
         overlay.alpha = 0f
         overlay.isClickable = false
         startupSplashAnimator = null
+        restoreStartupSplashSystemBars()
     }
 
     private fun animatorDurationScale(): Float = try {
