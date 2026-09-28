@@ -114,8 +114,8 @@ class SettingsActivity : AppCompatActivity() {
         return LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            minimumHeight = dp(76)
-            setPadding(dp(20), dp(8), dp(20), dp(8))
+            minimumHeight = dp(62)
+            setPadding(dp(16), dp(6), dp(16), dp(6))
             isClickable = true
             isFocusable = true
             background = selectableItemBackground()
@@ -130,13 +130,13 @@ class SettingsActivity : AppCompatActivity() {
             addView(
                 LinearLayout(this@SettingsActivity).apply {
                     orientation = LinearLayout.VERTICAL
-                    setPadding(dp(14), 0, dp(10), 0)
+                    setPadding(dp(12), 0, dp(8), 0)
                     layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                     addView(
                         TextView(this@SettingsActivity).apply {
                             text = option.name
                             setTextColor(getColor(option.textColorRes))
-                            textSize = 15f
+                            textSize = 14f
                             typeface = Typeface.DEFAULT_BOLD
                         }
                     )
@@ -144,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
                         TextView(this@SettingsActivity).apply {
                             text = option.description
                             setTextColor(getColor(option.secondaryColorRes))
-                            textSize = 12f
+                            textSize = 11f
                         }
                     )
                 }

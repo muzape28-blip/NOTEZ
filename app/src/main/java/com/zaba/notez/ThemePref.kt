@@ -27,18 +27,6 @@ object ThemePref {
 
     val OPTIONS = arrayOf(
         ThemeOption(
-            value = OLED,
-            name = "OLED Black",
-            description = "Hitam fokus dengan aksen hijau NOTEZ.",
-            styleRes = R.style.Theme_Notez,
-            backgroundColorRes = R.color.oled_bg,
-            surfaceColorRes = R.color.oled_surface,
-            textColorRes = R.color.oled_text,
-            secondaryColorRes = R.color.oled_secondary,
-            accentColorRes = R.color.oled_accent,
-            outlineColorRes = R.color.oled_outline
-        ),
-        ThemeOption(
             value = GITHUB_DARK,
             name = "GitHub Dark",
             description = "Markdown/readme vibe yang seimbang.",
@@ -51,18 +39,6 @@ object ThemePref {
             outlineColorRes = R.color.github_outline
         ),
         ThemeOption(
-            value = COBALT2,
-            name = "Cobalt2",
-            description = "Playful coder theme dengan aksen kuning.",
-            styleRes = R.style.Theme_Notez_Cobalt2,
-            backgroundColorRes = R.color.cobalt_bg,
-            surfaceColorRes = R.color.cobalt_surface,
-            textColorRes = R.color.cobalt_text,
-            secondaryColorRes = R.color.cobalt_secondary,
-            accentColorRes = R.color.cobalt_accent,
-            outlineColorRes = R.color.cobalt_outline
-        ),
-        ThemeOption(
             value = NOTEZ_YOU_DARK,
             name = "NOTEZ You Dark",
             description = "Material-ish dark yang kalem dan private.",
@@ -73,6 +49,30 @@ object ThemePref {
             secondaryColorRes = R.color.notez_you_secondary,
             accentColorRes = R.color.notez_you_accent,
             outlineColorRes = R.color.notez_you_outline
+        ),
+        ThemeOption(
+            value = OLED,
+            name = "OLED Black",
+            description = "Hitam fokus dengan aksen hijau NOTEZ.",
+            styleRes = R.style.Theme_Notez,
+            backgroundColorRes = R.color.oled_bg,
+            surfaceColorRes = R.color.oled_surface,
+            textColorRes = R.color.oled_text,
+            secondaryColorRes = R.color.oled_secondary,
+            accentColorRes = R.color.oled_accent,
+            outlineColorRes = R.color.oled_outline
+        ),
+        ThemeOption(
+            value = COBALT2,
+            name = "Cobalt2",
+            description = "Playful coder theme dengan aksen kuning.",
+            styleRes = R.style.Theme_Notez_Cobalt2,
+            backgroundColorRes = R.color.cobalt_bg,
+            surfaceColorRes = R.color.cobalt_surface,
+            textColorRes = R.color.cobalt_text,
+            secondaryColorRes = R.color.cobalt_secondary,
+            accentColorRes = R.color.cobalt_accent,
+            outlineColorRes = R.color.cobalt_outline
         )
     )
 
