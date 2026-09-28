@@ -11,6 +11,7 @@
         <item name="colorOnSurface">@color/oled_text</item>
         <item name="colorSurfaceVariant">@color/oled_surface</item>
         <item name="colorOnSurfaceVariant">@color/oled_secondary</item>
+        <item name="colorOutline">@color/oled_outline</item>
         <item name="colorError">@color/oled_danger</item>
     </style>
     <!-- GitHub Dark (palet ZCODE) -->
@@ -24,6 +25,7 @@
         <item name="colorOnSurface">@color/github_text</item>
         <item name="colorSurfaceVariant">@color/github_surface</item>
         <item name="colorOnSurfaceVariant">@color/github_secondary</item>
+        <item name="colorOutline">@color/github_outline</item>
         <item name="colorError">@color/github_danger</item>
         <item name="android:windowSplashScreenBackground">@color/github_bg</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_notez_horse_splash_system_icon</item>
@@ -40,6 +42,21 @@
         <item name="colorOnSurface">@color/cobalt_text</item>
         <item name="colorSurfaceVariant">@color/cobalt_surface</item>
         <item name="colorOnSurfaceVariant">@color/cobalt_secondary</item>
+        <item name="colorOutline">@color/cobalt_outline</item>
         <item name="colorError">@color/cobalt_danger</item>
+    </style>
+    <!-- NOTEZ You Dark (calm Material-ish dark) -->
+    <style name="Theme.Notez.NotezYouDark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/notez_you_accent</item>
+        <item name="colorOnPrimary">@color/notez_you_on_accent</item>
+        <item name="colorPrimaryContainer">@color/notez_you_accent</item>
+        <item name="colorOnPrimaryContainer">@color/notez_you_on_accent</item>
+        <item name="android:windowBackground">@color/notez_you_bg</item>
+        <item name="colorSurface">@color/notez_you_surface</item>
+        <item name="colorOnSurface">@color/notez_you_text</item>
+        <item name="colorSurfaceVariant">@color/notez_you_surface</item>
+        <item name="colorOnSurfaceVariant">@color/notez_you_secondary</item>
+        <item name="colorOutline">@color/notez_you_outline</item>
+        <item name="colorError">@color/notez_you_danger</item>
     </style>
 </resources>

@@ -1,9 +1,16 @@
 package com.zaba.notez
 
 import android.content.Intent
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -79,24 +86,139 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateSummaries() {
-        findViewById<TextView>(R.id.settings_theme_value).text =
-            ThemePref.NAMES.getOrElse(ThemePref.get(this)) { "GitHub Dark" }
+        findViewById<TextView>(R.id.settings_theme_value).text = ThemePref.nameOf(ThemePref.get(this))
         findViewById<TextView>(R.id.settings_version_value).text = versionName()
     }
 
     private fun showThemeDialog() {
         val current = ThemePref.get(this)
+        val list = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(8), 0, dp(8))
+        }
+        ThemePref.OPTIONS.forEach { option ->
+            list.addView(themeOptionRow(option, current))
+        }
+
         AlertDialog.Builder(this)
             .setTitle("Tema")
-            .setSingleChoiceItems(ThemePref.NAMES, current) { dialog, which ->
-                dialog.dismiss()
-                if (which != current) {
-                    ThemePref.set(this, which)
+            .setView(
+                ScrollView(this).apply {
+                    addView(list)
+                }
+            )
+            .show()
+    }
+
+    private fun themeOptionRow(option: ThemePref.ThemeOption, current: Int): View {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            minimumHeight = dp(76)
+            setPadding(dp(20), dp(8), dp(20), dp(8))
+            isClickable = true
+            isFocusable = true
+            background = selectableItemBackground()
+            setOnClickListener {
+                if (option.value != current) {
+                    ThemePref.set(this@SettingsActivity, option.value)
                     recreate()
                 }
             }
-            .show()
+
+            addView(themePreview(option))
+            addView(
+                LinearLayout(this@SettingsActivity).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(14), 0, dp(10), 0)
+                    layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                    addView(
+                        TextView(this@SettingsActivity).apply {
+                            text = option.name
+                            setTextColor(getColor(option.textColorRes))
+                            textSize = 15f
+                            typeface = Typeface.DEFAULT_BOLD
+                        }
+                    )
+                    addView(
+                        TextView(this@SettingsActivity).apply {
+                            text = option.description
+                            setTextColor(getColor(option.secondaryColorRes))
+                            textSize = 12f
+                        }
+                    )
+                }
+            )
+            addView(
+                TextView(this@SettingsActivity).apply {
+                    text = if (option.value == current) "✓" else ""
+                    setTextColor(getColor(option.accentColorRes))
+                    textSize = 20f
+                    typeface = Typeface.DEFAULT_BOLD
+                    gravity = Gravity.CENTER
+                    layoutParams = LinearLayout.LayoutParams(dp(28), ViewGroup.LayoutParams.WRAP_CONTENT)
+                }
+            )
+        }
     }
+
+    private fun themePreview(option: ThemePref.ThemeOption): View {
+        return LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(7), dp(6), dp(7), dp(6))
+            background = roundedDrawable(
+                fillColor = getColor(option.backgroundColorRes),
+                strokeColor = getColor(option.outlineColorRes),
+                strokeWidth = dp(1),
+                radius = dp(12).toFloat()
+            )
+            layoutParams = LinearLayout.LayoutParams(dp(70), dp(48))
+
+            addView(
+                TextView(this@SettingsActivity).apply {
+                    text = "Aa"
+                    setTextColor(getColor(option.textColorRes))
+                    textSize = 12f
+                    typeface = Typeface.DEFAULT_BOLD
+                    includeFontPadding = false
+                }
+            )
+            addView(
+                View(this@SettingsActivity).apply {
+                    background = roundedDrawable(getColor(option.surfaceColorRes), getColor(option.outlineColorRes), dp(1), dp(4).toFloat())
+                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(10)).apply {
+                        topMargin = dp(4)
+                    }
+                }
+            )
+            addView(
+                View(this@SettingsActivity).apply {
+                    background = roundedDrawable(getColor(option.accentColorRes), getColor(option.accentColorRes), 0, dp(4).toFloat())
+                    layoutParams = LinearLayout.LayoutParams(dp(34), dp(5)).apply {
+                        topMargin = dp(5)
+                    }
+                }
+            )
+        }
+    }
+
+    private fun roundedDrawable(
+        fillColor: Int,
+        strokeColor: Int,
+        strokeWidth: Int,
+        radius: Float
+    ): GradientDrawable = GradientDrawable().apply {
+        setColor(fillColor)
+        cornerRadius = radius
+        if (strokeWidth > 0) setStroke(strokeWidth, strokeColor)
+    }
+
+    private fun selectableItemBackground() = android.util.TypedValue().let { outValue ->
+        theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+        getDrawable(outValue.resourceId)
+    }
+
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     private fun exportJson() {
         lifecycleScope.launch(Dispatchers.IO) {

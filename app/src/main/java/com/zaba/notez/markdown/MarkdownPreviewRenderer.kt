@@ -474,6 +474,13 @@ class MarkdownPreviewRenderer(
                     accent = activity.colorResource(R.color.cobalt_accent),
                     danger = activity.colorResource(R.color.cobalt_danger)
                 )
+                ThemePref.NOTEZ_YOU_DARK -> PreviewColors(
+                    surface = activity.colorResource(R.color.notez_you_surface),
+                    text = activity.colorResource(R.color.notez_you_text),
+                    muted = activity.colorResource(R.color.notez_you_secondary),
+                    accent = activity.colorResource(R.color.notez_you_accent),
+                    danger = activity.colorResource(R.color.notez_you_danger)
+                )
                 else -> PreviewColors(
                     surface = activity.colorResource(R.color.github_surface),
                     text = activity.colorResource(R.color.github_text),

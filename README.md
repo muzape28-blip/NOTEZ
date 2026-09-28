@@ -24,10 +24,11 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 - Panduan Markdown lokal/offline dari drawer.
 - Search catatan.
 - Halaman Pengaturan dari drawer.
-- Tema bawaan:
+- Tema bawaan dengan picker preview:
   - GitHub Dark;
-  - OLED;
-  - Cobalt2.
+  - OLED Black;
+  - Cobalt2;
+  - NOTEZ You Dark.
 - Ekspor/import JSON.
 - Ekspor TXT.
 - Folder backup otomatis.
@@ -129,15 +130,15 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
 
 ### UI / appearance
 
-- Theme system masih sederhana.
+- Theme system v2 baru tahap awal:
+  - theme picker sudah punya preview kecil;
+  - tema curated masih terbatas.
 - Belum ada theme marketplace/plugin ecosystem.
 - Belum ada arbitrary CSS snippet seperti Obsidian.
 - Future candidate:
-  - Theme System v2;
-  - Material/Obsidian-inspired appearance polish;
-  - theme picker preview;
+  - Material/Obsidian-inspired appearance polish lanjutan;
   - card style/density setting;
-  - tambahan tema curated seperti Material Dark / NOTEZ Paper.
+  - tambahan tema curated seperti NOTEZ Paper.
 
 ### Export / sharing
 

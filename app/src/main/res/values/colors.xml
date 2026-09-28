@@ -9,6 +9,7 @@
     <color name="oled_accent">#39FF14</color>
     <color name="oled_on_accent">#050806</color>
     <color name="oled_danger">#FF5470</color>
+    <color name="oled_outline">#263326</color>
     <!-- GitHub Dark (copy ZCODE ZcodeTheme.kt) -->
     <color name="github_bg">#0D1117</color>
     <color name="github_surface">#161B22</color>
@@ -17,6 +18,7 @@
     <color name="github_accent">#58A6FF</color>
     <color name="github_on_accent">#0D1117</color>
     <color name="github_danger">#F85149</color>
+    <color name="github_outline">#30363D</color>
     <!-- Cobalt2 (copy ZCODE ZcodeTheme.kt) -->
     <color name="cobalt_bg">#193549</color>
     <color name="cobalt_surface">#152C3E</color>
@@ -25,6 +27,16 @@
     <color name="cobalt_accent">#FFC600</color>
     <color name="cobalt_on_accent">#193549</color>
     <color name="cobalt_danger">#FF5147</color>
+    <color name="cobalt_outline">#2B4C66</color>
+    <!-- NOTEZ You Dark (Material-ish calm dark) -->
+    <color name="notez_you_bg">#101411</color>
+    <color name="notez_you_surface">#1B211B</color>
+    <color name="notez_you_text">#EAF0EA</color>
+    <color name="notez_you_secondary">#AAB8AA</color>
+    <color name="notez_you_accent">#A5D6A7</color>
+    <color name="notez_you_on_accent">#0E1A10</color>
+    <color name="notez_you_danger">#FFB4AB</color>
+    <color name="notez_you_outline">#3A463A</color>
     <!-- Alias lama (kompatibilitas) -->
     <color name="bg_page">#050806</color>
     <color name="bg_surface">#101410</color>

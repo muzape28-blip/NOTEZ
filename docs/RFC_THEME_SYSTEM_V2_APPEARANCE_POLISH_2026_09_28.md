@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Tanggal | 2026-09-28 |
-| Status | DESIGNED / DRAFT RFC — belum diimplementasi, belum local build, belum CI, belum device UAT |
+| Status | IMPLEMENTED LOCALLY — static checks passed; CI/device UAT pending |
 | Repo | NOTEZ |
 | Basis saat ditulis | `main` @ `19e946e` (`docs: finalize v0.1.2 release notes`) |
 | Jenis perubahan | UI/UX appearance + theme system proposal |
@@ -828,12 +828,15 @@ Implement Theme System v2 MVP:
 - ask user device UAT.
 ```
 
-Status sampai RFC ini:
+Status sampai update ini:
 
 ```text
-DESIGNED only.
-Belum ada code change.
-Belum ada build.
-Belum ada CI.
-Belum ada device UAT.
+IMPLEMENTED LOCALLY untuk Theme System v2 MVP.
+NOTEZ You Dark ditambahkan sebagai theme append-only.
+Theme picker preview kecil ditambahkan di Settings page.
+Markdown Preview renderer sudah punya mapping warna NOTEZ You Dark.
+Static XML/source/security checks passed locally.
+Local Gradle build tidak tersedia di sandbox karena tidak ada Gradle wrapper/global gradle.
+CI pending sampai push.
+Device UAT pending.
 ```
