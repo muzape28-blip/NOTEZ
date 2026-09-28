@@ -459,34 +459,14 @@ class MarkdownPreviewRenderer(
         val danger: String
     ) {
         companion object {
-            fun from(activity: Activity): PreviewColors = when (ThemePref.get(activity)) {
-                ThemePref.OLED -> PreviewColors(
-                    surface = activity.colorResource(R.color.oled_surface),
-                    text = activity.colorResource(R.color.oled_text),
-                    muted = activity.colorResource(R.color.oled_secondary),
-                    accent = activity.colorResource(R.color.oled_accent),
-                    danger = activity.colorResource(R.color.oled_danger)
-                )
-                ThemePref.COBALT2 -> PreviewColors(
-                    surface = activity.colorResource(R.color.cobalt_surface),
-                    text = activity.colorResource(R.color.cobalt_text),
-                    muted = activity.colorResource(R.color.cobalt_secondary),
-                    accent = activity.colorResource(R.color.cobalt_accent),
-                    danger = activity.colorResource(R.color.cobalt_danger)
-                )
-                ThemePref.NOTEZ_YOU_DARK -> PreviewColors(
-                    surface = activity.colorResource(R.color.notez_you_surface),
-                    text = activity.colorResource(R.color.notez_you_text),
-                    muted = activity.colorResource(R.color.notez_you_secondary),
-                    accent = activity.colorResource(R.color.notez_you_accent),
-                    danger = activity.colorResource(R.color.notez_you_danger)
-                )
-                else -> PreviewColors(
-                    surface = activity.colorResource(R.color.github_surface),
-                    text = activity.colorResource(R.color.github_text),
-                    muted = activity.colorResource(R.color.github_secondary),
-                    accent = activity.colorResource(R.color.github_accent),
-                    danger = activity.colorResource(R.color.github_danger)
+            fun from(activity: Activity): PreviewColors {
+                val option = ThemePref.optionOf(ThemePref.get(activity))
+                return PreviewColors(
+                    surface = activity.colorResource(option.surfaceColorRes),
+                    text = activity.colorResource(option.textColorRes),
+                    muted = activity.colorResource(option.secondaryColorRes),
+                    accent = activity.colorResource(option.accentColorRes),
+                    danger = activity.colorResource(option.dangerColorRes)
                 )
             }
         }

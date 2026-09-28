@@ -24,11 +24,21 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 - Panduan Markdown lokal/offline dari drawer.
 - Search catatan.
 - Halaman Pengaturan dari drawer.
-- Tema bawaan dengan picker preview:
+- Tema bawaan curated dengan picker preview:
   - GitHub Dark;
+  - NOTEZ You Dark;
+  - NOTEZ You Warm;
+  - Fade Choco Matcha;
+  - Blue Moon Cheese;
+  - Raspberry Night;
+  - Gloomy Sakura Night;
+  - Gloomy Lavender;
+  - Gloome Dark Sunset;
+  - Dark Forest;
+  - Tokyo Night;
+  - Kawaii Catpucinn;
   - OLED Black;
-  - Cobalt2;
-  - NOTEZ You Dark.
+  - Cobalt2.
 - Ekspor/import JSON.
 - Ekspor TXT.
 - Folder backup otomatis.
@@ -132,7 +142,7 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
 
 - Theme system v2 baru tahap awal:
   - theme picker sudah punya preview kecil;
-  - tema curated masih terbatas.
+  - tema curated sudah bertambah, tapi masih lokal/bawaan APK.
 - Belum ada theme marketplace/plugin ecosystem.
 - Belum ada arbitrary CSS snippet seperti Obsidian.
 - Future candidate:

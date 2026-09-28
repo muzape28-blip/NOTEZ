@@ -59,4 +59,145 @@
         <item name="colorOutline">@color/notez_you_outline</item>
         <item name="colorError">@color/notez_you_danger</item>
     </style>
+    <!-- Curated dark themes (Theme System v2) -->
+
+    <style name="Theme.Notez.FadeChocoMatcha" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/fade_choco_matcha_accent</item>
+        <item name="colorOnPrimary">@color/fade_choco_matcha_on_accent</item>
+        <item name="colorPrimaryContainer">@color/fade_choco_matcha_accent</item>
+        <item name="colorOnPrimaryContainer">@color/fade_choco_matcha_on_accent</item>
+        <item name="android:windowBackground">@color/fade_choco_matcha_bg</item>
+        <item name="colorSurface">@color/fade_choco_matcha_surface</item>
+        <item name="colorOnSurface">@color/fade_choco_matcha_text</item>
+        <item name="colorSurfaceVariant">@color/fade_choco_matcha_surface</item>
+        <item name="colorOnSurfaceVariant">@color/fade_choco_matcha_secondary</item>
+        <item name="colorOutline">@color/fade_choco_matcha_outline</item>
+        <item name="colorError">@color/fade_choco_matcha_danger</item>
+    </style>
+
+    <style name="Theme.Notez.GloomySakuraNight" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/gloomy_sakura_night_accent</item>
+        <item name="colorOnPrimary">@color/gloomy_sakura_night_on_accent</item>
+        <item name="colorPrimaryContainer">@color/gloomy_sakura_night_accent</item>
+        <item name="colorOnPrimaryContainer">@color/gloomy_sakura_night_on_accent</item>
+        <item name="android:windowBackground">@color/gloomy_sakura_night_bg</item>
+        <item name="colorSurface">@color/gloomy_sakura_night_surface</item>
+        <item name="colorOnSurface">@color/gloomy_sakura_night_text</item>
+        <item name="colorSurfaceVariant">@color/gloomy_sakura_night_surface</item>
+        <item name="colorOnSurfaceVariant">@color/gloomy_sakura_night_secondary</item>
+        <item name="colorOutline">@color/gloomy_sakura_night_outline</item>
+        <item name="colorError">@color/gloomy_sakura_night_danger</item>
+    </style>
+
+    <style name="Theme.Notez.RaspberryNight" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/raspberry_night_accent</item>
+        <item name="colorOnPrimary">@color/raspberry_night_on_accent</item>
+        <item name="colorPrimaryContainer">@color/raspberry_night_accent</item>
+        <item name="colorOnPrimaryContainer">@color/raspberry_night_on_accent</item>
+        <item name="android:windowBackground">@color/raspberry_night_bg</item>
+        <item name="colorSurface">@color/raspberry_night_surface</item>
+        <item name="colorOnSurface">@color/raspberry_night_text</item>
+        <item name="colorSurfaceVariant">@color/raspberry_night_surface</item>
+        <item name="colorOnSurfaceVariant">@color/raspberry_night_secondary</item>
+        <item name="colorOutline">@color/raspberry_night_outline</item>
+        <item name="colorError">@color/raspberry_night_danger</item>
+    </style>
+
+    <style name="Theme.Notez.BlueMoonCheese" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/blue_moon_cheese_accent</item>
+        <item name="colorOnPrimary">@color/blue_moon_cheese_on_accent</item>
+        <item name="colorPrimaryContainer">@color/blue_moon_cheese_accent</item>
+        <item name="colorOnPrimaryContainer">@color/blue_moon_cheese_on_accent</item>
+        <item name="android:windowBackground">@color/blue_moon_cheese_bg</item>
+        <item name="colorSurface">@color/blue_moon_cheese_surface</item>
+        <item name="colorOnSurface">@color/blue_moon_cheese_text</item>
+        <item name="colorSurfaceVariant">@color/blue_moon_cheese_surface</item>
+        <item name="colorOnSurfaceVariant">@color/blue_moon_cheese_secondary</item>
+        <item name="colorOutline">@color/blue_moon_cheese_outline</item>
+        <item name="colorError">@color/blue_moon_cheese_danger</item>
+    </style>
+
+    <style name="Theme.Notez.NotezYouWarm" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/notez_you_warm_accent</item>
+        <item name="colorOnPrimary">@color/notez_you_warm_on_accent</item>
+        <item name="colorPrimaryContainer">@color/notez_you_warm_accent</item>
+        <item name="colorOnPrimaryContainer">@color/notez_you_warm_on_accent</item>
+        <item name="android:windowBackground">@color/notez_you_warm_bg</item>
+        <item name="colorSurface">@color/notez_you_warm_surface</item>
+        <item name="colorOnSurface">@color/notez_you_warm_text</item>
+        <item name="colorSurfaceVariant">@color/notez_you_warm_surface</item>
+        <item name="colorOnSurfaceVariant">@color/notez_you_warm_secondary</item>
+        <item name="colorOutline">@color/notez_you_warm_outline</item>
+        <item name="colorError">@color/notez_you_warm_danger</item>
+    </style>
+
+    <style name="Theme.Notez.GloomyLavender" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/gloomy_lavender_accent</item>
+        <item name="colorOnPrimary">@color/gloomy_lavender_on_accent</item>
+        <item name="colorPrimaryContainer">@color/gloomy_lavender_accent</item>
+        <item name="colorOnPrimaryContainer">@color/gloomy_lavender_on_accent</item>
+        <item name="android:windowBackground">@color/gloomy_lavender_bg</item>
+        <item name="colorSurface">@color/gloomy_lavender_surface</item>
+        <item name="colorOnSurface">@color/gloomy_lavender_text</item>
+        <item name="colorSurfaceVariant">@color/gloomy_lavender_surface</item>
+        <item name="colorOnSurfaceVariant">@color/gloomy_lavender_secondary</item>
+        <item name="colorOutline">@color/gloomy_lavender_outline</item>
+        <item name="colorError">@color/gloomy_lavender_danger</item>
+    </style>
+
+    <style name="Theme.Notez.DarkForest" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/dark_forest_accent</item>
+        <item name="colorOnPrimary">@color/dark_forest_on_accent</item>
+        <item name="colorPrimaryContainer">@color/dark_forest_accent</item>
+        <item name="colorOnPrimaryContainer">@color/dark_forest_on_accent</item>
+        <item name="android:windowBackground">@color/dark_forest_bg</item>
+        <item name="colorSurface">@color/dark_forest_surface</item>
+        <item name="colorOnSurface">@color/dark_forest_text</item>
+        <item name="colorSurfaceVariant">@color/dark_forest_surface</item>
+        <item name="colorOnSurfaceVariant">@color/dark_forest_secondary</item>
+        <item name="colorOutline">@color/dark_forest_outline</item>
+        <item name="colorError">@color/dark_forest_danger</item>
+    </style>
+
+    <style name="Theme.Notez.TokyoNight" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/tokyo_night_accent</item>
+        <item name="colorOnPrimary">@color/tokyo_night_on_accent</item>
+        <item name="colorPrimaryContainer">@color/tokyo_night_accent</item>
+        <item name="colorOnPrimaryContainer">@color/tokyo_night_on_accent</item>
+        <item name="android:windowBackground">@color/tokyo_night_bg</item>
+        <item name="colorSurface">@color/tokyo_night_surface</item>
+        <item name="colorOnSurface">@color/tokyo_night_text</item>
+        <item name="colorSurfaceVariant">@color/tokyo_night_surface</item>
+        <item name="colorOnSurfaceVariant">@color/tokyo_night_secondary</item>
+        <item name="colorOutline">@color/tokyo_night_outline</item>
+        <item name="colorError">@color/tokyo_night_danger</item>
+    </style>
+
+    <style name="Theme.Notez.KawaiiCatpucinn" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/kawaii_catpucinn_accent</item>
+        <item name="colorOnPrimary">@color/kawaii_catpucinn_on_accent</item>
+        <item name="colorPrimaryContainer">@color/kawaii_catpucinn_accent</item>
+        <item name="colorOnPrimaryContainer">@color/kawaii_catpucinn_on_accent</item>
+        <item name="android:windowBackground">@color/kawaii_catpucinn_bg</item>
+        <item name="colorSurface">@color/kawaii_catpucinn_surface</item>
+        <item name="colorOnSurface">@color/kawaii_catpucinn_text</item>
+        <item name="colorSurfaceVariant">@color/kawaii_catpucinn_surface</item>
+        <item name="colorOnSurfaceVariant">@color/kawaii_catpucinn_secondary</item>
+        <item name="colorOutline">@color/kawaii_catpucinn_outline</item>
+        <item name="colorError">@color/kawaii_catpucinn_danger</item>
+    </style>
+
+    <style name="Theme.Notez.GloomeDarkSunset" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/gloome_dark_sunset_accent</item>
+        <item name="colorOnPrimary">@color/gloome_dark_sunset_on_accent</item>
+        <item name="colorPrimaryContainer">@color/gloome_dark_sunset_accent</item>
+        <item name="colorOnPrimaryContainer">@color/gloome_dark_sunset_on_accent</item>
+        <item name="android:windowBackground">@color/gloome_dark_sunset_bg</item>
+        <item name="colorSurface">@color/gloome_dark_sunset_surface</item>
+        <item name="colorOnSurface">@color/gloome_dark_sunset_text</item>
+        <item name="colorSurfaceVariant">@color/gloome_dark_sunset_surface</item>
+        <item name="colorOnSurfaceVariant">@color/gloome_dark_sunset_secondary</item>
+        <item name="colorOutline">@color/gloome_dark_sunset_outline</item>
+        <item name="colorError">@color/gloome_dark_sunset_danger</item>
+    </style>
 </resources>

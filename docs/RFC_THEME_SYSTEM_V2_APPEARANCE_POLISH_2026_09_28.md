@@ -832,9 +832,9 @@ Status sampai update ini:
 
 ```text
 IMPLEMENTED LOCALLY untuk Theme System v2 MVP.
-NOTEZ You Dark ditambahkan sebagai theme append-only.
+NOTEZ You Dark dan curated dark theme batch ditambahkan secara append-only.
 Theme picker preview kecil ditambahkan di Settings page.
-Markdown Preview renderer sudah punya mapping warna NOTEZ You Dark.
+Markdown Preview renderer memakai token ThemePref sehingga ikut semua theme curated.
 Static XML/source/security checks passed locally.
 Local Gradle build tidak tersedia di sandbox karena tidak ada Gradle wrapper/global gradle.
 GitHub Actions debug build passed: run 36482324634.
