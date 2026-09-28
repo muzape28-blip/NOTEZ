@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Tanggal | 2026-09-29 |
-| Status | DESIGNED / DRAFT RFC — belum diimplementasi, belum local build, belum CI, belum device UAT |
+| Status | IMPLEMENTED LOCALLY — static checks passed; CI/device UAT pending |
 | Repo | NOTEZ |
 | Basis saat ditulis | `main` @ `795b504` (`docs: record splash system bar fix evidence`) |
 | Jenis perubahan | Navigation/settings UX restructure + future export/appearance foundation |
@@ -715,9 +715,9 @@ Implement Settings Page v1 MVP:
 Status of this RFC:
 
 ```text
-DESIGNED only.
-No code change yet.
-No build.
-No CI.
-No device UAT.
+IMPLEMENTED LOCALLY.
+Static XML/security/source checks passed.
+Local Gradle build is not available in the sandbox because there is no Gradle wrapper/global gradle.
+CI pending until pushed.
+Device UAT pending.
 ```

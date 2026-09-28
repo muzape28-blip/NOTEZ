@@ -179,87 +179,9 @@
                 android:focusable="true"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:text="Settings"
+                android:text="Pengaturan"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="15sp" />
-
-            <LinearLayout
-                android:id="@+id/settings_submenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/menu_theme"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="20dp"
-                    android:text="Tema"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/menu_export_json"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="20dp"
-                    android:text="Ekspor JSON"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/menu_export_txt"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="20dp"
-                    android:text="Ekspor TXT"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/menu_import_json"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="20dp"
-                    android:text="Impor JSON"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/menu_auto_backup_folder"
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:gravity="center_vertical"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingStart="36dp"
-                    android:paddingEnd="20dp"
-                    android:text="Folder backup otomatis"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-            </LinearLayout>
 
             <include layout="@layout/include_music_drawer" />
         </LinearLayout>

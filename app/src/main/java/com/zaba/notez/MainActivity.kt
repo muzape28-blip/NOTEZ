@@ -6,7 +6,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -41,53 +40,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var musicDrawer: MusicDrawerController
     private var collectJob: Job? = null
     private var query = ""
-    private var pendingExport: String? = null
     private var pendingDrawerAction: (() -> Unit)? = null
     private var searchOpen = false
-    private var settingsExpanded = false
+    private var appliedTheme = ThemePref.GITHUB_DARK
     private var startupSplashAnimator: AnimatorSet? = null
     private var startupSplashStatusBarColor: Int? = null
     private var startupSplashNavigationBarColor: Int? = null
     private var startupSplashSystemUiVisibility: Int? = null
-
-    private val createDoc = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
-        val data = pendingExport ?: return@registerForActivityResult
-        pendingExport = null
-        if (uri == null) return@registerForActivityResult
-        lifecycleScope.launch(Dispatchers.IO) {
-            contentResolver.openOutputStream(uri)?.use { it.write(data.toByteArray()) }
-            launch(Dispatchers.Main) { toast("Diekspor") }
-        }
-    }
-
-    private val openDoc = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri == null) return@registerForActivityResult
-        lifecycleScope.launch(Dispatchers.IO) {
-            val raw = contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
-            val notes = try { BackupHelper.fromJson(raw.orEmpty()) } catch (_: Exception) { null }
-            if (notes == null) {
-                launch(Dispatchers.Main) { toast("File backup tidak valid") }
-                return@launch
-            }
-            for (n in notes) dao.upsert(n)
-            launch(Dispatchers.Main) { toast("${notes.size} catatan dipulihkan") }
-        }
-    }
-
-    private val openTree = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
-        if (uri == null) return@registerForActivityResult
-        contentResolver.takePersistableUriPermission(uri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        BackupHelper.setTree(this, uri)
-        toast("Folder backup otomatis aktif")
-    }
 
     private val openMusic = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         if (::musicDrawer.isInitialized) musicDrawer.onMusicPicked(uris)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(ThemePref.styleOf(ThemePref.get(this)))
+        appliedTheme = ThemePref.get(this)
+        setTheme(ThemePref.styleOf(appliedTheme))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         playStartupSplash(savedInstanceState)
@@ -229,28 +196,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawer() {
-        val submenu = findViewById<View>(R.id.settings_submenu)
         findViewById<View>(R.id.menu_markdown_guide).setOnClickListener {
             closeDrawerThen { startActivity(Intent(this, MarkdownGuideActivity::class.java)) }
         }
         findViewById<TextView>(R.id.drawer_settings).setOnClickListener {
-            settingsExpanded = !settingsExpanded
-            submenu.visibility = if (settingsExpanded) View.VISIBLE else View.GONE
-        }
-        findViewById<View>(R.id.menu_theme).setOnClickListener {
-            closeDrawerThen { showThemeDialog() }
-        }
-        findViewById<View>(R.id.menu_export_json).setOnClickListener {
-            closeDrawerThen { exportJson() }
-        }
-        findViewById<View>(R.id.menu_export_txt).setOnClickListener {
-            closeDrawerThen { exportTxt() }
-        }
-        findViewById<View>(R.id.menu_import_json).setOnClickListener {
-            closeDrawerThen { openDoc.launch(arrayOf("application/json")) }
-        }
-        findViewById<View>(R.id.menu_auto_backup_folder).setOnClickListener {
-            closeDrawerThen { openTree.launch(null) }
+            closeDrawerThen { startActivity(Intent(this, SettingsActivity::class.java)) }
         }
         drawer.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
             override fun onDrawerClosed(drawerView: View) {
@@ -338,6 +288,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val currentTheme = ThemePref.get(this)
+        if (currentTheme != appliedTheme) {
+            recreate()
+            return
+        }
         observe()
         lifecycleScope.launch(Dispatchers.IO) {
             if (BackupHelper.autoBackupIfDue(this@MainActivity, dao)) {
@@ -376,42 +331,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun exportJson() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val data = BackupHelper.toJson(dao.getAllNow())
-            launch(Dispatchers.Main) {
-                pendingExport = data
-                createDoc.launch(BackupHelper.fileName("json"))
-            }
-        }
-    }
-
-    private fun exportTxt() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val data = BackupHelper.toTxt(dao.getAllNow())
-            launch(Dispatchers.Main) {
-                pendingExport = data
-                createDoc.launch(BackupHelper.fileName("txt"))
-            }
-        }
-    }
-
     private fun toast(msg: String) {
         android.widget.Toast.makeText(this, msg, android.widget.Toast.LENGTH_SHORT).show()
     }
-
-    private fun showThemeDialog() {
-        val current = ThemePref.get(this)
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("Tema")
-            .setSingleChoiceItems(ThemePref.NAMES, current) { dialog, which ->
-                if (which != current) {
-                    ThemePref.set(this, which)
-                    recreate()
-                }
-                dialog.dismiss()
-            }
-            .show()
-    }
-
 }

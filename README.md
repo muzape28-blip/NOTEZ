@@ -23,7 +23,7 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 - View mode dengan Markdown Preview v2 berbasis local WebView Reading View.
 - Panduan Markdown lokal/offline dari drawer.
 - Search catatan.
-- Drawer settings.
+- Halaman Pengaturan dari drawer.
 - Tema bawaan:
   - GitHub Dark;
   - OLED;
