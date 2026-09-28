@@ -78,6 +78,54 @@
             android:contentDescription="Catatan baru"
             android:filterTouchesWhenObscured="true"
             android:src="@android:drawable/ic_input_add" />
+
+        <FrameLayout
+            android:id="@+id/splash_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/github_bg"
+            android:clickable="true"
+            android:elevation="32dp"
+            android:focusable="true"
+            android:importantForAccessibility="noHideDescendants"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:id="@+id/splash_glow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_notez_horse_splash_glow" />
+
+                <ImageView
+                    android:id="@+id/splash_horse"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_notez_horse_splash_horse" />
+
+                <ImageView
+                    android:id="@+id/splash_accent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_notez_horse_splash_accent" />
+            </FrameLayout>
+        </FrameLayout>
     </FrameLayout>
 
     <ScrollView

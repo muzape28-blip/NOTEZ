@@ -1,13 +1,20 @@
 package com.zaba.notez
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     private var pendingDrawerAction: (() -> Unit)? = null
     private var searchOpen = false
     private var settingsExpanded = false
+    private var startupSplashAnimator: AnimatorSet? = null
 
     private val createDoc = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
         val data = pendingExport ?: return@registerForActivityResult
@@ -79,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        playStartupSplash(savedInstanceState)
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
         setupDrawer()
@@ -111,6 +120,82 @@ class MainActivity : AppCompatActivity() {
             query = it?.toString().orEmpty()
             observe()
         }
+    }
+
+    private fun playStartupSplash(savedInstanceState: Bundle?) {
+        val overlay = findViewById<View>(R.id.splash_overlay)
+        if (savedInstanceState != null || animatorDurationScale() == 0f) {
+            overlay.visibility = View.GONE
+            return
+        }
+
+        overlay.visibility = View.VISIBLE
+        overlay.alpha = 1f
+        overlay.isClickable = true
+        overlay.bringToFront()
+
+        val glow = findViewById<ImageView>(R.id.splash_glow)
+        val horse = findViewById<ImageView>(R.id.splash_horse)
+        val accent = findViewById<ImageView>(R.id.splash_accent)
+
+        overlay.post {
+            if (isFinishing || isDestroyed) return@post
+
+            glow.alpha = 0f
+            glow.scaleX = 1.02f
+            glow.scaleY = 1.02f
+            horse.alpha = 0f
+            horse.scaleX = 0.96f
+            horse.scaleY = 0.96f
+            horse.translationY = 10f
+            accent.alpha = 0f
+            accent.scaleX = 0.72f
+            accent.scaleY = 0.72f
+            accent.translationY = 14f
+            accent.pivotX = accent.width * 0.34f
+            accent.pivotY = accent.height * 0.78f
+
+            startupSplashAnimator = AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(horse, View.ALPHA, 0f, 1f).timed(260L, 80L),
+                    ObjectAnimator.ofFloat(horse, View.SCALE_X, 0.96f, 1f).timed(380L, 80L),
+                    ObjectAnimator.ofFloat(horse, View.SCALE_Y, 0.96f, 1f).timed(380L, 80L),
+                    ObjectAnimator.ofFloat(horse, View.TRANSLATION_Y, 10f, 0f).timed(380L, 80L),
+                    ObjectAnimator.ofFloat(glow, View.ALPHA, 0f, 0.82f, 0.46f).timed(680L, 210L),
+                    ObjectAnimator.ofFloat(glow, View.SCALE_X, 1.02f, 1.12f).timed(680L, 210L),
+                    ObjectAnimator.ofFloat(glow, View.SCALE_Y, 1.02f, 1.12f).timed(680L, 210L),
+                    ObjectAnimator.ofFloat(accent, View.ALPHA, 0f, 1f, 0.9f).timed(430L, 420L),
+                    ObjectAnimator.ofFloat(accent, View.SCALE_X, 0.72f, 1f).timed(430L, 420L),
+                    ObjectAnimator.ofFloat(accent, View.SCALE_Y, 0.72f, 1f).timed(430L, 420L),
+                    ObjectAnimator.ofFloat(accent, View.TRANSLATION_Y, 14f, 0f).timed(430L, 420L),
+                    ObjectAnimator.ofFloat(overlay, View.ALPHA, 1f, 0f).timed(180L, 1040L)
+                )
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) = hideStartupSplash(overlay)
+                    override fun onAnimationCancel(animation: Animator) = hideStartupSplash(overlay)
+                })
+                start()
+            }
+        }
+    }
+
+    private fun ObjectAnimator.timed(durationMs: Long, delayMs: Long): ObjectAnimator = apply {
+        duration = durationMs
+        startDelay = delayMs
+        interpolator = DecelerateInterpolator()
+    }
+
+    private fun hideStartupSplash(overlay: View) {
+        overlay.visibility = View.GONE
+        overlay.alpha = 0f
+        overlay.isClickable = false
+        startupSplashAnimator = null
+    }
+
+    private fun animatorDurationScale(): Float = try {
+        Settings.Global.getFloat(contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
+    } catch (_: Exception) {
+        1f
     }
 
     private fun setupDrawer() {
@@ -232,6 +317,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        startupSplashAnimator?.cancel()
+        startupSplashAnimator = null
         if (::musicDrawer.isInitialized) musicDrawer.destroy()
         super.onDestroy()
     }
@@ -296,4 +383,5 @@ class MainActivity : AppCompatActivity() {
             }
             .show()
     }
+
 }

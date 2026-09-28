@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Tanggal | 2026-09-28 |
-| Status | DESIGNED / DRAFT RFC — belum diimplementasi, belum local build, belum CI, belum device UAT |
+| Status | IMPLEMENTED LOCALLY — static checks passed; CI/device UAT pending |
 | Repo | NOTEZ |
 | Basis saat ditulis | `main` @ `656c79a` (`docs: add theme system v2 appearance RFC`) |
 | Jenis perubahan | Branding/UI startup polish proposal |
@@ -537,11 +537,12 @@ Recommendation:
 ## 15. Current status
 
 ```text
-Status: DESIGNED only.
+Status: IMPLEMENTED LOCALLY.
 Concept image exists as design mockup.
-No production asset installed.
-No code change.
-No build.
-No CI.
-No device UAT.
+Production launcher icon asset already installed from previous icon trial.
+Splash overlay assets/code are installed locally in MainActivity.
+Static XML/resource/security checks passed locally.
+Local Gradle build is not available in the sandbox because there is no Gradle wrapper/global gradle.
+CI pending until pushed.
+Device UAT pending.
 ```

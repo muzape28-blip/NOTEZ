@@ -25,6 +25,9 @@
         <item name="colorSurfaceVariant">@color/github_surface</item>
         <item name="colorOnSurfaceVariant">@color/github_secondary</item>
         <item name="colorError">@color/github_danger</item>
+        <item name="android:windowSplashScreenBackground">@color/github_bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_notez_horse_splash_system_icon</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
     </style>
     <!-- Cobalt2 (palet ZCODE) -->
     <style name="Theme.Notez.Cobalt2" parent="Theme.Material3.Dark.NoActionBar">
