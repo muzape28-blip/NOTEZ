@@ -837,7 +837,7 @@ Theme picker preview kecil ditambahkan di Settings page.
 Markdown Preview renderer memakai token ThemePref sehingga ikut semua theme curated.
 Static XML/source/security checks passed locally.
 Local Gradle build tidak tersedia di sandbox karena tidak ada Gradle wrapper/global gradle.
-GitHub Actions debug build passed: run 36482324634.
-Debug artifact: notez-debug, artifact ID 10997580254, size metadata 8,077,165 bytes.
+GitHub Actions debug build passed: run 36486984900.
+Debug artifact: notez-debug, artifact ID 10998743929, size metadata 8,082,817 bytes.
 Device UAT pending.
 ```
