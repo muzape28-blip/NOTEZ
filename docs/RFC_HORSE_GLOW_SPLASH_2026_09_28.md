@@ -541,9 +541,10 @@ Status: CI VERIFIED for debug build.
 Concept image exists as design mockup.
 Production launcher icon asset already installed from previous icon trial.
 Splash overlay assets/code are installed in MainActivity.
+Custom splash now darkens status/navigation bars during the animation so the green theme status bar does not break the splash frame.
 Static XML/resource/security checks passed locally.
 Local Gradle build is not available in the sandbox because there is no Gradle wrapper/global gradle.
-GitHub Actions debug build passed: run 36452392225.
-Debug artifact: notez-debug, artifact ID 10983829108, size metadata 8,068,036 bytes.
+GitHub Actions debug build passed: run 36457202736.
+Debug artifact: notez-debug, artifact ID 10987010307, size metadata 8,068,831 bytes.
 Device UAT pending.
 ```
