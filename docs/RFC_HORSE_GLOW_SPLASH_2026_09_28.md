@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Tanggal | 2026-09-28 |
-| Status | IMPLEMENTED LOCALLY — static checks passed; CI/device UAT pending |
+| Status | CI VERIFIED — debug build success; device UAT pending |
 | Repo | NOTEZ |
 | Basis saat ditulis | `main` @ `656c79a` (`docs: add theme system v2 appearance RFC`) |
 | Jenis perubahan | Branding/UI startup polish proposal |
@@ -537,12 +537,13 @@ Recommendation:
 ## 15. Current status
 
 ```text
-Status: IMPLEMENTED LOCALLY.
+Status: CI VERIFIED for debug build.
 Concept image exists as design mockup.
 Production launcher icon asset already installed from previous icon trial.
-Splash overlay assets/code are installed locally in MainActivity.
+Splash overlay assets/code are installed in MainActivity.
 Static XML/resource/security checks passed locally.
 Local Gradle build is not available in the sandbox because there is no Gradle wrapper/global gradle.
-CI pending until pushed.
+GitHub Actions debug build passed: run 36452392225.
+Debug artifact: notez-debug, artifact ID 10983829108, size metadata 8,068,036 bytes.
 Device UAT pending.
 ```
