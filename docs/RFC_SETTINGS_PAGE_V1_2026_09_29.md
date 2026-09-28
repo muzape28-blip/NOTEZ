@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Tanggal | 2026-09-29 |
-| Status | IMPLEMENTED LOCALLY — static checks passed; CI/device UAT pending |
+| Status | CI VERIFIED — debug build success; device UAT pending |
 | Repo | NOTEZ |
 | Basis saat ditulis | `main` @ `795b504` (`docs: record splash system bar fix evidence`) |
 | Jenis perubahan | Navigation/settings UX restructure + future export/appearance foundation |
@@ -715,9 +715,10 @@ Implement Settings Page v1 MVP:
 Status of this RFC:
 
 ```text
-IMPLEMENTED LOCALLY.
+CI VERIFIED for debug build.
 Static XML/security/source checks passed.
 Local Gradle build is not available in the sandbox because there is no Gradle wrapper/global gradle.
-CI pending until pushed.
+GitHub Actions debug build passed: run 36480199407.
+Debug artifact: notez-debug, artifact ID 10996746709, size metadata 8,073,170 bytes.
 Device UAT pending.
 ```
