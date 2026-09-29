@@ -1,6 +1,6 @@
 # RFC — Raw HTML Compatibility P1 + Optional Online Cache Direction (2026-09-29)
 
-Status: IMPLEMENTED LOCALLY — CI PENDING — DEVICE UAT PENDING
+Status: IMPLEMENTED + CI VERIFIED — DEVICE UAT PENDING
 
 ## Context
 
@@ -119,7 +119,17 @@ Approved behavior implemented locally:
 
 ## CI Evidence
 
-Pending push and GitHub Actions run.
+- Raw HTML implementation commit: `60f53e9 feat: expand safe raw html compatibility`.
+- Optional image cache commit: `b8618e5 feat: add user-triggered remote image cache`.
+- Compile fixes:
+  - `2d63c48 fix: repair markdown image source regex`.
+  - `034dc26 fix: require detected image mime before caching`.
+- Latest GitHub Actions run: `36530981167` — `success`.
+- Run URL: <https://github.com/muzape28-blip/NOTEZ/actions/runs/36530981167>.
+- Artifact: `notez-debug`, artifact id `11016099495`, size `8,115,686` bytes.
+- Failed CI attempts before fixes:
+  - `36530289381`: Kotlin parse error in Markdown image regex string.
+  - `36530634612`: nullable MIME type compile error before cache write.
 
 ## Device UAT
 

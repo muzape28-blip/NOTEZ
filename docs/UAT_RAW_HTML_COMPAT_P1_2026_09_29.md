@@ -1,12 +1,13 @@
 # UAT — Raw HTML Compatibility P1 + Optional Image Cache (2026-09-29)
 
-Status: PENDING DEVICE UAT
+Status: CI VERIFIED — PENDING DEVICE UAT
 
 ## Build Under Test
 
-- Commit: pending.
-- GitHub Actions run: pending.
-- Artifact: pending.
+- Latest commit: `034dc26 fix: require detected image mime before caching`.
+- Feature commits: `60f53e9`, `b8618e5`.
+- GitHub Actions run: `36530981167` — `success`.
+- Artifact: `notez-debug`, artifact id `11016099495`, size `8,115,686` bytes.
 
 ## Test Note
 
