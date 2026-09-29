@@ -2,6 +2,8 @@
 
 **NOTEZ** adalah aplikasi Android lokal untuk menyimpan ide, catatan, todo, draft, snippet, dan hal penting lain sebelum lupa.
 
+**Latest production release:** `v0.1.4` — hotfix tampilan versi aplikasi di Pengaturan. Feature batch utama tetap `v0.1.3`.
+
 ```text
 cepat dicatat
 nyaman dibaca

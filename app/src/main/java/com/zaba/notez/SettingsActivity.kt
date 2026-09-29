@@ -331,10 +331,15 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     @Suppress("DEPRECATION")
-    private fun versionName(): String = try {
-        packageManager.getPackageInfo(packageName, 0).versionName ?: "unknown"
-    } catch (_: Exception) {
-        "unknown"
+    private fun versionName(): String {
+        val fallback = getString(R.string.notez_version_name)
+        return try {
+            packageManager.getPackageInfo(packageName, 0).versionName
+                ?.takeIf { it.isNotBlank() && it != "unknown" }
+                ?: fallback
+        } catch (_: Exception) {
+            fallback
+        }
     }
 
     private fun toast(message: String) {
