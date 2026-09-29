@@ -136,7 +136,10 @@ class MarkdownPreviewRenderer(
                     details: true,
                     summary: true,
                     abbr: true,
-                    cite: true
+                    cite: true,
+                    dl: true,
+                    dt: true,
+                    dd: true
                   };
                   var allowedRenderedTags = {
                     a: true,
@@ -145,7 +148,10 @@ class MarkdownPreviewRenderer(
                     br: true,
                     cite: true,
                     code: true,
+                    dd: true,
                     del: true,
+                    dl: true,
+                    dt: true,
                     details: true,
                     div: true,
                     em: true,
@@ -372,6 +378,201 @@ class MarkdownPreviewRenderer(
                     return safeExternalHref(href);
                   }
 
+                  function normalizeFootnoteLabel(label) {
+                    return String(label || '').trim().toLowerCase();
+                  }
+
+                  function notezFootnoteIdPart(label) {
+                    var slug = slugifyHeading(normalizeFootnoteLabel(label));
+                    return slug === 'section' ? 'note' : slug;
+                  }
+
+                  function notezFootnoteSlug(label) {
+                    return 'notez-fn-' + notezFootnoteIdPart(label);
+                  }
+
+                  function notezFootnoteRefSlug(label, count) {
+                    return 'notez-fnref-' + notezFootnoteIdPart(label) + '-' + count;
+                  }
+
+                  function notezFootnoteIndex(env, label) {
+                    env.footnoteNumbers = env.footnoteNumbers || Object.create(null);
+                    env.footnoteOrder = env.footnoteOrder || [];
+                    if (!env.footnoteNumbers[label]) {
+                      env.footnoteNumbers[label] = env.footnoteOrder.length + 1;
+                      env.footnoteOrder.push(label);
+                    }
+                    return env.footnoteNumbers[label];
+                  }
+
+                  function markdownFenceMarker(line) {
+                    var match = String(line || '').match(/^ {0,3}(`{3,}|~{3,})/);
+                    return match ? match[1].charAt(0) : '';
+                  }
+
+                  function nextFenceState(line, currentFence) {
+                    var marker = markdownFenceMarker(line);
+                    if (!marker) return currentFence;
+                    if (!currentFence) return marker;
+                    return currentFence === marker ? '' : currentFence;
+                  }
+
+                  function extractFootnotes(markdown) {
+                    var lines = String(markdown || '').split(/\r?\n/);
+                    var output = [];
+                    var definitions = Object.create(null);
+                    var definitionOrder = [];
+                    var fence = '';
+                    for (var i = 0; i < lines.length; i++) {
+                      if (fence || markdownFenceMarker(lines[i])) {
+                        output.push(lines[i]);
+                        fence = nextFenceState(lines[i], fence);
+                        continue;
+                      }
+                      var match = lines[i].match(/^\[\^([^\]]+)\]:\s*(.*)$/);
+                      if (!match) {
+                        output.push(lines[i]);
+                        continue;
+                      }
+                      var label = normalizeFootnoteLabel(match[1]);
+                      if (!label) {
+                        output.push(lines[i]);
+                        continue;
+                      }
+                      var body = [match[2] || ''];
+                      while (i + 1 < lines.length && /^(?: {4}|\t)/.test(lines[i + 1])) {
+                        i += 1;
+                        body.push(lines[i].replace(/^(?: {4}|\t)/, ''));
+                      }
+                      if (!definitions[label]) definitionOrder.push(label);
+                      definitions[label] = body.join('\n').trim();
+                    }
+                    return {
+                      markdown: output.join('\n'),
+                      definitions: definitions,
+                      definitionOrder: definitionOrder
+                    };
+                  }
+
+                  function canStartDefinitionTerm(line) {
+                    var value = String(line || '').trim();
+                    if (!value) return false;
+                    if (/^(?:#{1,6}\s|[-*+]\s|\d+\.\s|>|```|~~~|\||<)/.test(value)) return false;
+                    if (/^\[\^([^\]]+)\]:/.test(value)) return false;
+                    return true;
+                  }
+
+                  function preprocessDefinitionLists(markdown) {
+                    var lines = String(markdown || '').split(/\r?\n/);
+                    var output = [];
+                    var fence = '';
+                    for (var i = 0; i < lines.length; i++) {
+                      if (fence || markdownFenceMarker(lines[i])) {
+                        output.push(lines[i]);
+                        fence = nextFenceState(lines[i], fence);
+                        continue;
+                      }
+                      if (
+                        i + 1 < lines.length &&
+                        canStartDefinitionTerm(lines[i]) &&
+                        /^:\s+/.test(lines[i + 1])
+                      ) {
+                        var terms = [lines[i].trim()];
+                        var definitions = [];
+                        i += 1;
+                        while (i < lines.length && /^:\s+/.test(lines[i])) {
+                          definitions.push(lines[i].replace(/^:\s+/, '').trim());
+                          while (i + 1 < lines.length && /^(?: {4}|\t)/.test(lines[i + 1])) {
+                            i += 1;
+                            definitions[definitions.length - 1] += '\n' + lines[i].replace(/^(?: {4}|\t)/, '').trim();
+                          }
+                          i += 1;
+                          if (i < lines.length && lines[i].trim() && !/^:\s+/.test(lines[i])) break;
+                        }
+                        i -= 1;
+                        output.push('');
+                        output.push('<dl>');
+                        terms.forEach(function (term) {
+                          output.push('<dt>' + escapeHtml(term) + '</dt>');
+                        });
+                        definitions.forEach(function (definition) {
+                          output.push('<dd>' + escapeHtml(definition) + '</dd>');
+                        });
+                        output.push('</dl>');
+                        output.push('');
+                        continue;
+                      }
+                      output.push(lines[i]);
+                    }
+                    return output.join('\n');
+                  }
+
+                  function findClosingDelimiter(src, marker, start) {
+                    var index = start;
+                    while (index < src.length) {
+                      index = src.indexOf(marker, index);
+                      if (index < 0) return -1;
+                      if (src.charAt(index - 1) === '\\') {
+                        index += marker.length;
+                        continue;
+                      }
+                      if (marker === '~' && (src.charAt(index - 1) === '~' || src.charAt(index + 1) === '~')) {
+                        index += marker.length;
+                        continue;
+                      }
+                      return index;
+                    }
+                    return -1;
+                  }
+
+                  function addSimpleDelimitedRule(ruleName, marker, tagName) {
+                    md.inline.ruler.before('emphasis', ruleName, function (state, silent) {
+                      var pos = state.pos;
+                      var src = state.src;
+                      if (src.slice(pos, pos + marker.length) !== marker) return false;
+                      if (marker === '~' && src.charAt(pos + 1) === '~') return false;
+                      var end = findClosingDelimiter(src, marker, pos + marker.length);
+                      if (end < 0) return false;
+                      var content = src.slice(pos + marker.length, end);
+                      if (!content || /^\s|\s$/.test(content) || content.indexOf('\n') >= 0) return false;
+                      if (silent) return false;
+                      var token = state.push(ruleName, '', 0);
+                      token.content = content;
+                      state.pos = end + marker.length;
+                      return true;
+                    });
+                    md.renderer.rules[ruleName] = function (tokens, idx) {
+                      return '<' + tagName + '>' + escapeHtml(tokens[idx].content) + '</' + tagName + '>';
+                    };
+                  }
+
+                  addSimpleDelimitedRule('notez_mark', '==', 'mark');
+                  addSimpleDelimitedRule('notez_sup', '^', 'sup');
+                  addSimpleDelimitedRule('notez_sub', '~', 'sub');
+
+                  md.inline.ruler.after('escape', 'notez_footnote_ref', function (state, silent) {
+                    var pos = state.pos;
+                    var src = state.src;
+                    if (src.charAt(pos) !== '[' || src.charAt(pos + 1) !== '^') return false;
+                    var end = src.indexOf(']', pos + 2);
+                    if (end < 0) return false;
+                    var label = normalizeFootnoteLabel(src.slice(pos + 2, end));
+                    if (!label || !state.env || !state.env.footnotes || !state.env.footnotes[label]) return false;
+                    if (silent) return false;
+                    var token = state.push('notez_footnote_ref', '', 0);
+                    token.meta = { label: label };
+                    state.pos = end + 1;
+                    return true;
+                  });
+
+                  md.renderer.rules.notez_footnote_ref = function (tokens, idx, options, env) {
+                    var label = tokens[idx].meta.label;
+                    var index = notezFootnoteIndex(env, label);
+                    env.footnoteRefCounts = env.footnoteRefCounts || Object.create(null);
+                    env.footnoteRefCounts[label] = (env.footnoteRefCounts[label] || 0) + 1;
+                    return '<sup><a href="#' + notezFootnoteSlug(label) + '">[' + index + ']</a></sup>';
+                  };
+
                   var defaultLinkOpen = md.renderer.rules.link_open || function (tokens, idx, options, env, self) {
                     return self.renderToken(tokens, idx, options);
                   };
@@ -417,12 +618,22 @@ class MarkdownPreviewRenderer(
                   };
 
                   var preview = document.getElementById('preview');
-                  setSafePreviewHtml(md.render(source));
+                  var footnoteExtraction = extractFootnotes(source);
+                  var preparedSource = preprocessDefinitionLists(footnoteExtraction.markdown);
+                  var renderEnv = {
+                    footnotes: footnoteExtraction.definitions,
+                    footnoteOrder: [],
+                    footnoteNumbers: Object.create(null),
+                    footnoteRefCounts: Object.create(null)
+                  };
+                  setSafePreviewHtml(md.render(preparedSource, renderEnv));
                   addHeadingAnchors();
                   wrapTables();
                   enhanceTaskLists();
                   enhanceCodeBlocks();
                   enhanceCallouts();
+                  enhanceFootnoteRefs();
+                  appendFootnotes(renderEnv);
                   hardenLinks();
 
                   function slugifyHeading(text) {
@@ -681,6 +892,50 @@ class MarkdownPreviewRenderer(
                     });
                   }
 
+                  function enhanceFootnoteRefs() {
+                    var seen = Object.create(null);
+                    Array.prototype.slice.call(preview.querySelectorAll('sup > a[href^="#notez-fn-"]')).forEach(function (link) {
+                      var labelPart = (link.getAttribute('href') || '').replace(/^#notez-fn-/, '');
+                      if (!labelPart) return;
+                      seen[labelPart] = (seen[labelPart] || 0) + 1;
+                      var sup = link.parentNode;
+                      sup.classList.add('notez-footnote-ref');
+                      sup.id = 'notez-fnref-' + labelPart + '-' + seen[labelPart];
+                    });
+                  }
+
+                  function appendSanitizedInline(parent, html) {
+                    var template = document.createElement('template');
+                    template.innerHTML = String(html || '');
+                    sanitizeRenderedDom(template.content);
+                    parent.appendChild(template.content);
+                  }
+
+                  function appendFootnotes(env) {
+                    if (!env || !env.footnoteOrder || !env.footnoteOrder.length) return;
+                    var section = document.createElement('section');
+                    section.className = 'notez-footnotes';
+                    var title = document.createElement('div');
+                    title.className = 'notez-footnotes-title';
+                    title.textContent = 'Footnotes';
+                    var list = document.createElement('ol');
+                    env.footnoteOrder.forEach(function (label) {
+                      var item = document.createElement('li');
+                      item.id = notezFootnoteSlug(label);
+                      appendSanitizedInline(item, md.renderInline(env.footnotes[label] || '', env));
+                      var back = document.createElement('a');
+                      back.href = '#' + notezFootnoteRefSlug(label, 1);
+                      back.className = 'notez-footnote-backref';
+                      back.textContent = '↩';
+                      item.appendChild(document.createTextNode(' '));
+                      item.appendChild(back);
+                      list.appendChild(item);
+                    });
+                    section.appendChild(title);
+                    section.appendChild(list);
+                    preview.appendChild(section);
+                  }
+
                   function hardenLinks() {
                     Array.prototype.slice.call(preview.querySelectorAll('a[href]')).forEach(function (a) {
                       var href = a.getAttribute('href') || '';
@@ -733,7 +988,7 @@ class MarkdownPreviewRenderer(
         h1 { font-size: 1.75em; padding-bottom: .3em; border-bottom: 1px solid var(--notez-border); }
         h2 { font-size: 1.45em; padding-bottom: .25em; border-bottom: 1px solid var(--notez-border); }
         h3 { font-size: 1.2em; }
-        p, ul, ol, blockquote, pre, .notez-table-wrap, .notez-image-placeholder { margin: .75em 0; }
+        p, ul, ol, dl, blockquote, pre, .notez-table-wrap, .notez-image-placeholder, .notez-footnotes { margin: .75em 0; }
         ul, ol { padding-left: 1.45em; }
         li + li { margin-top: .25em; }
         a { color: var(--notez-accent); text-decoration: none; }
@@ -798,26 +1053,33 @@ class MarkdownPreviewRenderer(
         blockquote {
           border-left: 4px solid var(--notez-border);
           color: var(--notez-muted);
-          padding: .05em 0 .05em 1em;
+          padding: .08em 0 .08em 1em;
         }
         .notez-table-wrap {
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
+          border: 1px solid var(--notez-border);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.025);
         }
         table {
-          border-collapse: collapse;
+          border-collapse: separate;
+          border-spacing: 0;
           min-width: 100%;
           width: max-content;
         }
         th, td {
-          border: 1px solid var(--notez-border);
+          border-right: 1px solid var(--notez-border);
+          border-bottom: 1px solid var(--notez-border);
           padding: 8px 10px;
           text-align: left;
           vertical-align: top;
         }
+        th:last-child, td:last-child { border-right: 0; }
+        tr:last-child td { border-bottom: 0; }
         th {
           background: var(--notez-soft);
-          font-weight: 700;
+          font-weight: 800;
         }
         tr:nth-child(even) td { background: rgba(255, 255, 255, 0.025); }
         .task-list-item {
@@ -831,10 +1093,11 @@ class MarkdownPreviewRenderer(
         }
         .notez-callout {
           border-left-width: 4px;
-          border-radius: 10px;
+          border-radius: 12px;
           padding: 10px 12px;
           color: var(--notez-text);
-          background: var(--notez-soft);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.032));
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
         .notez-callout > p { margin: .35em 0 0; }
         .notez-callout-title {
@@ -874,6 +1137,50 @@ class MarkdownPreviewRenderer(
           font-weight: 700;
           letter-spacing: .05em;
           text-transform: uppercase;
+        }
+        dl {
+          border-left: 3px solid var(--notez-border);
+          padding-left: 12px;
+        }
+        dt {
+          color: var(--notez-text);
+          font-weight: 800;
+          margin-top: .55em;
+        }
+        dd {
+          color: var(--notez-muted);
+          margin: .2em 0 .55em 1em;
+        }
+        .notez-footnote-ref {
+          font-size: .78em;
+          line-height: 0;
+        }
+        .notez-footnote-ref a {
+          border: 1px solid var(--notez-border);
+          border-radius: 999px;
+          padding: 0 .28em;
+          background: rgba(255, 255, 255, 0.05);
+        }
+        .notez-footnotes {
+          border-top: 1px solid var(--notez-border);
+          color: var(--notez-muted);
+          font-size: .9em;
+          margin-top: 1.6em;
+          padding-top: .9em;
+        }
+        .notez-footnotes-title {
+          color: var(--notez-text);
+          font-size: .78em;
+          font-weight: 900;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+        }
+        .notez-footnotes ol { padding-left: 1.4em; }
+        .notez-footnotes li { margin: .35em 0; }
+        .notez-footnote-backref {
+          color: var(--notez-accent);
+          font-size: .9em;
+          text-decoration: none;
         }
         kbd {
           display: inline-block;

@@ -1,6 +1,6 @@
 # Panduan Markdown NOTEZ
 
-Markdown adalah cara menulis teks biasa dengan tanda-tanda sederhana, supaya catatan tetap rapi saat dibaca. Kamu menulis pakai syntax Markdown di mode edit, lalu NOTEZ menampilkan hasil rapinya di mode baca (preview) lewat Markdown Preview v3.
+Markdown adalah cara menulis teks biasa dengan tanda-tanda sederhana, supaya catatan tetap rapi saat dibaca. Kamu menulis pakai syntax Markdown di mode edit, lalu NOTEZ menampilkan hasil rapinya di mode baca (preview) lewat Markdown Preview v4.
 
 Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelasan cara pakai, contoh dalam kalimat nyata, kesalahan umum yang sering kejadian, dan jawaban untuk pertanyaan yang biasanya muncul. Kamu tidak perlu membaca semuanya sekali duduk — pakai daftar isi di bawah untuk lompat ke bagian yang kamu butuhkan.
 
@@ -11,6 +11,7 @@ Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelas
 - [3. Teks miring](#3-teks-miring)
 - [4. Tebal + miring](#4-tebal-miring)
 - [5. Coret (strikethrough)](#5-coret-strikethrough)
+- [5a. Highlight, superscript, dan subscript](#5a-highlight-superscript-dan-subscript)
 - [6. Heading / judul](#6-heading-judul)
 - [7. Paragraf dan baris baru](#7-paragraf-dan-baris-baru)
 - [8. Garis pemisah (horizontal rule)](#8-garis-pemisah-horizontal-rule)
@@ -24,6 +25,8 @@ Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelas
 - [15a. Code block untuk berbagai bahasa pemrograman](#15a-code-block-untuk-berbagai-bahasa-pemrograman)
 - [15b. Tips menulis catatan yang enak dibaca di layar kecil](#15b-tips-menulis-catatan-yang-enak-dibaca-di-layar-kecil)
 - [16. Table](#16-table)
+- [16a. Footnote](#16a-footnote)
+- [16b. Definition list](#16b-definition-list)
 - [17. Image](#17-image)
 - [18. Raw HTML](#18-raw-html)
 - [19. Escape karakter Markdown](#19-escape-karakter-markdown)
@@ -46,6 +49,9 @@ Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelas
 | Miring | `*teks*` |
 | Tebal + miring | `***teks***` |
 | Coret | `~~teks~~` |
+| Highlight/sorot | `==teks==` atau `<mark>teks</mark>` |
+| Superscript | `x^2^` atau `x<sup>2</sup>` |
+| Subscript | `H~2~O` atau `H<sub>2</sub>O` |
 | Judul level 1–6 | `#` sampai `######` |
 | Garis pemisah | `---` |
 | Bullet list | `- item` |
@@ -58,6 +64,8 @@ Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelas
 | Inline code | `` `kode` `` |
 | Code block | tiga backtick, lihat bagian 15 |
 | Table | `\| kolom \| kolom \|` |
+| Footnote | `teks[^1]` + `[^1]: catatan` |
+| Definition list | `Istilah` lalu `: definisi` |
 | Alignment tabel | `:---` kiri, `:---:` tengah, `---:` kanan |
 | Image | `![alt](url)` |
 | Safe raw HTML kecil | `<kbd>Ctrl</kbd>`, `<mark>penting</mark>` |
@@ -90,7 +98,7 @@ Jangan lupa **backup catatan** sebelum update.
 atau menandai beberapa bagian sekaligus dalam satu kalimat yang sama:
 
 ```md
-Hari ini fokus ke **Markdown Preview v3** dan **UI polish**.
+Hari ini fokus ke **Markdown Preview v4** dan **UI polish**.
 ```
 
 Bisa juga dipakai untuk menonjolkan angka atau label:
@@ -188,6 +196,56 @@ Meeting ~~Senin~~ dipindah ke Rabu.
 ```
 
 **Kesalahan umum:** hanya satu tilde (`~teks~`) tidak akan dianggap coret di Markdown standar — harus dua tilde di setiap sisi.
+
+---
+
+## 5a. Highlight, superscript, dan subscript
+
+Markdown Preview v4 menambah syntax kecil yang berguna untuk catatan belajar, teknis, dan revisi.
+
+### Highlight / sorot
+
+Gunakan dua tanda sama dengan di kiri dan kanan teks:
+
+```md
+Ini ==bagian penting== yang perlu diingat.
+```
+
+Alternatif HTML aman:
+
+```md
+Ini <mark>bagian penting</mark> yang perlu diingat.
+```
+
+### Superscript
+
+Cocok untuk pangkat kecil atau notasi sederhana:
+
+```md
+x^2^ + y^2^
+```
+
+Alternatif HTML aman:
+
+```md
+x<sup>2</sup>
+```
+
+### Subscript
+
+Cocok untuk rumus ringan seperti air:
+
+```md
+H~2~O
+```
+
+Alternatif HTML aman:
+
+```md
+H<sub>2</sub>O
+```
+
+Catatan: fitur ini untuk notasi ringan, bukan pengganti LaTeX/math engine penuh.
 
 ---
 
@@ -690,7 +748,7 @@ Karena NOTEZ dipakai di HP, layar lebih sempit dibanding desktop. Beberapa kebia
 ```md
 | Nama | Status | Catatan |
 | --- | --- | --- |
-| Markdown | Done | Preview v2 |
+| Markdown | Done | Preview v4 |
 | UI polish | Plan | Future |
 ```
 
@@ -724,6 +782,45 @@ Aturan strukturnya:
 
 **Kesalahan umum:** jumlah kolom di baris pemisah (`---`) harus sama dengan jumlah kolom di baris header — kalau jumlahnya beda, tabel bisa tampil tidak sesuai harapan.
 
+
+---
+
+## 16a. Footnote
+
+Footnote berguna untuk catatan tambahan tanpa memutus alur paragraf utama.
+
+Cara menulis:
+
+```md
+Kalimat utama tetap enak dibaca.[^1]
+
+[^1]: Ini catatan kaki yang muncul di bagian bawah preview.
+```
+
+Keterangan:
+
+- `[^1]` di paragraf utama adalah penanda referensi;
+- `[^1]: ...` adalah isi catatan kaki;
+- label tidak harus angka, misalnya `[^sumber]`, tapi angka paling mudah dibaca;
+- footnote cocok untuk sumber, catatan kecil, atau penjelasan tambahan.
+
+---
+
+## 16b. Definition list
+
+Definition list cocok untuk glosarium kecil: istilah diikuti definisi.
+
+Cara menulis:
+
+```md
+API
+: Application Programming Interface
+
+Offline-first
+: Aplikasi tetap bisa dipakai tanpa internet.
+```
+
+Di preview, istilah tampil lebih tegas dan definisinya tampil sebagai penjelasan di bawahnya.
 
 ---
 
@@ -771,6 +868,7 @@ Isi detail yang bisa dibuka.
 </details>
 <abbr title="HyperText Markup Language">HTML</abbr>
 <cite>Judul Referensi</cite>
+<dl><dt>Istilah</dt><dd>Definisi</dd></dl>
 ```
 
 Tag di atas tetap disanitasi. Artinya atribut bebas seperti `style=`, `class=`, `id=`, dan event handler seperti `onclick=` akan dibuang atau dibuat tidak aktif.
@@ -810,7 +908,7 @@ Atau pakai code block kalau contohnya lebih panjang:
 ```
 ````
 
-Intinya: gunakan Markdown bawaan NOTEZ untuk struktur utama, lalu pakai safe raw HTML kecil hanya saat benar-benar perlu, misalnya `<kbd>`, `<mark>`, `<sub>`, `<sup>`, atau `<details>`.
+Intinya: gunakan Markdown bawaan NOTEZ untuk struktur utama, lalu pakai safe raw HTML kecil hanya saat benar-benar perlu, misalnya `<kbd>`, `<mark>`, `<sub>`, `<sup>`, `<details>`, atau definition list.
 
 ---
 
@@ -844,11 +942,6 @@ Markdown di luar NOTEZ (misalnya di GitHub atau Obsidian) punya beberapa fitur t
 
 | Fitur | Contoh syntax umum | Status di NOTEZ |
 | --- | --- | --- |
-| Footnote | `Teks[^1]` ... `[^1]: catatan kaki` | Tidak didukung, tampil sebagai teks biasa |
-| Highlight/sorot Markdown | `==teks==` | Tidak didukung; gunakan `<mark>teks</mark>` jika perlu |
-| Superscript syntax | `teks^atas^` | Tidak didukung; gunakan `<sup>atas</sup>` jika perlu |
-| Subscript syntax | `teks~bawah~` | Tidak didukung; gunakan `<sub>bawah</sub>` jika perlu |
-| Definition list | `Istilah` lalu `: definisi` | Tidak didukung |
 | Front matter | `---` blok metadata di awal file | Tidak diproses sebagai metadata |
 | Rumus matematika/LaTeX | `$x^2$` atau `$$...$$` | Tidak dirender, tampil sebagai teks |
 | Diagram (mis. Mermaid) | ```` ```mermaid ```` blok | Tidak dirender sebagai diagram |
@@ -857,7 +950,7 @@ Markdown di luar NOTEZ (misalnya di GitHub atau Obsidian) punya beberapa fitur t
 | Reference-style link | `[label][ref]` + `[ref]: url` | Belum tentu dikenali, gunakan link biasa (bagian 13) |
 | Table of contents otomatis | `[[TOC]]` atau serupa | Tidak ada otomatis; daftar isi manual dengan link internal bisa dibuat kalau perlu |
 
-Kalau kamu terbiasa menulis Markdown di aplikasi lain dan salah satu fitur di atas tidak tampil seperti biasanya di NOTEZ, itu bukan bug — memang belum didukung. Gunakan alternatif yang sudah didukung: misalnya untuk menonjolkan teks, pakai **tebal** (bagian 2) atau `<mark>highlight aman</mark>`; untuk rumus sederhana, tulis sebagai inline code atau jelaskan dengan kata-kata.
+Kalau kamu terbiasa menulis Markdown di aplikasi lain dan salah satu fitur di atas tidak tampil seperti biasanya di NOTEZ, itu bukan bug — memang belum didukung. Gunakan alternatif yang sudah didukung: misalnya untuk rumus sederhana, tulis sebagai inline code atau pakai superscript/subscript ringan jika cukup.
 
 ---
 
@@ -1581,7 +1674,7 @@ NOTEZ tidak menjalankan semua kemungkinan Markdown yang ada di luar sana. Ini ba
 - **Gambar remote** tidak otomatis dimuat — NOTEZ tidak mengakses internet tanpa izin (bagian 17).
 - **Checkbox di preview** cuma tampilan status baca, bukan tombol yang bisa ditap (bagian 10).
 - **Link eksternal** yang ditap dibuka lewat aplikasi lain (browser), bukan di dalam NOTEZ (bagian 13).
-- **Fitur lanjutan** seperti footnote, syntax highlight `==teks==`, superscript/subscript gaya non-HTML, rumus matematika, diagram, dan emoji shortcode belum didukung (bagian 20).
+- **Fitur lanjutan berat** seperti rumus matematika/LaTeX penuh, diagram, embed aktif, dan emoji shortcode belum didukung (bagian 20).
 
 Pilihan-pilihan ini menjaga NOTEZ tetap ringan, offline, dan aman dari konten yang tidak terduga — bukan keterbatasan teknis semata, tapi bagian dari prinsip desain aplikasinya.
 

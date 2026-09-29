@@ -20,7 +20,7 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 
 - Catatan tanpa batas karakter buatan app.
 - Edit mode native Android `EditText`.
-- View mode dengan Markdown Preview v3 berbasis local WebView Reading View.
+- View mode dengan Markdown Preview v4 berbasis local WebView Reading View.
 - Panduan Markdown lokal/offline dari drawer.
 - Search catatan.
 - Halaman Pengaturan dari drawer.
@@ -57,6 +57,8 @@ NOTEZ mendukung Markdown umum untuk catatan rapi:
 - italic `*teks*`;
 - bold + italic `***teks***`;
 - strikethrough `~~teks~~`;
+- highlight `==teks==` / `<mark>teks</mark>`;
+- superscript/subscript ringan `x^2^` dan `H~2~O`;
 - bullet list dan numbered list;
 - checklist `- [ ]` / `- [x]`;
 - quote `>`;
@@ -70,8 +72,10 @@ NOTEZ mendukung Markdown umum untuk catatan rapi:
 - inline code;
 - fenced code block dengan local syntax highlighting ringan;
 - table dengan alignment `:---`, `:---:`, `---:`;
+- footnote `[^1]` + `[^1]: catatan`;
+- definition list `Istilah` lalu `: definisi`;
 - image placeholder untuk remote image;
-- safe raw HTML allowlist kecil: `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, `<u>`, `<s>`, `<small>`, `<details>`, `<summary>`, `<abbr title="...">`, `<cite>`;
+- safe raw HTML allowlist kecil: `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, `<u>`, `<s>`, `<small>`, `<details>`, `<summary>`, `<abbr title="...">`, `<cite>`, `<dl>`, `<dt>`, `<dd>`;
 - raw HTML di luar allowlist tetap tampil sebagai teks/escaped, bukan dijalankan.
 
 Panduan lengkap tersedia langsung di aplikasi:
@@ -120,10 +124,7 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
 - Checkbox di preview belum interaktif.
   - Untuk mengubah checklist, edit teks Markdown `- [ ]` / `- [x]` langsung.
 - Fitur Markdown lanjutan belum didukung:
-  - footnote;
-  - highlight Markdown `==teks==` belum didukung; gunakan `<mark>teks</mark>` jika perlu highlight aman;
-  - superscript/subscript syntax non-HTML;
-  - LaTeX/math;
+  - LaTeX/math penuh;
   - Mermaid/diagram;
   - emoji shortcode `:smile:`;
   - auto table-of-contents seperti `[[TOC]]`.
