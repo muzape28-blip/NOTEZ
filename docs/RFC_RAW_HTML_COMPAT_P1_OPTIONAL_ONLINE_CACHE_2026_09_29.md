@@ -1,6 +1,6 @@
 # RFC — Raw HTML Compatibility P1 + Optional Online Cache Direction (2026-09-29)
 
-Status: IMPLEMENTED + CI VERIFIED — DEVICE UAT PENDING
+Status: IMPLEMENTED + CI VERIFIED + DEVICE VERIFIED / PASS
 
 ## Context
 
@@ -142,4 +142,6 @@ Approved behavior implemented locally:
 
 ## Device UAT
 
-Pending user/device verification.
+- Result: DEVICE VERIFIED / PASS.
+- Reported by user on 2026-09-29: "Okeeeyy mantapss semua pass".
+- Scope understood from preceding UAT thread: ZCODE README-style raw HTML, screenshot table rendering, placeholder body tap, `Load & cache`, cached/offline image behavior, and safety boundaries.

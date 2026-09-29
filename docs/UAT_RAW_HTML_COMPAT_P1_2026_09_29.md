@@ -1,6 +1,6 @@
 # UAT — Raw HTML Compatibility P1 + Optional Image Cache (2026-09-29)
 
-Status: CI VERIFIED — PENDING DEVICE UAT
+Status: DEVICE VERIFIED / PASS
 
 ## Build Under Test
 
@@ -97,4 +97,13 @@ Expected:
 
 ## Result
 
-Pending.
+PASS — reported by user on 2026-09-29: "Okeeeyy mantapss semua pass".
+
+Verified scope from the latest UAT exchange:
+
+- ZCODE README-style raw HTML renders, not as literal escaped text.
+- Raw screenshot table support passes.
+- Placeholder body tap behaves like `Load & cache`.
+- Explicit `Load & cache` flow works.
+- Optional user-triggered online image cache behavior passes.
+- Safety boundaries remain acceptable for UAT.
