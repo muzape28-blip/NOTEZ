@@ -46,7 +46,7 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 - Folder backup otomatis.
 - Music drawer/player lokal.
 - Delete note dengan custom trash glyph + undo snackbar.
-- Tetap tanpa permission `INTERNET`.
+- Offline-first dengan optional user-triggered online image cache (`INTERNET` hanya dipakai saat user tap `Load & cache`).
 
 ---
 
@@ -76,7 +76,7 @@ NOTEZ mendukung Markdown umum untuk catatan rapi:
 - table dengan alignment `:---`, `:---:`, `---:`;
 - footnote `[^1]` + `[^1]: catatan`;
 - definition list `Istilah` lalu `: definisi`;
-- image placeholder untuk remote image;
+- image placeholder untuk remote image, dengan tombol `Load & cache` manual untuk menyimpan gambar online ke cache lokal;
 - safe raw HTML allowlist: tag kecil seperti `<br>`, `<kbd>`, `<mark>`, `<details>`, definition list, plus subset README-style seperti `<div align="center">`, `<h1>`-`<h6>`, `<p>`, `<strong>/<b>`, `<em>/<i>`, `<a href="...">`, dan `<img>` sebagai placeholder;
 - raw HTML di luar allowlist tetap tampil sebagai teks/escaped, bukan dijalankan.
 
@@ -92,20 +92,22 @@ Panduan ini offline, read-only, dan punya daftar isi clickable untuk lompat ke b
 
 ## Privacy / offline stance
 
-NOTEZ sengaja menjaga permukaan jaringan tetap kecil:
+NOTEZ tetap offline-first dan menjaga permukaan jaringan tetap kecil:
 
-- tidak memakai `android.permission.INTERNET`;
+- `android.permission.INTERNET` hanya dipakai untuk gambar online saat user tap `Load & cache`;
 - tidak memakai CDN;
-- tidak memuat remote script/style/font/image;
+- tidak memuat remote script/style/font/iframe;
+- remote image Markdown/raw HTML tidak otomatis diunduh;
+- gambar yang berhasil di-load disimpan lokal agar bisa dibaca offline lagi;
 - Markdown renderer memakai asset lokal dari APK;
 - WebView preview tidak memakai `addJavascriptInterface`;
-- link eksternal dibuka lewat aplikasi/browser luar saat user tap;
-- remote image Markdown tidak otomatis diunduh.
+- link eksternal dibuka lewat aplikasi/browser luar saat user tap.
 
 Prinsipnya:
 
 ```text
 Catatan user tetap lokal.
+Online hanya saat user meminta.
 Konten asing tidak dieksekusi diam-diam.
 ```
 
@@ -121,9 +123,10 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
   - Hanya allowlist aman yang aktif.
   - README-style `<img>` didukung sebagai placeholder, bukan gambar remote aktif.
   - Tag seperti `<script>`, `<style>`, `<iframe>`, `<form>`, event handler `onclick=`, `style=`, `class=`, dan `javascript:` tetap diblok/escaped.
-- Remote image belum auto-render.
-  - NOTEZ tetap no `INTERNET` pada build ini.
-  - Future candidate: optional user-triggered online image loading + local caching, atau local image/file attachment yang tetap offline-first.
+- Remote image tidak auto-render.
+  - User bisa tap `Load & cache` untuk mengambil gambar online sekali lalu menyimpannya lokal.
+  - SVG remote tetap hati-hati; tipe utama yang didukung cache: PNG, JPG/JPEG, WebP, GIF.
+  - Future candidate: local image/file attachment.
 - Checkbox di preview belum interaktif.
   - Untuk mengubah checklist, edit teks Markdown `- [ ]` / `- [x]` langsung.
 - Fitur Markdown lanjutan belum didukung:
@@ -213,9 +216,10 @@ Release publik terbaru : tetap sesuai GitHub Releases, belum otomatis berubah ha
 Kontrak penting yang dijaga:
 
 ```text
-No INTERNET permission
+Offline-first with user-triggered INTERNET only
 No CDN
-No remote scripts/styles/fonts/images
+No remote scripts/styles/fonts/iframes
+No remote image auto-load
 No addJavascriptInterface
 Edit mode native EditText
 View mode local WebView Reading View

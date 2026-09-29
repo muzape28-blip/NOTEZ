@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.zaba.notez.markdown.RemoteImageCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -105,6 +106,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, AboutNotezActivity::class.java))
         }
         findViewById<TextView>(R.id.settings_row_privacy).setOnClickListener { showPrivacyDialog() }
+        findViewById<TextView>(R.id.settings_row_clear_remote_image_cache).setOnClickListener { confirmClearRemoteImageCache() }
 
         updateSummaries()
     }
@@ -299,13 +301,32 @@ class SettingsActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Privacy / Offline")
             .setMessage(
-                "NOTEZ tetap lokal dan offline-first.\n\n" +
-                    "• Tidak memakai permission INTERNET.\n" +
-                    "• Markdown renderer memakai asset lokal dari APK.\n" +
+                "NOTEZ tetap offline-first. Semua fitur inti tetap jalan tanpa internet.\n\n" +
+                    "• INTERNET hanya dipakai saat kamu tap Load & cache pada gambar online.\n" +
                     "• Remote image tidak auto-load.\n" +
+                    "• Gambar yang berhasil dimuat disimpan lokal untuk dibaca offline.\n" +
+                    "• Markdown renderer memakai asset lokal dari APK.\n" +
+                    "• Remote script/style/font/iframe tetap tidak dimuat.\n" +
                     "• Link eksternal dibuka lewat aplikasi/browser luar saat user tap."
             )
             .setPositiveButton("OK", null)
+            .show()
+    }
+
+    private fun confirmClearRemoteImageCache() {
+        val cache = RemoteImageCache(this)
+        AlertDialog.Builder(this)
+            .setTitle("Hapus cache gambar online?")
+            .setMessage(
+                "Cache sekarang: ${cache.formattedSize()}\n\n" +
+                    "Gambar online yang pernah di-load akan dihapus dari penyimpanan lokal. " +
+                    "Catatan tetap aman; nanti gambar bisa di-load lagi kalau dibutuhkan."
+            )
+            .setPositiveButton("Hapus") { _, _ ->
+                val result = cache.clear()
+                toast("Cache gambar dihapus (${result.files} file)")
+            }
+            .setNegativeButton("Batal", null)
             .show()
     }
 

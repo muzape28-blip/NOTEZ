@@ -2,6 +2,7 @@ package com.zaba.notez.markdown
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import androidx.appcompat.app.AlertDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
@@ -17,6 +18,8 @@ import com.zaba.notez.R
 import com.zaba.notez.ThemePref
 import java.io.ByteArrayInputStream
 import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import org.json.JSONObject
 
 /**
@@ -29,7 +32,9 @@ import org.json.JSONObject
  * - no native JavaScript bridge;
  * - same-document #anchor links are allowed for local table-of-contents jumps;
  * - WebView navigation to remote URLs is blocked and opened externally instead;
- * - remote images are rendered as placeholders, not fetched in WebView.
+ * - remote images are placeholders by default;
+ * - user-triggered image downloads happen natively, then cached files are served back to WebView
+ *   through https://notez.local/cache/image/... only.
  */
 class MarkdownPreviewRenderer(
     private val activity: Activity,
@@ -38,12 +43,17 @@ class MarkdownPreviewRenderer(
     private val markdownItJs: String by lazy {
         activity.assets.open("markdown/markdown-it.umd.min.js").bufferedReader().use { it.readText() }
     }
+    private val remoteImageCache = RemoteImageCache(activity)
+    private val imageExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    @Volatile private var destroyed = false
+    private var currentMarkdown: String = ""
 
     init {
         configureWebView()
     }
 
     fun render(markdown: String) {
+        currentMarkdown = markdown
         webView.loadDataWithBaseURL(
             NOTEZ_BASE_URL,
             buildHtml(markdown),
@@ -54,6 +64,8 @@ class MarkdownPreviewRenderer(
     }
 
     fun destroy() {
+        destroyed = true
+        imageExecutor.shutdownNow()
         webView.stopLoading()
         webView.loadUrl("about:blank")
         webView.destroy()
@@ -87,6 +99,10 @@ class MarkdownPreviewRenderer(
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val uri = request.url ?: return true
+                if (isImageLoadRequest(uri)) {
+                    confirmAndLoadImage(uri)
+                    return true
+                }
                 if (isLocalPreviewUrl(uri)) return false
                 return openExternalOrBlock(uri)
             }
@@ -96,6 +112,9 @@ class MarkdownPreviewRenderer(
                 request: WebResourceRequest
             ): WebResourceResponse? {
                 val uri = request.url ?: return blockedResponse()
+                if (RemoteImageCache.isCacheUri(uri)) {
+                    return remoteImageCache.responseFor(uri) ?: blockedResponse()
+                }
                 if (isLocalPreviewUrl(uri)) return null
                 if (uri.scheme.equals("about", ignoreCase = true)) return null
                 return blockedResponse()
@@ -106,6 +125,7 @@ class MarkdownPreviewRenderer(
     private fun buildHtml(markdown: String): String {
         val colors = PreviewColors.from(activity)
         val markdownJson = JSONObject.quote(markdown)
+        val cachedImagesJson = cachedImagesJson(markdown)
         return """
             <!doctype html>
             <html>
@@ -122,8 +142,11 @@ class MarkdownPreviewRenderer(
                   'use strict';
 
                   var source = $markdownJson;
+                  var cachedImages = $cachedImagesJson;
                   var safeExternalLink = /^(https?:|mailto:|tel:)/i;
                   var safeAnchorLink = /^#[A-Za-z0-9][A-Za-z0-9_-]*$/;
+                  var safeImageLoadLink = /^notez-image:\/\/load\?src=.+/i;
+                  var safeCachedImageLink = /^https:\/\/notez\.local\/cache\/image\/[a-f0-9]{64}$/i;
                   var allowedRawHtmlTags = {
                     a: true,
                     abbr: true,
@@ -178,6 +201,7 @@ class MarkdownPreviewRenderer(
                     h6: true,
                     hr: true,
                     i: true,
+                    img: true,
                     kbd: true,
                     li: true,
                     mark: true,
@@ -205,7 +229,12 @@ class MarkdownPreviewRenderer(
                     'notez-align-justify': true,
                     'notez-align-left': true,
                     'notez-align-right': true,
+                    'notez-cached-image': true,
+                    'notez-image-action': true,
+                    'notez-image-actions': true,
                     'notez-image-kicker': true,
+                    'notez-image-load': true,
+                    'notez-image-open': true,
                     'notez-image-placeholder': true,
                     'notez-image-placeholder-inline': true,
                     'notez-image-placeholder-raw': true,
@@ -327,22 +356,66 @@ class MarkdownPreviewRenderer(
                     return source.length > 180 ? source.slice(0, 177) + '…' : source;
                   }
 
-                  function renderImagePlaceholder(rawSrc, alt, widthValue, heightValue, insideLink) {
+                  function renderImageOrPlaceholder(rawSrc, alt, widthValue, heightValue, insideLink, openHref) {
                     var href = safeExternalHref(rawSrc);
+                    var safeOpenHref = safeHref(openHref || '') || href;
                     var style = imagePlaceholderStyle(widthValue, heightValue);
-                    var classes = 'notez-image-placeholder notez-image-placeholder-raw notez-image-placeholder-inline' + (style ? ' notez-image-placeholder-sized' : '');
+                    var cachedSrc = safeCachedImageHref(cachedImageHref(rawSrc));
                     var title = shortImageSource(rawSrc);
                     var label = alt || 'image';
-                    var helper = href ? 'Remote image placeholder' : 'Image placeholder';
+                    if (cachedSrc) {
+                      var imgClasses = 'notez-cached-image' + (style ? ' notez-image-placeholder-sized' : '');
+                      var img = '<img class="' + imgClasses + '" src="' + escapeAttribute(cachedSrc) + '" alt="' + escapeAttribute(label) + '" title="' + escapeAttribute(title) + '"' +
+                        (style ? ' style="' + escapeAttribute(style) + '"' : '') + '>';
+                      return safeOpenHref && !insideLink ? '<a href="' + escapeAttribute(safeOpenHref) + '" target="_self" rel="nofollow noopener noreferrer">' + img + '</a>' : img;
+                    }
+                    var classes = 'notez-image-placeholder notez-image-placeholder-raw notez-image-placeholder-inline' + (style ? ' notez-image-placeholder-sized' : '');
+                    var helper = href ? 'Remote image belum dimuat' : 'Image placeholder';
                     var attrs = ' class="' + classes + '" title="' + escapeAttribute(title) + '"';
                     if (style) attrs += ' style="' + escapeAttribute(style) + '"';
-                    var tag = href && !insideLink ? 'a' : 'span';
-                    if (tag === 'a') attrs += ' href="' + escapeAttribute(href) + '" target="_self" rel="nofollow noopener noreferrer"';
-                    return '<' + tag + attrs + '>' +
+                    var openTag = insideLink ? '<span' + attrs + '>' : '<span' + attrs + '>';
+                    var actions = '';
+                    if (href) {
+                      actions += '<span class="notez-image-actions">' +
+                        '<a class="notez-image-action notez-image-load" href="' + escapeAttribute(notezImageLoadHref(rawSrc)) + '">Load &amp; cache</a>';
+                      if (safeOpenHref) {
+                        actions += '<a class="notez-image-action notez-image-open" href="' + escapeAttribute(safeOpenHref) + '" target="_self" rel="nofollow noopener noreferrer">Open link</a>';
+                      }
+                      actions += '</span>';
+                    }
+                    return openTag +
                       '<span class="notez-image-kicker">Image</span>' +
                       '<strong>' + escapeHtml(label) + '</strong>' +
                       '<small>' + helper + '</small>' +
-                      '</' + tag + '>';
+                      actions +
+                      '</span>';
+                  }
+
+                  function soleRawImageChild(node) {
+                    var image = null;
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                      var child = node.childNodes[i];
+                      if (child.nodeType === Node.TEXT_NODE && !String(child.nodeValue || '').trim()) continue;
+                      if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'img' && !image) {
+                        image = child;
+                        continue;
+                      }
+                      return null;
+                    }
+                    return image;
+                  }
+
+                  function renderLinkedRawImage(node) {
+                    var image = soleRawImageChild(node);
+                    if (!image) return '';
+                    return renderImageOrPlaceholder(
+                      image.getAttribute('src') || '',
+                      image.getAttribute('alt') || '',
+                      image.getAttribute('width') || '',
+                      image.getAttribute('height') || '',
+                      false,
+                      node.getAttribute('href') || ''
+                    );
                   }
 
                   function renderSafeRawAttributes(node, tagName) {
@@ -398,13 +471,18 @@ class MarkdownPreviewRenderer(
                     if (tagName === 'br') {
                       return '<br>';
                     }
+                    if (tagName === 'a') {
+                      var linkedImage = renderLinkedRawImage(node);
+                      if (linkedImage) return linkedImage;
+                    }
                     if (tagName === 'img') {
-                      return renderImagePlaceholder(
+                      return renderImageOrPlaceholder(
                         node.getAttribute('src') || '',
                         node.getAttribute('alt') || '',
                         node.getAttribute('width') || '',
                         node.getAttribute('height') || '',
-                        parentTag === 'a'
+                        parentTag === 'a',
+                        ''
                       );
                     }
                     return '<' + tagName + renderSafeRawAttributes(node, tagName) + '>' +
@@ -419,6 +497,9 @@ class MarkdownPreviewRenderer(
                   }
 
                   function isSafeRenderedElement(element, tagName) {
+                    if (tagName === 'img') {
+                      return hasClassToken(element, 'notez-cached-image') && !!safeCachedImageHref(element.getAttribute('src') || '');
+                    }
                     if (tagName !== 'div' && tagName !== 'span') return true;
                     var classes = (element.getAttribute('class') || '').split(/\s+/).filter(Boolean);
                     if (!classes.length) return tagName === 'div';
@@ -450,12 +531,17 @@ class MarkdownPreviewRenderer(
                       } else if (name === 'style' && (tagName === 'th' || tagName === 'td') && isSafeTextAlign(value)) {
                         keep = true;
                         nextValue = normalizedTextAlign(value);
-                      } else if (name === 'style' && hasClassToken(element, 'notez-image-placeholder')) {
+                      } else if (name === 'src' && tagName === 'img') {
+                        nextValue = safeCachedImageHref(value);
+                        keep = nextValue.length > 0;
+                      } else if ((name === 'alt') && tagName === 'img') {
+                        keep = true;
+                      } else if (name === 'style' && (hasClassToken(element, 'notez-image-placeholder') || hasClassToken(element, 'notez-cached-image'))) {
                         nextValue = normalizeImagePlaceholderStyle(value);
                         keep = nextValue.length > 0;
                       } else if (name === 'start' && tagName === 'ol' && /^\d{1,6}$/.test(value)) {
                         keep = true;
-                      } else if (name === 'title' && (tagName === 'abbr' || tagName === 'a' || hasClassToken(element, 'notez-image-placeholder'))) {
+                      } else if (name === 'title' && (tagName === 'abbr' || tagName === 'a' || tagName === 'img' || hasClassToken(element, 'notez-image-placeholder'))) {
                         keep = true;
                       } else if (name === 'open' && tagName === 'details') {
                         keep = true;
@@ -515,10 +601,29 @@ class MarkdownPreviewRenderer(
                     return safeExternalLink.test(href) ? href : '';
                   }
 
+                  function safeImageLoadHref(value) {
+                    var href = String(value || '').trim();
+                    return safeImageLoadLink.test(href) ? href : '';
+                  }
+
+                  function safeCachedImageHref(value) {
+                    var href = String(value || '').trim();
+                    return safeCachedImageLink.test(href) ? href : '';
+                  }
+
                   function safeHref(value) {
                     var href = String(value || '').trim();
                     if (isSafeAnchor(href)) return href;
+                    if (safeImageLoadHref(href)) return href;
                     return safeExternalHref(href);
+                  }
+
+                  function notezImageLoadHref(rawSrc) {
+                    return 'notez-image://load?src=' + encodeURIComponent(String(rawSrc || '').trim());
+                  }
+
+                  function cachedImageHref(rawSrc) {
+                    return cachedImages[String(rawSrc || '').trim()] || '';
                   }
 
                   function normalizeFootnoteLabel(label) {
@@ -735,21 +840,11 @@ class MarkdownPreviewRenderer(
                   md.renderer.rules.image = function (tokens, idx, options, env, self) {
                     var token = tokens[idx];
                     var rawSrc = token.attrGet('src') || '';
-                    var href = safeExternalHref(rawSrc);
                     var alt = token.content || '';
                     if (!alt && token.children) {
                       alt = self.renderInlineAsText(token.children, options, env);
                     }
-                    var sourceText = escapeHtml(rawSrc || '(no source)');
-                    var altText = escapeHtml(alt || 'image');
-                    var open = href ? '<a class="notez-image-placeholder" href="' + escapeHtml(href) + '">' : '<div class="notez-image-placeholder">';
-                    var close = href ? '</a>' : '</div>';
-                    return open +
-                      '<span class="notez-image-kicker">Image</span>' +
-                      '<strong>' + altText + '</strong>' +
-                      '<code>' + sourceText + '</code>' +
-                      '<small>Remote images stay as links because NOTEZ has no INTERNET permission.</small>' +
-                      close;
+                    return renderImageOrPlaceholder(rawSrc, alt, '', '', false, '');
                   };
 
                   md.renderer.rules.html_inline = function (tokens, idx) {
@@ -1274,6 +1369,13 @@ class MarkdownPreviewRenderer(
           margin: .18em .3em .18em 0;
           box-sizing: border-box;
         }
+        .notez-cached-image {
+          display: inline-block;
+          max-width: 100%;
+          height: auto;
+          vertical-align: middle;
+          border-radius: 8px;
+        }
         .notez-image-placeholder-sized {
           align-items: center;
           text-align: center;
@@ -1294,6 +1396,22 @@ class MarkdownPreviewRenderer(
         }
         .notez-image-placeholder small { color: var(--notez-muted); }
         .notez-image-placeholder-inline small { font-size: .72em; }
+        .notez-image-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          justify-content: center;
+          margin-top: 7px;
+        }
+        .notez-image-action {
+          border: 1px solid var(--notez-border);
+          border-radius: 999px;
+          padding: 2px 8px;
+          background: rgba(255, 255, 255, 0.055);
+          font-size: .76em;
+          font-weight: 800;
+        }
+        .notez-image-load { color: var(--notez-accent); }
         .notez-image-kicker {
           display: inline-block;
           color: var(--notez-muted);
@@ -1391,6 +1509,72 @@ class MarkdownPreviewRenderer(
         }
     """.trimIndent()
 
+
+    private fun cachedImagesJson(markdown: String): String {
+        val json = JSONObject()
+        extractRemoteImageSources(markdown).forEach { source ->
+            remoteImageCache.cachedWebUrlFor(source)?.let { cachedUrl ->
+                json.put(source, cachedUrl)
+            }
+        }
+        return json.toString()
+    }
+
+    private fun extractRemoteImageSources(markdown: String): Set<String> {
+        val sources = linkedSetOf<String>()
+        MARKDOWN_IMAGE_PATTERN.findAll(markdown).forEach { match ->
+            match.groupValues.getOrNull(1)
+                ?.trim()
+                ?.trim('<', '>')
+                ?.normalizeHtmlAttribute()
+                ?.takeIf(::isRemoteHttpUrl)
+                ?.let(sources::add)
+        }
+        RAW_IMG_SRC_PATTERN.findAll(markdown).forEach { match ->
+            match.groupValues.getOrNull(2)
+                ?.trim()
+                ?.normalizeHtmlAttribute()
+                ?.takeIf(::isRemoteHttpUrl)
+                ?.let(sources::add)
+        }
+        return sources
+    }
+
+    private fun isImageLoadRequest(uri: Uri): Boolean =
+        uri.scheme.equals(IMAGE_LOAD_SCHEME, ignoreCase = true) &&
+            uri.host.equals(IMAGE_LOAD_HOST, ignoreCase = true) &&
+            isRemoteHttpUrl(uri.getQueryParameter("src").orEmpty())
+
+    private fun confirmAndLoadImage(uri: Uri) {
+        val source = uri.getQueryParameter("src").orEmpty().trim()
+        if (!isRemoteHttpUrl(source) || destroyed || activity.isFinishing) return
+        val host = runCatching { Uri.parse(source).host.orEmpty() }.getOrDefault("").ifBlank { source }
+        AlertDialog.Builder(activity)
+            .setTitle("Load gambar online?")
+            .setMessage(
+                "NOTEZ akan memakai internet sekali untuk mengambil gambar dari:\n\n" +
+                    "$host\n\n" +
+                    "Setelah berhasil, gambar disimpan lokal dan bisa dibaca offline. " +
+                    "Remote image lain tetap tidak dimuat otomatis."
+            )
+            .setPositiveButton("Load & cache") { _, _ -> downloadImage(source) }
+            .setNegativeButton("Batal", null)
+            .setNeutralButton("Open browser") { _, _ -> openExternalOrBlock(Uri.parse(source)) }
+            .show()
+    }
+
+    private fun downloadImage(source: String) {
+        Toast.makeText(activity, "Mengambil gambar…", Toast.LENGTH_SHORT).show()
+        imageExecutor.execute {
+            val result = remoteImageCache.download(source)
+            activity.runOnUiThread {
+                if (destroyed || activity.isFinishing) return@runOnUiThread
+                Toast.makeText(activity, result.message, Toast.LENGTH_SHORT).show()
+                if (result.success) render(currentMarkdown)
+            }
+        }
+    }
+
     private fun isLocalPreviewUrl(uri: Uri): Boolean =
         uri.scheme.equals("https", ignoreCase = true) && uri.host.equals(NOTEZ_HOST, ignoreCase = true)
 
@@ -1436,9 +1620,25 @@ class MarkdownPreviewRenderer(
     private companion object {
         private const val NOTEZ_HOST = "notez.local"
         private const val NOTEZ_BASE_URL = "https://notez.local/"
+        private const val IMAGE_LOAD_SCHEME = "notez-image"
+        private const val IMAGE_LOAD_HOST = "load"
         private val EXTERNAL_SCHEMES = setOf("http", "https", "mailto", "tel")
+        private val MARKDOWN_IMAGE_PATTERN = Regex("!\[[^\]]*]\(\s*<?([^\s)>"]+)")
+        private val RAW_IMG_SRC_PATTERN = Regex("""<img\b[^>]*\bsrc\s*=\s*(["'])((?:(?!\1).)*)\1""", RegexOption.IGNORE_CASE)
     }
 }
+
+private fun isRemoteHttpUrl(value: String): Boolean = runCatching {
+    val uri = Uri.parse(value.trim())
+    uri.scheme.equals("http", ignoreCase = true) || uri.scheme.equals("https", ignoreCase = true)
+}.getOrDefault(false)
+
+private fun String.normalizeHtmlAttribute(): String = this
+    .replace("&amp;", "&")
+    .replace("&quot;", "\"")
+    .replace("&#34;", "\"")
+    .replace("&#39;", "'")
+    .replace("&apos;", "'")
 
 private fun Activity.colorResource(colorRes: Int): String =
     String.format(Locale.US, "#%06X", 0xFFFFFF and getColor(colorRes))

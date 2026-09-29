@@ -25,7 +25,7 @@ User approved the direction:
 
 ## P1 Scope Implemented Locally
 
-P1 keeps NOTEZ without `android.permission.INTERNET`.
+P1 initially kept NOTEZ without `android.permission.INTERNET`; the same local batch was extended with the approved optional online cache direction before push/UAT, so current head intentionally includes `android.permission.INTERNET` for user-triggered image loading only.
 
 ### Newly supported raw HTML subset
 
@@ -75,37 +75,42 @@ Meaning:
 - user must be able to clear cached remote content;
 - no remote script/style/font/iframe execution.
 
-## P2 Direction — Not Implemented In This Patch
+## Optional Online Image Cache — Implemented In Same Local Batch
 
-Optional remote image cache is intentionally not implemented in P1.
+Android `INTERNET` is not a runtime/temporary permission. Adding it to the manifest changes NOTEZ from `no INTERNET permission` to:
 
-Reason: Android `INTERNET` is not a runtime/temporary permission. Adding it to the manifest changes NOTEZ from `no INTERNET permission` to `offline-first with user-triggered online access`.
+> offline-first with user-triggered online access.
 
-Future P2 candidate:
+Approved behavior implemented locally:
 
-- add `android.permission.INTERNET`;
-- keep remote image placeholders by default;
-- add `Load & cache` action on placeholders;
-- show a consent dialog with domain/source;
-- download only after user taps;
-- store private local cache;
-- render cached image offline;
-- provide `Clear remote image cache` setting;
+- added `android.permission.INTERNET`;
+- remote image placeholders remain the default;
+- placeholders include a `Load & cache` action when source is remote HTTP(S);
+- tapping `Load & cache` shows a native confirmation dialog with the source domain;
+- download happens only after user confirms;
+- downloaded images are stored in private local cache under app files;
+- cached images are served back to the WebView through `https://notez.local/cache/image/...` only;
+- WebView network loads remain blocked for arbitrary remote resources;
+- Settings includes `Hapus cache gambar online`;
 - no background fetch;
 - no remote scripts/styles/fonts/iframes;
-- treat SVG badges carefully, probably placeholder/chip first unless a separate SVG sanitizer/render policy is approved.
+- supported cached image MIME types: PNG, JPG/JPEG, WebP, GIF;
+- SVG badge rendering remains cautious and may stay placeholder unless a separate SVG policy is approved.
 
 ## Implementation Notes
 
 - Main renderer: `app/src/main/java/com/zaba/notez/markdown/MarkdownPreviewRenderer.kt`.
+- Remote image cache helper: `app/src/main/java/com/zaba/notez/markdown/RemoteImageCache.kt`.
+- Manifest: `app/src/main/AndroidManifest.xml` intentionally includes `android.permission.INTERNET` for user-triggered image cache.
+- Settings cache clear row: `SettingsActivity.kt` and `activity_settings.xml`.
 - User guide: `app/src/main/assets/help/markdown_guide.md`.
 - About page: `app/src/main/assets/help/about_notez.md`.
-- README updated to describe the expanded safe raw HTML subset.
+- README updated to describe the expanded safe raw HTML subset and offline-first/user-triggered-online posture.
 
 ## Local Checks
 
 - XML parse: PASS.
-- No `android.permission.INTERNET`: PASS.
+- `android.permission.INTERNET` present intentionally for user-triggered image cache: PASS.
 - No `addJavascriptInterface`: PASS.
 - No CDN marker: PASS.
 - Embedded preview JavaScript syntax smoke (`new Function(...)` in Node): PASS.

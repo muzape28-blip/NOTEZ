@@ -1,4 +1,4 @@
-# UAT — Raw HTML Compatibility P1 (2026-09-29)
+# UAT — Raw HTML Compatibility P1 + Optional Image Cache (2026-09-29)
 
 Status: PENDING DEVICE UAT
 
@@ -39,10 +39,32 @@ ZCODE adalah IDE Python untuk Android.
 - `<h1>ZCODE</h1>` renders as a heading.
 - `<strong>` renders bold.
 - `<em>` renders italic.
-- Raw `<img>` becomes NOTEZ image placeholder/chip.
+- Raw `<img>` becomes NOTEZ image placeholder/chip before loading.
 - `alt` text such as `ZCODE logo`, `CI Build`, and `GNU GPLv3` is visible inside placeholders.
 - `width="112"` makes the logo placeholder compact/sized, not full-screen.
-- Link wrapping the badge remains tappable only as a safe external link; WebView does not load it internally.
+- Placeholder shows `Load & cache` for remote HTTP(S) image sources.
+- Link wrapping the badge does not make WebView load remote content internally.
+
+
+## Expected — Optional Load & Cache
+
+Use a small PNG/JPG/WebP/GIF remote image URL for this section.
+
+1. Tap `Load & cache` on a remote image placeholder.
+2. Confirm the dialog shows the source domain and explains one-time internet use.
+3. Tap `Load & cache` in the dialog.
+4. Expected: image downloads, saves locally, and the Reading View rerenders with the cached image.
+5. Turn off network / airplane mode and reopen the note.
+6. Expected: cached image still appears from local cache.
+7. Open Settings → Aplikasi → `Hapus cache gambar online`.
+8. Confirm cache size is shown and clearing cache works.
+9. Reopen note.
+10. Expected: image returns to placeholder state.
+
+Notes:
+
+- Remote images must not auto-load just by opening the note.
+- SVG badge URLs may remain placeholder if unsupported by current image-cache policy.
 
 ## Expected — Safety
 
@@ -62,7 +84,9 @@ Expected:
 - free `style=` does not affect page layout;
 - `onclick` does nothing;
 - `javascript:` link is inactive/unsafe;
-- no remote image auto-load happens.
+- no remote image auto-load happens;
+- `INTERNET` is used only after user taps and confirms `Load & cache`;
+- remote script/style/font/iframe still does not load.
 
 ## Result
 

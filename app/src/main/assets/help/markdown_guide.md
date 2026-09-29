@@ -837,7 +837,7 @@ Di preview, istilah tampil lebih tegas dan definisinya tampil sebagai penjelasan
 - teks di dalam `[]` adalah *alt text* — deskripsi singkat gambar, berguna untuk aksesibilitas dan tetap muncul kalau gambarnya gagal dimuat;
 - alamat di dalam `()` adalah sumber gambarnya.
 
-**Di NOTEZ:** gambar dari internet (remote) tidak otomatis dimuat. Preview menampilkan placeholder atau link ke gambar tersebut, bukan langsung mengunduh dan menampilkannya di layar. Ini menjaga NOTEZ tetap offline-first dan mencegah catatan mengambil resource jaringan diam-diam.
+**Di NOTEZ:** gambar dari internet (remote) tidak otomatis dimuat. Preview menampilkan placeholder/link lebih dulu. Kalau kamu tap `Load & cache`, NOTEZ meminta konfirmasi, mengambil gambar sekali, menyimpannya lokal, lalu bisa menampilkannya lagi saat offline. Ini menjaga NOTEZ tetap offline-first dan mencegah catatan mengambil resource jaringan diam-diam.
 
 Contoh penulisan yang tetap berguna meski gambarnya tidak dimuat otomatis:
 
@@ -918,9 +918,9 @@ NOTEZ tidak auto-load remote image. Kalau catatan berisi:
 <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GNU GPLv3">
 ```
 
-NOTEZ menampilkan placeholder/chip berdasarkan `alt`, bukan mengambil SVG dari internet. Ini menjaga prinsip offline-first: tidak ada request jaringan hanya karena kamu membuka catatan.
+NOTEZ menampilkan placeholder/chip berdasarkan `alt`, bukan mengambil gambar dari internet secara otomatis. Ini menjaga prinsip offline-first: tidak ada request jaringan hanya karena kamu membuka catatan.
 
-Arah fitur yang sudah dicatat untuk fase berikutnya adalah **optional user-triggered online loading + local caching**. Artinya nanti NOTEZ bisa punya tombol seperti `Load & cache`, tapi hanya setelah user tap dan setuju. Setelah berhasil, gambar disimpan lokal agar bisa dibaca offline lagi. Fitur itu belum bagian dari behavior section ini.
+Kalau placeholder menampilkan tombol `Load & cache`, kamu bisa tap tombol itu untuk mengambil gambar secara manual. NOTEZ akan menampilkan dialog konfirmasi berisi domain sumber. Setelah berhasil, gambar disimpan lokal dan render berikutnya memakai cache. Untuk keamanan MVP, tipe utama yang didukung cache adalah PNG, JPG/JPEG, WebP, dan GIF; SVG badge remote bisa tetap menjadi placeholder kalau belum lolos policy render aman.
 
 Kalau kamu ingin menulis contoh HTML sebagai dokumentasi, bungkus dengan inline code atau code block:
 
@@ -1023,7 +1023,7 @@ Titik dua di sisi kanan tanda hubung adalah kode alignment. Posisi titik dua (ki
 Untuk keamanan. NOTEZ mengizinkan subset aman seperti `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, `<details>`, serta struktur README umum seperti `<div align="center">`, `<h1>`, `<p>`, `<strong>`, `<em>`, `<a>`, dan `<img>` placeholder. HTML berbahaya seperti `<script>`, `<iframe>`, `<style>`, `onclick=`, `style=`, atau `javascript:` tetap dibuat tidak aktif/escaped.
 
 **Kenapa remote image tidak langsung tampil?**
-NOTEZ dirancang offline-first dan menghormati privasi — aplikasi tidak mengakses jaringan diam-diam hanya karena ada `![...](url)` atau `<img src="https://...">` di catatanmu.
+NOTEZ dirancang offline-first dan menghormati privasi — aplikasi tidak mengakses jaringan diam-diam hanya karena ada `![...](url)` atau `<img src="https://...">` di catatanmu. Online hanya terjadi saat kamu tap `Load & cache`, lalu hasilnya disimpan lokal.
 
 **Bagaimana bikin catatan rapi tanpa format ribet?**
 Cukup pakai heading untuk judul bagian, bullet list untuk poin-poin, dan tebal untuk kata kunci penting. Tiga elemen itu saja sudah membuat catatan panjang jauh lebih mudah dibaca ulang.
@@ -1700,7 +1700,7 @@ Coba tulis syntax Markdown untuk masing-masing soal di bawah, baru cocokkan deng
 NOTEZ tidak menjalankan semua kemungkinan Markdown yang ada di luar sana. Ini batasan yang disengaja, bukan bug:
 
 - **Raw HTML bebas** tidak aktif — hanya safe allowlist yang didukung; subset README-style umum tersedia, tapi tag/atribut berbahaya tetap escaped (bagian 18).
-- **Gambar remote** tidak otomatis dimuat — Markdown image dan raw `<img>` menjadi placeholder/link, bukan request internet diam-diam (bagian 17–18).
+- **Gambar remote** tidak otomatis dimuat — Markdown image dan raw `<img>` menjadi placeholder/link dulu; `Load & cache` bersifat manual dan user-triggered (bagian 17–18).
 - **Checkbox di preview** cuma tampilan status baca, bukan tombol yang bisa ditap (bagian 10).
 - **Link eksternal** yang ditap dibuka lewat aplikasi lain (browser), bukan di dalam NOTEZ (bagian 13).
 - **Fitur lanjutan berat** seperti rumus matematika/LaTeX penuh, diagram, embed aktif, dan emoji shortcode belum didukung (bagian 20).

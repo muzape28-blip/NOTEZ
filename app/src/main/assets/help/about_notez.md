@@ -29,7 +29,7 @@ Mode baca akan menampilkan catatan dengan Markdown Preview v4.
 
 **Mode edit** memakai teks biasa agar input tetap ringan dan familiar.
 
-**Mode baca** memakai Reading View lokal berbasis WebView untuk menampilkan Markdown yang rapi: heading, list, table, callout, code block, footnote, definition list, dan safe raw HTML kecil.
+**Mode baca** memakai Reading View lokal berbasis WebView untuk menampilkan Markdown yang rapi: heading, list, table, callout, code block, footnote, definition list, safe raw HTML, dan placeholder gambar online.
 
 ---
 
@@ -47,7 +47,7 @@ NOTEZ mendukung banyak format Markdown yang sering dipakai untuk catatan harian,
 - code block dengan badge dan highlight lokal;
 - footnote;
 - definition list;
-- safe raw HTML kecil seperti `<kbd>`, `<mark>`, `<sub>`, `<sup>`, dan `<details>`.
+- safe raw HTML seperti `<kbd>`, `<mark>`, `<sub>`, `<sup>`, `<details>`, dan subset README-style (`<div align="center">`, heading, paragraf, link, dan `<img>` placeholder).
 
 Untuk syntax lengkap, buka **Panduan Markdown** dari drawer.
 
@@ -67,16 +67,17 @@ Gunakan backup JSON sebelum mencoba perubahan besar atau sebelum pindah perangka
 
 ## Privasi dan offline
 
-NOTEZ menjaga catatan tetap lokal.
+NOTEZ menjaga catatan tetap lokal dan tetap offline-first.
 
 ```text
-No INTERNET permission
+Online hanya saat user meminta
 No CDN
-No remote scripts/styles/fonts/images
+No remote scripts/styles/fonts/iframes
+No remote image auto-load
 No native WebView bridge
 ```
 
-Remote image di Markdown maupun raw HTML `<img>` tidak dimuat otomatis. Ia tampil sebagai placeholder/link; link eksternal hanya dibuka lewat aplikasi/browser luar saat kamu tap.
+Remote image di Markdown maupun raw HTML `<img>` tidak dimuat otomatis. Ia tampil sebagai placeholder/link. Kalau kamu tap `Load & cache`, NOTEZ mengambil gambar sekali, menyimpannya lokal, lalu bisa menampilkannya lagi saat offline. Link eksternal tetap dibuka lewat aplikasi/browser luar saat kamu tap.
 
 ---
 
@@ -90,7 +91,7 @@ NOTEZ punya beberapa tema curated bawaan dan theme picker dengan preview kecil. 
 
 Beberapa fitur belum ada dan sengaja dipilih bertahap:
 
-- remote image belum auto-render; raw `<img>` baru menjadi placeholder aman;
+- remote image tidak auto-render; raw `<img>` menjadi placeholder aman dan bisa di-load/cache manual;
 - checkbox di preview belum interaktif;
 - belum ada LaTeX/math penuh;
 - belum ada Mermaid/diagram;
@@ -99,4 +100,4 @@ Beberapa fitur belum ada dan sengaja dipilih bertahap:
 - belum ada real Trash / Recently Deleted;
 - belum ada sync/cloud.
 
-Prinsip NOTEZ tetap sama: stabil dulu, jaga offline/privacy-first, lalu tambah fitur kecil yang benar-benar kepakai.
+Prinsip NOTEZ tetap sama: local by default, online only when you ask, offline again after cache.
