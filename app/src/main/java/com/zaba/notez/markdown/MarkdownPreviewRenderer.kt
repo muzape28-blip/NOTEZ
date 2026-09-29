@@ -25,7 +25,7 @@ import org.json.JSONObject
  * Security contract:
  * - markdown-it is loaded from APK assets and inlined into the HTML shell;
  * - no CDN/external script/style/font;
- * - raw HTML is disabled by markdown-it (`html: false`);
+ * - raw HTML is enabled only through a small sanitized allowlist;
  * - no native JavaScript bridge;
  * - same-document #anchor links are allowed for local table-of-contents jumps;
  * - WebView navigation to remote URLs is blocked and opened externally instead;
@@ -124,8 +124,67 @@ class MarkdownPreviewRenderer(
                   var source = $markdownJson;
                   var safeExternalLink = /^(https?:|mailto:|tel:)/i;
                   var safeAnchorLink = /^#[A-Za-z0-9][A-Za-z0-9_-]*$/;
+                  var allowedRawHtmlTags = {
+                    br: true,
+                    sub: true,
+                    sup: true,
+                    kbd: true,
+                    mark: true,
+                    u: true,
+                    s: true,
+                    small: true,
+                    details: true,
+                    summary: true,
+                    abbr: true,
+                    cite: true
+                  };
+                  var allowedRenderedTags = {
+                    a: true,
+                    abbr: true,
+                    blockquote: true,
+                    br: true,
+                    cite: true,
+                    code: true,
+                    del: true,
+                    details: true,
+                    div: true,
+                    em: true,
+                    h1: true,
+                    h2: true,
+                    h3: true,
+                    h4: true,
+                    h5: true,
+                    h6: true,
+                    hr: true,
+                    kbd: true,
+                    li: true,
+                    mark: true,
+                    ol: true,
+                    p: true,
+                    pre: true,
+                    s: true,
+                    small: true,
+                    span: true,
+                    strong: true,
+                    sub: true,
+                    summary: true,
+                    sup: true,
+                    table: true,
+                    tbody: true,
+                    td: true,
+                    th: true,
+                    thead: true,
+                    tr: true,
+                    u: true,
+                    ul: true
+                  };
+                  var allowedNotezClasses = {
+                    'notez-image-placeholder': true,
+                    'notez-image-kicker': true,
+                    'notez-unsafe-link': true
+                  };
                   var md = window.markdownit({
-                    html: false,
+                    html: true,
                     linkify: true,
                     typographer: false,
                     breaks: false
@@ -141,6 +200,161 @@ class MarkdownPreviewRenderer(
                         "'": '&#39;'
                       })[ch];
                     });
+                  }
+
+                  function escapeAttribute(value) {
+                    return escapeHtml(value).replace(/`/g, '&#96;');
+                  }
+
+                  function safeClassTokens(value, tagName) {
+                    return String(value || '').split(/\s+/).filter(function (name) {
+                      if (!name) return false;
+                      if (allowedNotezClasses[name]) return true;
+                      if (tagName === 'code' && /^language-[A-Za-z0-9_.+-]{1,40}$/.test(name)) return true;
+                      return false;
+                    }).join(' ');
+                  }
+
+                  function isSafeTextAlign(value) {
+                    return /^\s*text-align\s*:\s*(left|right|center)\s*;?\s*$/i.test(String(value || ''));
+                  }
+
+                  function normalizedTextAlign(value) {
+                    var match = String(value || '').match(/text-align\s*:\s*(left|right|center)/i);
+                    return match ? 'text-align:' + match[1].toLowerCase() : '';
+                  }
+
+                  function renderSafeRawAttributes(node, tagName) {
+                    var html = '';
+                    if (tagName === 'details' && node.hasAttribute('open')) {
+                      html += ' open';
+                    }
+                    if (tagName === 'abbr' && node.hasAttribute('title')) {
+                      html += ' title="' + escapeAttribute(node.getAttribute('title') || '') + '"';
+                    }
+                    return html;
+                  }
+
+                  function renderSafeRawNodes(nodes) {
+                    var html = '';
+                    Array.prototype.slice.call(nodes).forEach(function (node) {
+                      html += renderSafeRawNode(node);
+                    });
+                    return html;
+                  }
+
+                  function renderSafeRawNode(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                      return escapeHtml(node.nodeValue || '');
+                    }
+                    if (node.nodeType === Node.COMMENT_NODE) {
+                      return escapeHtml('<!--' + (node.nodeValue || '') + '-->');
+                    }
+                    if (node.nodeType !== Node.ELEMENT_NODE) {
+                      return '';
+                    }
+                    var tagName = node.tagName.toLowerCase();
+                    if (!allowedRawHtmlTags[tagName]) {
+                      return escapeHtml(node.outerHTML || '');
+                    }
+                    if (tagName === 'br') {
+                      return '<br>';
+                    }
+                    return '<' + tagName + renderSafeRawAttributes(node, tagName) + '>' +
+                      renderSafeRawNodes(node.childNodes) +
+                      '</' + tagName + '>';
+                  }
+
+                  function sanitizeRawHtml(raw) {
+                    var template = document.createElement('template');
+                    template.innerHTML = String(raw || '');
+                    return renderSafeRawNodes(template.content.childNodes);
+                  }
+
+                  function isSafeRenderedElement(element, tagName) {
+                    if (tagName === 'div') {
+                      return (element.getAttribute('class') || '').split(/\s+/).some(function (name) {
+                        return name === 'notez-image-placeholder';
+                      });
+                    }
+                    if (tagName === 'span') {
+                      return (element.getAttribute('class') || '').split(/\s+/).some(function (name) {
+                        return name === 'notez-image-kicker';
+                      });
+                    }
+                    return true;
+                  }
+
+                  function sanitizeRenderedAttributes(element, tagName) {
+                    Array.prototype.slice.call(element.attributes || []).forEach(function (attr) {
+                      var name = attr.name.toLowerCase();
+                      var value = attr.value || '';
+                      var keep = false;
+                      var nextValue = value;
+                      if (name === 'href' && tagName === 'a') {
+                        keep = !!safeHref(value);
+                      } else if (name === 'target' && tagName === 'a') {
+                        keep = value === '_self';
+                      } else if (name === 'rel' && tagName === 'a') {
+                        keep = true;
+                        nextValue = 'nofollow noopener noreferrer';
+                      } else if (name === 'class') {
+                        nextValue = safeClassTokens(value, tagName);
+                        keep = nextValue.length > 0;
+                      } else if (name === 'style' && (tagName === 'th' || tagName === 'td') && isSafeTextAlign(value)) {
+                        keep = true;
+                        nextValue = normalizedTextAlign(value);
+                      } else if (name === 'start' && tagName === 'ol' && /^\d{1,6}$/.test(value)) {
+                        keep = true;
+                      } else if (name === 'title' && tagName === 'abbr') {
+                        keep = true;
+                      } else if (name === 'open' && tagName === 'details') {
+                        keep = true;
+                        nextValue = '';
+                      }
+
+                      if (keep) {
+                        element.setAttribute(attr.name, nextValue);
+                      } else {
+                        element.removeAttribute(attr.name);
+                      }
+                    });
+                  }
+
+                  function replaceWithEscapedOuterHtml(node) {
+                    var text = node.nodeType === Node.COMMENT_NODE
+                      ? '<!--' + (node.nodeValue || '') + '-->'
+                      : (node.outerHTML || node.textContent || '');
+                    node.parentNode.replaceChild(document.createTextNode(text), node);
+                  }
+
+                  function sanitizeRenderedDom(root) {
+                    Array.prototype.slice.call(root.childNodes).forEach(function (node) {
+                      if (node.nodeType === Node.TEXT_NODE) return;
+                      if (node.nodeType === Node.COMMENT_NODE) {
+                        replaceWithEscapedOuterHtml(node);
+                        return;
+                      }
+                      if (node.nodeType !== Node.ELEMENT_NODE) {
+                        node.parentNode.removeChild(node);
+                        return;
+                      }
+                      var tagName = node.tagName.toLowerCase();
+                      if (!allowedRenderedTags[tagName] || !isSafeRenderedElement(node, tagName)) {
+                        replaceWithEscapedOuterHtml(node);
+                        return;
+                      }
+                      sanitizeRenderedAttributes(node, tagName);
+                      sanitizeRenderedDom(node);
+                    });
+                  }
+
+                  function setSafePreviewHtml(html) {
+                    var template = document.createElement('template');
+                    template.innerHTML = String(html || '');
+                    sanitizeRenderedDom(template.content);
+                    while (preview.firstChild) preview.removeChild(preview.firstChild);
+                    preview.appendChild(template.content);
                   }
 
                   function isSafeAnchor(href) {
@@ -194,11 +408,20 @@ class MarkdownPreviewRenderer(
                       close;
                   };
 
+                  md.renderer.rules.html_inline = function (tokens, idx) {
+                    return sanitizeRawHtml(tokens[idx].content || '');
+                  };
+
+                  md.renderer.rules.html_block = function (tokens, idx) {
+                    return sanitizeRawHtml(tokens[idx].content || '');
+                  };
+
                   var preview = document.getElementById('preview');
-                  preview.innerHTML = md.render(source);
+                  setSafePreviewHtml(md.render(source));
                   addHeadingAnchors();
                   wrapTables();
                   enhanceTaskLists();
+                  enhanceCodeBlocks();
                   enhanceCallouts();
                   hardenLinks();
 
@@ -244,6 +467,201 @@ class MarkdownPreviewRenderer(
                       checkbox.setAttribute('aria-hidden', 'true');
                       li.classList.add('task-list-item');
                       li.insertBefore(checkbox, li.firstChild);
+                    });
+                  }
+
+                  function prettyLanguageName(lang) {
+                    var normalized = normalizeLanguage(lang);
+                    return ({
+                      js: 'JS',
+                      ts: 'TS',
+                      javascript: 'JS',
+                      typescript: 'TS',
+                      kotlin: 'KOTLIN',
+                      kt: 'KOTLIN',
+                      java: 'JAVA',
+                      python: 'PYTHON',
+                      py: 'PYTHON',
+                      bash: 'SHELL',
+                      sh: 'SHELL',
+                      shell: 'SHELL',
+                      json: 'JSON',
+                      xml: 'XML',
+                      html: 'HTML',
+                      css: 'CSS',
+                      md: 'MD',
+                      markdown: 'MD'
+                    })[normalized] || String(lang || 'CODE').toUpperCase();
+                  }
+
+                  function normalizeLanguage(lang) {
+                    var value = String(lang || '').toLowerCase().replace(/^language-/, '');
+                    if (value === 'kt') return 'kotlin';
+                    if (value === 'js' || value === 'jsx') return 'javascript';
+                    if (value === 'ts' || value === 'tsx') return 'typescript';
+                    if (value === 'py') return 'python';
+                    if (value === 'sh' || value === 'shell' || value === 'zsh') return 'bash';
+                    if (value === 'htm') return 'html';
+                    if (value === 'md') return 'markdown';
+                    return value;
+                  }
+
+                  function languageFromCodeClass(code) {
+                    var match = (code.getAttribute('class') || '').match(/(?:^|\s)language-([A-Za-z0-9_.+-]{1,40})(?:\s|$)/);
+                    return match ? normalizeLanguage(match[1]) : '';
+                  }
+
+                  function syntaxSpan(className, text) {
+                    return '<span class="ntz-syntax-' + className + '">' + escapeHtml(text) + '</span>';
+                  }
+
+                  function stickyRule(pattern, className) {
+                    var flags = (pattern.ignoreCase ? 'i' : '') + (pattern.multiline ? 'm' : '') + 'y';
+                    return { regex: new RegExp(pattern.source, flags), className: className };
+                  }
+
+                  function highlightByRules(text, rules) {
+                    var sourceText = String(text || '');
+                    var output = '';
+                    var index = 0;
+                    while (index < sourceText.length) {
+                      var matched = false;
+                      for (var i = 0; i < rules.length; i++) {
+                        var rule = rules[i];
+                        rule.regex.lastIndex = index;
+                        var match = rule.regex.exec(sourceText);
+                        if (match && match.index === index && match[0]) {
+                          output += syntaxSpan(rule.className, match[0]);
+                          index += match[0].length;
+                          matched = true;
+                          break;
+                        }
+                      }
+                      if (!matched) {
+                        output += escapeHtml(sourceText.charAt(index));
+                        index += 1;
+                      }
+                    }
+                    return output;
+                  }
+
+                  function codeRules(language) {
+                    var commonStrings = /(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/;
+                    var commonNumber = /\b(?:0x[0-9a-f]+|\d+(?:\.\d+)?)\b/i;
+                    var cComment = /(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)/;
+                    var pyComment = /#[^\n]*/;
+                    var cOperator = /[{}()[\].,;:+\-*\/%=!<>|&?]+/;
+                    var xmlTag = /<\/?[A-Za-z][^>]*\/?>/;
+                    var rulesByLanguage = {
+                      kotlin: [
+                        stickyRule(cComment, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/\b(?:as|break|class|continue|do|else|false|for|fun|if|in|interface|is|null|object|package|return|super|this|throw|true|try|typealias|typeof|val|var|when|while|by|catch|constructor|delegate|dynamic|field|file|finally|get|import|init|param|property|receiver|set|setparam|where|actual|abstract|annotation|companion|const|crossinline|data|enum|expect|external|final|infix|inline|inner|internal|lateinit|noinline|open|operator|out|override|private|protected|public|reified|sealed|suspend|tailrec|vararg)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/\b[A-Z][A-Za-z0-9_]*\b/, 'type'),
+                        stickyRule(/\b[A-Za-z_][A-Za-z0-9_]*(?=\s*\()/, 'function'),
+                        stickyRule(cOperator, 'operator')
+                      ],
+                      java: [
+                        stickyRule(cComment, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|exports|extends|false|final|finally|float|for|if|implements|import|instanceof|int|interface|long|module|native|new|null|open|opens|package|private|protected|provides|public|requires|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|to|transient|true|try|uses|var|void|volatile|while|with)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/\b[A-Z][A-Za-z0-9_]*\b/, 'type'),
+                        stickyRule(/\b[A-Za-z_][A-Za-z0-9_]*(?=\s*\()/, 'function'),
+                        stickyRule(cOperator, 'operator')
+                      ],
+                      javascript: [
+                        stickyRule(cComment, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/\b(?:await|async|break|case|catch|class|const|continue|debugger|default|delete|do|else|export|extends|false|finally|for|from|function|if|import|in|instanceof|let|new|null|of|return|static|super|switch|this|throw|true|try|typeof|undefined|var|void|while|yield)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/\b[A-Z][A-Za-z0-9_]*\b/, 'type'),
+                        stickyRule(/\b[A-Za-z_$][A-Za-z0-9_$]*(?=\s*\()/, 'function'),
+                        stickyRule(cOperator, 'operator')
+                      ],
+                      typescript: [
+                        stickyRule(cComment, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/\b(?:abstract|any|as|asserts|async|await|boolean|break|case|catch|class|const|continue|debugger|declare|default|delete|do|else|enum|export|extends|false|finally|for|from|function|if|implements|import|in|infer|instanceof|interface|is|keyof|let|module|namespace|never|new|null|number|object|of|private|protected|public|readonly|return|static|string|super|switch|symbol|this|throw|true|try|type|typeof|undefined|unique|unknown|var|void|while|yield)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/\b[A-Z][A-Za-z0-9_]*\b/, 'type'),
+                        stickyRule(/\b[A-Za-z_$][A-Za-z0-9_$]*(?=\s*\()/, 'function'),
+                        stickyRule(cOperator, 'operator')
+                      ],
+                      python: [
+                        stickyRule(pyComment, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/\b(?:and|as|assert|async|await|break|class|continue|def|del|elif|else|except|False|finally|for|from|global|if|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|True|try|while|with|yield)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/\b[A-Z][A-Za-z0-9_]*\b/, 'type'),
+                        stickyRule(/\b[A-Za-z_][A-Za-z0-9_]*(?=\s*\()/, 'function'),
+                        stickyRule(cOperator, 'operator')
+                      ],
+                      bash: [
+                        stickyRule(pyComment, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/\b(?:case|do|done|elif|else|esac|export|fi|for|function|if|in|local|readonly|return|select|then|until|while)\b/, 'keyword'),
+                        stickyRule(/\$[A-Za-z_][A-Za-z0-9_]*|\$\{[^}]+\}/, 'variable'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(cOperator, 'operator')
+                      ],
+                      json: [
+                        stickyRule(/"(?:\\.|[^"\\])*"(?=\s*:)/, 'key'),
+                        stickyRule(/"(?:\\.|[^"\\])*"/, 'string'),
+                        stickyRule(/\b(?:true|false|null)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/[{}[\],:]/, 'operator')
+                      ],
+                      xml: [
+                        stickyRule(/<!--[\s\S]*?-->/, 'comment'),
+                        stickyRule(xmlTag, 'tag'),
+                        stickyRule(/&[A-Za-z0-9#]+;/, 'entity')
+                      ],
+                      html: [
+                        stickyRule(/<!--[\s\S]*?-->/, 'comment'),
+                        stickyRule(xmlTag, 'tag'),
+                        stickyRule(/&[A-Za-z0-9#]+;/, 'entity')
+                      ],
+                      css: [
+                        stickyRule(/\/\*[\s\S]*?\*\//, 'comment'),
+                        stickyRule(commonStrings, 'string'),
+                        stickyRule(/#[0-9a-f]{3,8}\b/i, 'number'),
+                        stickyRule(/\b(?:align-items|background|border|color|display|font|font-size|font-weight|gap|grid|height|justify-content|line-height|margin|padding|position|width)\b/, 'keyword'),
+                        stickyRule(commonNumber, 'number'),
+                        stickyRule(/[{}()[\].,;:+\-*\/%=!<>|&?]+/, 'operator')
+                      ],
+                      markdown: [
+                        stickyRule(/^#{1,6}[^\n]*/m, 'keyword'),
+                        stickyRule(/^>[^\n]*/m, 'comment'),
+                        stickyRule(/^\s*(?:[-*+] |\d+\. )/m, 'operator'),
+                        stickyRule(/`[^`]*`/, 'string'),
+                        stickyRule(/\*\*[^*]+\*\*|__[^_]+__/, 'keyword'),
+                        stickyRule(/\[[^\]]+\]\([^)]*\)/, 'function')
+                      ]
+                    };
+                    return rulesByLanguage[language] || [];
+                  }
+
+                  function highlightCode(text, language) {
+                    var rules = codeRules(language);
+                    return rules.length ? highlightByRules(text, rules) : escapeHtml(text);
+                  }
+
+                  function enhanceCodeBlocks() {
+                    Array.prototype.slice.call(preview.querySelectorAll('pre > code')).forEach(function (code) {
+                      var language = languageFromCodeClass(code);
+                      var pre = code.parentNode;
+                      var rawText = code.textContent || '';
+                      pre.classList.add('notez-code-card');
+                      if (language) {
+                        var label = document.createElement('div');
+                        label.className = 'notez-code-label';
+                        label.textContent = prettyLanguageName(language);
+                        pre.insertBefore(label, code);
+                      }
+                      code.classList.add('notez-code-highlighted');
+                      code.innerHTML = highlightCode(rawText, language);
                     });
                   }
 
@@ -331,10 +749,15 @@ class MarkdownPreviewRenderer(
         pre {
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
-          background: var(--notez-soft);
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035));
           border: 1px solid var(--notez-border);
-          border-radius: 10px;
+          border-radius: 14px;
           padding: 12px;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+        }
+        pre.notez-code-card {
+          position: relative;
+          padding-top: 38px;
         }
         pre code {
           display: block;
@@ -343,6 +766,35 @@ class MarkdownPreviewRenderer(
           border-radius: 0;
           white-space: pre;
         }
+        .notez-code-label {
+          position: absolute;
+          top: 9px;
+          right: 10px;
+          max-width: 42%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          color: var(--notez-muted);
+          border: 1px solid var(--notez-border);
+          border-radius: 999px;
+          background: rgba(0, 0, 0, 0.18);
+          padding: 2px 8px;
+          font-size: .68em;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+          font-weight: 800;
+          letter-spacing: .06em;
+        }
+        .notez-code-highlighted .ntz-syntax-comment { color: #8B949E; font-style: italic; }
+        .notez-code-highlighted .ntz-syntax-keyword { color: #FF7B72; font-weight: 700; }
+        .notez-code-highlighted .ntz-syntax-string { color: #A5D6FF; }
+        .notez-code-highlighted .ntz-syntax-number { color: #79C0FF; }
+        .notez-code-highlighted .ntz-syntax-function { color: #D2A8FF; }
+        .notez-code-highlighted .ntz-syntax-type { color: #FFA657; }
+        .notez-code-highlighted .ntz-syntax-operator { color: #FF7B72; }
+        .notez-code-highlighted .ntz-syntax-variable { color: #FFA657; }
+        .notez-code-highlighted .ntz-syntax-key { color: #7EE787; }
+        .notez-code-highlighted .ntz-syntax-tag { color: #7EE787; }
+        .notez-code-highlighted .ntz-syntax-entity { color: #D2A8FF; }
         blockquote {
           border-left: 4px solid var(--notez-border);
           color: var(--notez-muted);
@@ -423,6 +875,44 @@ class MarkdownPreviewRenderer(
           letter-spacing: .05em;
           text-transform: uppercase;
         }
+        kbd {
+          display: inline-block;
+          border: 1px solid var(--notez-border);
+          border-bottom-color: rgba(255, 255, 255, 0.26);
+          border-radius: 7px;
+          background: rgba(255, 255, 255, 0.08);
+          color: var(--notez-text);
+          box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+          font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+          font-size: .84em;
+          padding: .08em .45em;
+          white-space: nowrap;
+        }
+        mark {
+          border-radius: 5px;
+          background: rgba(255, 212, 77, 0.26);
+          color: var(--notez-text);
+          padding: .02em .22em;
+        }
+        details {
+          border: 1px solid var(--notez-border);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.035);
+          margin: .85em 0;
+          padding: 10px 12px;
+        }
+        summary {
+          cursor: pointer;
+          color: var(--notez-text);
+          font-weight: 800;
+        }
+        details[open] summary { margin-bottom: .45em; }
+        abbr[title] {
+          text-decoration: underline dotted;
+          text-underline-offset: .16em;
+        }
+        sub, sup { line-height: 0; }
+        small { color: var(--notez-muted); }
         hr {
           border: 0;
           border-top: 1px solid var(--notez-border);

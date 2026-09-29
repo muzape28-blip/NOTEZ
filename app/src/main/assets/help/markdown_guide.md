@@ -1,6 +1,6 @@
 # Panduan Markdown NOTEZ
 
-Markdown adalah cara menulis teks biasa dengan tanda-tanda sederhana, supaya catatan tetap rapi saat dibaca. Kamu menulis pakai syntax Markdown di mode edit, lalu NOTEZ menampilkan hasil rapinya di mode baca (preview) lewat Markdown Preview v2.
+Markdown adalah cara menulis teks biasa dengan tanda-tanda sederhana, supaya catatan tetap rapi saat dibaca. Kamu menulis pakai syntax Markdown di mode edit, lalu NOTEZ menampilkan hasil rapinya di mode baca (preview) lewat Markdown Preview v3.
 
 Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelasan cara pakai, contoh dalam kalimat nyata, kesalahan umum yang sering kejadian, dan jawaban untuk pertanyaan yang biasanya muncul. Kamu tidak perlu membaca semuanya sekali duduk — pakai daftar isi di bawah untuk lompat ke bagian yang kamu butuhkan.
 
@@ -60,7 +60,7 @@ Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelas
 | Table | `\| kolom \| kolom \|` |
 | Alignment tabel | `:---` kiri, `:---:` tengah, `---:` kanan |
 | Image | `![alt](url)` |
-| Raw HTML (tampil sebagai teks) | `<tag>` |
+| Safe raw HTML kecil | `<kbd>Ctrl</kbd>`, `<mark>penting</mark>` |
 | Escape | `\*teks\*` |
 
 ---
@@ -90,7 +90,7 @@ Jangan lupa **backup catatan** sebelum update.
 atau menandai beberapa bagian sekaligus dalam satu kalimat yang sama:
 
 ```md
-Hari ini fokus ke **Markdown Preview v2** dan **UI polish**.
+Hari ini fokus ke **Markdown Preview v3** dan **UI polish**.
 ```
 
 Bisa juga dipakai untuk menonjolkan angka atau label:
@@ -492,7 +492,7 @@ gradle assembleDebug
 ```
 ````
 
-**Catatan teknis:** nama bahasa setelah backtick pembuka (`kotlin`, `python`, `bash`, `json`, dan sebagainya) sifatnya cuma label/hint untuk kemungkinan syntax highlighting; kalau tidak yakin bahasanya apa, boleh dikosongkan dan blok kode tetap tampil dengan format monospace.
+**Catatan teknis:** nama bahasa setelah backtick pembuka (`kotlin`, `python`, `bash`, `json`, `html`, `css`, `markdown`, dan sebagainya) sekarang dipakai NOTEZ sebagai label dan syntax highlighting lokal ringan. Kalau tidak yakin bahasanya apa, boleh dikosongkan dan blok kode tetap tampil dengan format monospace.
 
 **Kesalahan umum:** lupa menutup tiga backtick di akhir membuat sisa catatan setelahnya ikut tampil sebagai kode. Selalu pastikan jumlah baris pembuka dan penutup backtick seimbang.
 
@@ -500,7 +500,7 @@ gradle assembleDebug
 
 ## 15a. Code block untuk berbagai bahasa pemrograman
 
-Label bahasa setelah backtick pembuka murni kosmetik/hint, tapi berguna kalau catatanmu menyimpan banyak snippet dari bahasa berbeda. Berikut referensi label yang umum dipakai, masing-masing dengan contoh singkat:
+Label bahasa setelah backtick pembuka membantu NOTEZ memberi badge bahasa dan warna syntax lokal ringan. Berikut referensi label yang umum dipakai, masing-masing dengan contoh singkat:
 
 ````md
 ```kotlin
@@ -754,23 +754,46 @@ Alt text `Screenshot halaman login` tetap membantu pembaca tahu gambar itu tenta
 
 ## 18. Raw HTML
 
-Markdown di beberapa tempat, seperti GitHub atau Obsidian, bisa menerima sebagian tag HTML mentah. Contohnya:
+Markdown di beberapa tempat, seperti GitHub atau Obsidian, bisa menerima sebagian tag HTML mentah. Di NOTEZ, raw HTML sekarang **tidak bebas**, tapi ada allowlist kecil yang aman untuk kebutuhan menulis.
+
+Tag kecil yang didukung:
 
 ```md
-<br>
-<sub>2</sub>
-<kbd>Ctrl</kbd>
-<script>alert("hi")</script>
+Baris satu<br>Baris dua
+H<sub>2</sub>O dan x<sup>2</sup>
+Tekan <kbd>Ctrl</kbd> + <kbd>S</kbd>
+<mark>bagian penting</mark>
+<u>garis bawah</u> dan <s>teks dicoret</s>
+<small>catatan kecil</small>
+<details>
+<summary>Ringkasan</summary>
+Isi detail yang bisa dibuka.
+</details>
+<abbr title="HyperText Markup Language">HTML</abbr>
+<cite>Judul Referensi</cite>
 ```
 
-Di NOTEZ, raw HTML sengaja tidak dirender sebagai elemen aktif. Artinya, tag seperti `<br>`, `<div>`, `<sub>`, `<kbd>`, atau `<script>` akan tampil sebagai teks biasa/escaped, bukan dijalankan.
+Tag di atas tetap disanitasi. Artinya atribut bebas seperti `style=`, `class=`, `id=`, dan event handler seperti `onclick=` akan dibuang atau dibuat tidak aktif.
+
+Yang tetap **tidak** diizinkan:
+
+```md
+<script>alert("hi")</script>
+<style>body { color: red }</style>
+<iframe src="https://contoh.com"></iframe>
+<img src="https://contoh.com/gambar.png">
+<div onclick="alert('nope')">klik</div>
+<a href="javascript:alert(1)">bahaya</a>
+```
+
+Kalau kamu menulis tag yang tidak masuk allowlist, NOTEZ akan menampilkannya sebagai teks biasa/escaped, bukan menjalankannya.
 
 Ini bukan bug. Ini adalah keputusan keamanan dan privasi:
 
 - catatan hasil copy-paste dari web tidak bisa menjalankan script diam-diam;
 - NOTEZ tetap offline-first dan tidak memuat resource asing;
 - tampilan catatan lebih mudah diprediksi;
-- tidak ada risiko tag seperti `<script>`, `<iframe>`, event handler seperti `onclick=`, atau link `javascript:` aktif.
+- tag seperti `<script>`, `<style>`, `<iframe>`, remote image HTML `<img>`, event handler `onclick=`, dan link `javascript:` tidak aktif.
 
 Kalau kamu ingin menulis contoh HTML sebagai dokumentasi, bungkus dengan inline code atau code block:
 
@@ -787,9 +810,7 @@ Atau pakai code block kalau contohnya lebih panjang:
 ```
 ````
 
-Untuk saat ini, gunakan syntax Markdown bawaan NOTEZ seperti heading, list, table, callout, link, dan code block.
-
-Di masa depan, NOTEZ bisa saja mempertimbangkan **safe HTML allowlist**, misalnya hanya tag kecil yang aman seperti `<br>`, `<sub>`, `<sup>`, `<kbd>`, atau `<mark>`. Kalau itu dilakukan, fiturnya harus lewat RFC/UAT terpisah dan tetap tidak akan mengizinkan HTML berbahaya seperti `<script>`, `<iframe>`, remote script/style, `onclick=`, atau `javascript:`.
+Intinya: gunakan Markdown bawaan NOTEZ untuk struktur utama, lalu pakai safe raw HTML kecil hanya saat benar-benar perlu, misalnya `<kbd>`, `<mark>`, `<sub>`, `<sup>`, atau `<details>`.
 
 ---
 
@@ -824,19 +845,19 @@ Markdown di luar NOTEZ (misalnya di GitHub atau Obsidian) punya beberapa fitur t
 | Fitur | Contoh syntax umum | Status di NOTEZ |
 | --- | --- | --- |
 | Footnote | `Teks[^1]` ... `[^1]: catatan kaki` | Tidak didukung, tampil sebagai teks biasa |
-| Highlight/sorot | `==teks==` | Tidak didukung |
-| Superscript | `teks^atas^` | Tidak didukung |
-| Subscript | `teks~bawah~` | Tidak didukung |
+| Highlight/sorot Markdown | `==teks==` | Tidak didukung; gunakan `<mark>teks</mark>` jika perlu |
+| Superscript syntax | `teks^atas^` | Tidak didukung; gunakan `<sup>atas</sup>` jika perlu |
+| Subscript syntax | `teks~bawah~` | Tidak didukung; gunakan `<sub>bawah</sub>` jika perlu |
 | Definition list | `Istilah` lalu `: definisi` | Tidak didukung |
 | Front matter | `---` blok metadata di awal file | Tidak diproses sebagai metadata |
 | Rumus matematika/LaTeX | `$x^2$` atau `$$...$$` | Tidak dirender, tampil sebagai teks |
 | Diagram (mis. Mermaid) | ```` ```mermaid ```` blok | Tidak dirender sebagai diagram |
-| Embed HTML aktif (iframe, video, script) | `<iframe>`, `<video>` | Dinonaktifkan, tampil sebagai teks (lihat bagian 18) |
+| Embed HTML aktif (iframe, video, script) | `<iframe>`, `<video>`, `<script>` | Dinonaktifkan/escaped (lihat bagian 18) |
 | Emoji shortcode | `:smile:` | Tidak dikonversi otomatis jadi emoji |
 | Reference-style link | `[label][ref]` + `[ref]: url` | Belum tentu dikenali, gunakan link biasa (bagian 13) |
 | Table of contents otomatis | `[[TOC]]` atau serupa | Tidak ada otomatis; daftar isi manual dengan link internal bisa dibuat kalau perlu |
 
-Kalau kamu terbiasa menulis Markdown di aplikasi lain dan salah satu fitur di atas tidak tampil seperti biasanya di NOTEZ, itu bukan bug — memang belum didukung. Gunakan alternatif yang sudah didukung: misalnya untuk menonjolkan teks, pakai **tebal** (bagian 2) alih-alih highlight; untuk rumus sederhana, tulis sebagai inline code atau jelaskan dengan kata-kata.
+Kalau kamu terbiasa menulis Markdown di aplikasi lain dan salah satu fitur di atas tidak tampil seperti biasanya di NOTEZ, itu bukan bug — memang belum didukung. Gunakan alternatif yang sudah didukung: misalnya untuk menonjolkan teks, pakai **tebal** (bagian 2) atau `<mark>highlight aman</mark>`; untuk rumus sederhana, tulis sebagai inline code atau jelaskan dengan kata-kata.
 
 ---
 
@@ -853,7 +874,7 @@ Ringkasan cepat kesalahan yang paling sering terjadi, dikumpulkan dari penjelasa
 | Callout tidak berwarna/tidak terdeteksi | Baris pertama bukan format `[!JENIS]` yang tepat | Cek ejaan jenisnya: NOTE, TIP, IMPORTANT, WARNING, CAUTION |
 | Checkbox tidak bisa ditap | Memang bukan tombol di mode baca | Edit teks Markdown-nya langsung di mode edit |
 | Gambar tidak muncul | Gambar remote memang tidak auto-load | Ini perilaku normal NOTEZ, bukan error |
-| Tag HTML tampil sebagai teks | Raw HTML memang dinonaktifkan | Ini perilaku normal NOTEZ, bukan error |
+| Tag HTML tertentu tampil sebagai teks | Tag itu tidak masuk safe allowlist | Ini perilaku normal NOTEZ, bukan error |
 | Code block "bocor" ke teks setelahnya | Lupa menutup tiga backtick | Pastikan ada backtick pembuka dan penutup yang seimbang |
 | Karakter Markdown tampil sebagai format padahal maunya literal | Belum di-escape | Tambahkan backslash `\` di depan karakter tersebut |
 
@@ -876,8 +897,8 @@ Baris `---` adalah penanda wajib yang memberi tahu renderer "baris di atas saya 
 **Kenapa `---:` bikin kolom rata kanan?**
 Titik dua di sisi kanan tanda hubung adalah kode alignment. Posisi titik dua (kiri, kanan, atau dua-duanya) menentukan arah rata kolom tersebut.
 
-**Kenapa raw HTML tidak aktif di NOTEZ?**
-Untuk keamanan. Kalau HTML dibiarkan aktif, catatan yang berisi kode berbahaya (misalnya hasil tempel dari sumber tidak tepercaya) bisa saja dijalankan begitu saja. NOTEZ memilih menampilkannya sebagai teks biasa supaya tidak ada risiko itu.
+**Kenapa raw HTML di NOTEZ dibatasi?**
+Untuk keamanan. NOTEZ hanya mengizinkan tag kecil yang aman seperti `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, dan `<details>`. HTML berbahaya seperti `<script>`, `<iframe>`, `<style>`, `onclick=`, `style=`, atau `javascript:` tetap dibuat tidak aktif/escaped.
 
 **Kenapa remote image tidak langsung tampil?**
 NOTEZ dirancang offline-first dan menghormati privasi — aplikasi tidak mengakses jaringan diam-diam hanya karena ada `![...](url)` di catatanmu.
@@ -931,7 +952,7 @@ Tanda `>` selalu di depan, diikuti `[!JENIS]` di baris pertama, lalu isi callout
 Untuk paragraf biasa, umumnya tidak. Tapi untuk list bersarang, indentasi/spasi di awal baris justru menentukan level sub-poinnya — lihat bagian 9.
 
 **Kenapa saya tidak boleh mengandalkan warna teks langsung (misalnya tag `<span style="color:red">`)?**
-Karena itu termasuk raw HTML, yang di NOTEZ ditampilkan sebagai teks biasa, bukan diproses jadi warna sungguhan.
+Karena `span`, `style=`, `class=`, dan CSS bebas tidak masuk safe allowlist NOTEZ. Kalau perlu menandai teks, pakai `**tebal**` atau `<mark>highlight aman</mark>`.
 
 **Apakah ada batas panjang untuk satu catatan?**
 Panduan ini tidak membahas batas teknis penyimpanan; yang dibahas di sini murni soal syntax Markdown-nya.
@@ -1287,7 +1308,7 @@ class Node(val value: Int, var next: Node? = null)
 ## v0.1.1
 
 ### Ditambahkan
-- Markdown Preview v2.
+- Markdown Preview lokal.
 - Callout: NOTE, TIP, IMPORTANT, WARNING, CAUTION.
 ````
 
@@ -1556,11 +1577,11 @@ Coba tulis syntax Markdown untuk masing-masing soal di bawah, baru cocokkan deng
 
 NOTEZ tidak menjalankan semua kemungkinan Markdown yang ada di luar sana. Ini batasan yang disengaja, bukan bug:
 
-- **Raw HTML** tidak aktif — tag HTML tampil sebagai teks, tidak pernah dijalankan (bagian 18).
+- **Raw HTML bebas** tidak aktif — hanya safe allowlist kecil yang didukung; tag berbahaya tetap escaped (bagian 18).
 - **Gambar remote** tidak otomatis dimuat — NOTEZ tidak mengakses internet tanpa izin (bagian 17).
 - **Checkbox di preview** cuma tampilan status baca, bukan tombol yang bisa ditap (bagian 10).
 - **Link eksternal** yang ditap dibuka lewat aplikasi lain (browser), bukan di dalam NOTEZ (bagian 13).
-- **Fitur lanjutan** seperti footnote, highlight, superscript/subscript, rumus matematika, diagram, dan emoji shortcode belum didukung (bagian 20).
+- **Fitur lanjutan** seperti footnote, syntax highlight `==teks==`, superscript/subscript gaya non-HTML, rumus matematika, diagram, dan emoji shortcode belum didukung (bagian 20).
 
 Pilihan-pilihan ini menjaga NOTEZ tetap ringan, offline, dan aman dari konten yang tidak terduga — bukan keterbatasan teknis semata, tapi bagian dari prinsip desain aplikasinya.
 

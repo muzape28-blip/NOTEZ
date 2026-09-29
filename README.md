@@ -20,7 +20,7 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 
 - Catatan tanpa batas karakter buatan app.
 - Edit mode native Android `EditText`.
-- View mode dengan Markdown Preview v2 berbasis local WebView Reading View.
+- View mode dengan Markdown Preview v3 berbasis local WebView Reading View.
 - Panduan Markdown lokal/offline dari drawer.
 - Search catatan.
 - Halaman Pengaturan dari drawer.
@@ -68,10 +68,11 @@ NOTEZ mendukung Markdown umum untuk catatan rapi:
   - `CAUTION`;
 - Markdown link dan bare URL;
 - inline code;
-- fenced code block;
+- fenced code block dengan local syntax highlighting ringan;
 - table dengan alignment `:---`, `:---:`, `---:`;
 - image placeholder untuk remote image;
-- raw HTML tampil sebagai teks/escaped, bukan dijalankan.
+- safe raw HTML allowlist kecil: `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, `<u>`, `<s>`, `<small>`, `<details>`, `<summary>`, `<abbr title="...">`, `<cite>`;
+- raw HTML di luar allowlist tetap tampil sebagai teks/escaped, bukan dijalankan.
 
 Panduan lengkap tersedia langsung di aplikasi:
 
@@ -110,9 +111,9 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
 
 ### Markdown / preview
 
-- Safe raw HTML allowlist belum aktif.
-  - Saat ini raw HTML tetap tampil sebagai teks/escaped.
-  - Future candidate: allowlist terbatas seperti `<br>`, `<sub>`, `<sup>`, `<kbd>`, atau `<mark>` lewat RFC/UAT terpisah.
+- Raw HTML bebas/tanpa batas tidak didukung.
+  - Hanya allowlist kecil yang aman yang aktif.
+  - Tag seperti `<script>`, `<style>`, `<iframe>`, `<img>`, `<form>`, event handler `onclick=`, `style=`, `class=`, dan `javascript:` tetap diblok/escaped.
 - Remote image belum auto-render.
   - NOTEZ tetap no `INTERNET`.
   - Future candidate: local image/file attachment yang tetap offline-first.
@@ -120,7 +121,7 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
   - Untuk mengubah checklist, edit teks Markdown `- [ ]` / `- [x]` langsung.
 - Fitur Markdown lanjutan belum didukung:
   - footnote;
-  - highlight `==teks==`;
+  - highlight Markdown `==teks==` belum didukung; gunakan `<mark>teks</mark>` jika perlu highlight aman;
   - superscript/subscript syntax non-HTML;
   - LaTeX/math;
   - Mermaid/diagram;
