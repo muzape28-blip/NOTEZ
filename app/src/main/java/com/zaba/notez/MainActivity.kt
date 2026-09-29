@@ -75,6 +75,9 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
         }
+        findViewById<TextView>(R.id.empty_about_link).setOnClickListener {
+            startActivity(Intent(this, AboutNotezActivity::class.java))
+        }
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 val id = dao.upsert(Note(title = "Catatan baru"))
@@ -315,10 +318,13 @@ class MainActivity : AppCompatActivity() {
             flow.collectLatest {
                 adapter.submit(it)
                 val empty = it.isEmpty()
+                val searching = query.isNotBlank()
                 findViewById<RecyclerView>(R.id.list).visibility =
                     if (empty) View.GONE else View.VISIBLE
-                findViewById<TextView>(R.id.empty).visibility =
-                    if (empty) View.VISIBLE else View.GONE
+                findViewById<View>(R.id.empty_welcome).visibility =
+                    if (empty && !searching) View.VISIBLE else View.GONE
+                findViewById<TextView>(R.id.empty_search).visibility =
+                    if (empty && searching) View.VISIBLE else View.GONE
             }
         }
     }

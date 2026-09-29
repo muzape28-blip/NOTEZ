@@ -75,6 +75,9 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.settings_row_auto_backup_folder).setOnClickListener {
             openTree.launch(null)
         }
+        findViewById<TextView>(R.id.settings_row_about_notez).setOnClickListener {
+            startActivity(Intent(this, AboutNotezActivity::class.java))
+        }
         findViewById<TextView>(R.id.settings_row_privacy).setOnClickListener { showPrivacyDialog() }
 
         updateSummaries()

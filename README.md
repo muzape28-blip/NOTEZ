@@ -21,6 +21,8 @@ NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap
 - Catatan tanpa batas karakter buatan app.
 - Edit mode native Android `EditText`.
 - View mode dengan Markdown Preview v4 berbasis local WebView Reading View.
+- Welcome empty state dengan icon NOTEZ dan link Panduan NOTEZ saat belum ada catatan.
+- Panduan NOTEZ / Tentang NOTEZ lokal/offline.
 - Panduan Markdown lokal/offline dari drawer.
 - Search catatan.
 - Halaman Pengaturan dari drawer.

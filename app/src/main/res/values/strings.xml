@@ -10,5 +10,6 @@
     <string name="cd_delete_note">Hapus catatan</string>
     <string name="cd_back">Kembali</string>
     <string name="markdown_guide_title">Panduan Markdown</string>
+    <string name="about_notez_title">Tentang NOTEZ</string>
     <string name="settings_title">Pengaturan</string>
 </resources>

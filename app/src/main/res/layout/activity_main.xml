@@ -58,12 +58,81 @@
                     android:clipToPadding="false"
                     android:padding="8dp" />
 
-                <TextView
-                    android:id="@+id/empty"
+                <LinearLayout
+                    android:id="@+id/empty_welcome"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Belum ada catatan.\nKetuk + untuk mulai."
+                    android:orientation="vertical"
+                    android:paddingStart="28dp"
+                    android:paddingEnd="28dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/empty_notez_icon"
+                        android:layout_width="84dp"
+                        android:layout_height="84dp"
+                        android:alpha="0.95"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_notez_horse_launcher_fg" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:gravity="center"
+                        android:text="@string/app_name"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="25sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:lineSpacingExtra="2dp"
+                        android:maxWidth="300dp"
+                        android:text="Catat ide, rencana, dan lainnya\nsebelum ditelan waktu."
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="18dp"
+                        android:gravity="center"
+                        android:text="Ketuk + untuk mulai."
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/empty_about_link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="4dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:minWidth="120dp"
+                        android:text="Panduan NOTEZ"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/empty_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingStart="28dp"
+                    android:paddingEnd="28dp"
+                    android:text="Tidak ada hasil.\nCoba kata kunci lain."
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="15sp"
                     android:visibility="gone" />
             </FrameLayout>

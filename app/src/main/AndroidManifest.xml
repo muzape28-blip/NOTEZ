@@ -35,6 +35,9 @@
             android:name=".MarkdownGuideActivity"
             android:exported="false" />
         <activity
+            android:name=".AboutNotezActivity"
+            android:exported="false" />
+        <activity
             android:name=".SettingsActivity"
             android:exported="false" />
     </application>
