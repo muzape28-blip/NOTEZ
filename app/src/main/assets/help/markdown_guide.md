@@ -891,6 +891,8 @@ Yang dilakukan NOTEZ:
 
 - `<div align="center">`, `left`, `right`, dan `justify` didukung sebagai alignment aman;
 - `<h1>` sampai `<h6>`, `<p>`, `<strong>/<b>`, dan `<em>/<i>` dirender sebagai struktur teks;
+- `<table>`, `<tr>`, `<td>`, `<th>`, `<tbody>`, dan `<thead>` didukung untuk tabel README sederhana;
+- `<td align="center">` / `<th align="center">` ikut dirender sebagai alignment aman;
 - `<a href="...">` boleh untuk `https:`, `http:`, `mailto:`, `tel:`, dan anchor lokal `#bagian`;
 - `<img>` tidak diunduh otomatis, tapi berubah menjadi placeholder image;
 - atribut ukuran `<img width="112" height="112">` dipakai untuk ukuran placeholder dengan batas aman.
@@ -920,7 +922,7 @@ NOTEZ tidak auto-load remote image. Kalau catatan berisi:
 
 NOTEZ menampilkan placeholder/chip berdasarkan `alt`, bukan mengambil gambar dari internet secara otomatis. Ini menjaga prinsip offline-first: tidak ada request jaringan hanya karena kamu membuka catatan.
 
-Kalau placeholder menampilkan tombol `Load & cache`, kamu bisa tap tombol itu untuk mengambil gambar secara manual. NOTEZ akan menampilkan dialog konfirmasi berisi domain sumber. Setelah berhasil, gambar disimpan lokal dan render berikutnya memakai cache. Untuk keamanan MVP, tipe utama yang didukung cache adalah PNG, JPG/JPEG, WebP, dan GIF; SVG badge remote bisa tetap menjadi placeholder kalau belum lolos policy render aman.
+Kalau placeholder menampilkan tombol `Load & cache`, kamu bisa tap tombol itu — atau tap area placeholder-nya — untuk mengambil gambar secara manual. NOTEZ akan menampilkan dialog konfirmasi berisi domain sumber. Setelah berhasil, gambar disimpan lokal dan render berikutnya memakai cache. Untuk README GitHub yang punya link repo di dalam catatan, path relatif seperti `docs/screenshots/a.png` bisa diarahkan ke `raw.githubusercontent.com` secara user-triggered. Untuk keamanan MVP, tipe utama yang didukung cache adalah PNG, JPG/JPEG, WebP, dan GIF; SVG badge remote bisa tetap menjadi placeholder kalau belum lolos policy render aman.
 
 Kalau kamu ingin menulis contoh HTML sebagai dokumentasi, bungkus dengan inline code atau code block:
 

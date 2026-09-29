@@ -43,9 +43,15 @@ P1 initially kept NOTEZ without `android.permission.INTERNET`; the same local ba
   - This is mapped to internal NOTEZ alignment classes, not free CSS.
 - Images:
   - raw `<img>` becomes a NOTEZ placeholder/chip;
+  - tapping the placeholder body behaves like `Load & cache` when a loadable remote source exists;
   - `alt` becomes the visible label;
   - `width` / `height` are used for placeholder sizing with safe clamping;
-  - remote images are not fetched and not embedded as active `<img>`.
+  - remote images are not fetched until user action;
+  - relative GitHub README paths can resolve to `raw.githubusercontent.com` when a GitHub repo URL is present in the same note.
+
+- README screenshot tables:
+  - safe raw `<table>`, `<tbody>`, `<thead>`, `<tr>`, `<td>`, and `<th>` are supported;
+  - `align` on cells/headings/paragraph containers is mapped to internal NOTEZ alignment classes.
 
 ### Still blocked / stripped
 
@@ -96,6 +102,7 @@ Approved behavior implemented locally:
 - no remote scripts/styles/fonts/iframes;
 - supported cached image MIME types: PNG, JPG/JPEG, WebP, GIF;
 - SVG badge rendering remains cautious and may stay placeholder unless a separate SVG policy is approved.
+- follow-up fix after device UAT feedback: placeholder body tap now triggers the same load flow as the `Load & cache` button, and ZCODE README raw screenshot tables are part of the target compatibility case.
 
 ## Implementation Notes
 

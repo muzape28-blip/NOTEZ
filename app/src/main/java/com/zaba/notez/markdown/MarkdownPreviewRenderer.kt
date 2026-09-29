@@ -125,6 +125,7 @@ class MarkdownPreviewRenderer(
     private fun buildHtml(markdown: String): String {
         val colors = PreviewColors.from(activity)
         val markdownJson = JSONObject.quote(markdown)
+        val githubRawBaseJson = JSONObject.quote(githubRawBase(markdown))
         val cachedImagesJson = cachedImagesJson(markdown)
         return """
             <!doctype html>
@@ -142,6 +143,7 @@ class MarkdownPreviewRenderer(
                   'use strict';
 
                   var source = $markdownJson;
+                  var githubRawBase = $githubRawBaseJson;
                   var cachedImages = $cachedImagesJson;
                   var safeExternalLink = /^(https?:|mailto:|tel:)/i;
                   var safeAnchorLink = /^#[A-Za-z0-9][A-Za-z0-9_-]*$/;
@@ -174,6 +176,12 @@ class MarkdownPreviewRenderer(
                     small: true,
                     strong: true,
                     sub: true,
+                    table: true,
+                    tbody: true,
+                    td: true,
+                    th: true,
+                    thead: true,
+                    tr: true,
                     summary: true,
                     sup: true,
                     u: true
@@ -213,14 +221,14 @@ class MarkdownPreviewRenderer(
                     span: true,
                     strong: true,
                     sub: true,
-                    summary: true,
-                    sup: true,
                     table: true,
                     tbody: true,
                     td: true,
                     th: true,
                     thead: true,
                     tr: true,
+                    summary: true,
+                    sup: true,
                     u: true,
                     ul: true
                   };
@@ -288,7 +296,7 @@ class MarkdownPreviewRenderer(
                   }
 
                   function isAlignableRawTag(tagName) {
-                    return tagName === 'div' || tagName === 'p' || /^h[1-6]$/.test(tagName);
+                    return tagName === 'div' || tagName === 'p' || tagName === 'td' || tagName === 'th' || /^h[1-6]$/.test(tagName);
                   }
 
                   function safeDimensionPx(value, max) {
@@ -356,12 +364,25 @@ class MarkdownPreviewRenderer(
                     return source.length > 180 ? source.slice(0, 177) + '…' : source;
                   }
 
+                  function hasExplicitScheme(value) {
+                    return /^[A-Za-z][A-Za-z0-9+.-]*:/.test(String(value || '').trim());
+                  }
+
+                  function resolvedImageSource(rawSrc) {
+                    var raw = String(rawSrc || '').trim();
+                    if (!raw) return '';
+                    if (safeExternalHref(raw)) return raw;
+                    if (raw.indexOf('//') === 0 || hasExplicitScheme(raw) || !githubRawBase) return '';
+                    return githubRawBase + encodeURI(raw.replace(/^\/+/, ''));
+                  }
+
                   function renderImageOrPlaceholder(rawSrc, alt, widthValue, heightValue, insideLink, openHref) {
-                    var href = safeExternalHref(rawSrc);
+                    var resolvedSrc = resolvedImageSource(rawSrc);
+                    var href = safeExternalHref(resolvedSrc);
                     var safeOpenHref = safeHref(openHref || '') || href;
                     var style = imagePlaceholderStyle(widthValue, heightValue);
-                    var cachedSrc = safeCachedImageHref(cachedImageHref(rawSrc));
-                    var title = shortImageSource(rawSrc);
+                    var cachedSrc = safeCachedImageHref(cachedImageHref(resolvedSrc));
+                    var title = rawSrc === resolvedSrc ? shortImageSource(rawSrc) : shortImageSource(rawSrc + ' → ' + resolvedSrc);
                     var label = alt || 'image';
                     if (cachedSrc) {
                       var imgClasses = 'notez-cached-image' + (style ? ' notez-image-placeholder-sized' : '');
@@ -370,14 +391,14 @@ class MarkdownPreviewRenderer(
                       return safeOpenHref && !insideLink ? '<a href="' + escapeAttribute(safeOpenHref) + '" target="_self" rel="nofollow noopener noreferrer">' + img + '</a>' : img;
                     }
                     var classes = 'notez-image-placeholder notez-image-placeholder-raw notez-image-placeholder-inline' + (style ? ' notez-image-placeholder-sized' : '');
-                    var helper = href ? 'Remote image belum dimuat' : 'Image placeholder';
+                    var helper = href ? 'Remote image belum dimuat' : 'Relative/local image placeholder';
                     var attrs = ' class="' + classes + '" title="' + escapeAttribute(title) + '"';
                     if (style) attrs += ' style="' + escapeAttribute(style) + '"';
                     var openTag = insideLink ? '<span' + attrs + '>' : '<span' + attrs + '>';
                     var actions = '';
                     if (href) {
                       actions += '<span class="notez-image-actions">' +
-                        '<a class="notez-image-action notez-image-load" href="' + escapeAttribute(notezImageLoadHref(rawSrc)) + '">Load &amp; cache</a>';
+                        '<a class="notez-image-action notez-image-load" href="' + escapeAttribute(notezImageLoadHref(resolvedSrc)) + '">Load &amp; cache</a>';
                       if (safeOpenHref) {
                         actions += '<a class="notez-image-action notez-image-open" href="' + escapeAttribute(safeOpenHref) + '" target="_self" rel="nofollow noopener noreferrer">Open link</a>';
                       }
@@ -423,6 +444,14 @@ class MarkdownPreviewRenderer(
                     var classes = [];
                     var align = isAlignableRawTag(tagName) ? safeAlign(node.getAttribute('align')) : '';
                     if (align) classes.push('notez-align-' + align);
+                    if ((tagName === 'td' || tagName === 'th') && node.hasAttribute('colspan')) {
+                      var colspan = String(node.getAttribute('colspan') || '').trim();
+                      if (/^\d{1,2}$/.test(colspan)) html += ' colspan="' + Math.max(1, Math.min(parseInt(colspan, 10), 12)) + '"';
+                    }
+                    if ((tagName === 'td' || tagName === 'th') && node.hasAttribute('rowspan')) {
+                      var rowspan = String(node.getAttribute('rowspan') || '').trim();
+                      if (/^\d{1,2}$/.test(rowspan)) html += ' rowspan="' + Math.max(1, Math.min(parseInt(rowspan, 10), 12)) + '"';
+                    }
                     if (tagName === 'a') {
                       var href = safeHref(node.getAttribute('href') || '');
                       if (href) {
@@ -539,6 +568,9 @@ class MarkdownPreviewRenderer(
                       } else if (name === 'style' && (hasClassToken(element, 'notez-image-placeholder') || hasClassToken(element, 'notez-cached-image'))) {
                         nextValue = normalizeImagePlaceholderStyle(value);
                         keep = nextValue.length > 0;
+                      } else if ((name === 'colspan' || name === 'rowspan') && (tagName === 'td' || tagName === 'th') && /^\d{1,2}$/.test(value)) {
+                        keep = true;
+                        nextValue = String(Math.max(1, Math.min(parseInt(value, 10), 12)));
                       } else if (name === 'start' && tagName === 'ol' && /^\d{1,6}$/.test(value)) {
                         keep = true;
                       } else if (name === 'title' && (tagName === 'abbr' || tagName === 'a' || tagName === 'img' || hasClassToken(element, 'notez-image-placeholder'))) {
@@ -873,6 +905,7 @@ class MarkdownPreviewRenderer(
                   enhanceFootnoteRefs();
                   appendFootnotes(renderEnv);
                   hardenLinks();
+                  addImagePlaceholderHandlers();
 
                   function slugifyHeading(text) {
                     var slug = String(text || '').toLowerCase()
@@ -1181,6 +1214,19 @@ class MarkdownPreviewRenderer(
                         a.removeAttribute('href');
                         a.classList.add('notez-unsafe-link');
                       }
+                    });
+                  }
+
+                  function addImagePlaceholderHandlers() {
+                    Array.prototype.slice.call(preview.querySelectorAll('.notez-image-placeholder')).forEach(function (box) {
+                      box.addEventListener('click', function (event) {
+                        if (event.target && event.target.closest && event.target.closest('a')) return;
+                        var load = box.querySelector('a.notez-image-load[href]');
+                        var href = load ? load.getAttribute('href') : '';
+                        if (!safeImageLoadHref(href)) return;
+                        event.preventDefault();
+                        window.location.href = href;
+                      });
                     });
                   }
                 })();
@@ -1522,11 +1568,13 @@ class MarkdownPreviewRenderer(
 
     private fun extractRemoteImageSources(markdown: String): Set<String> {
         val sources = linkedSetOf<String>()
+        val base = githubRawBase(markdown)
         MARKDOWN_IMAGE_PATTERN.findAll(markdown).forEach { match ->
             match.groupValues.getOrNull(1)
                 ?.trim()
                 ?.trim('<', '>')
                 ?.normalizeHtmlAttribute()
+                ?.resolveImageSource(base)
                 ?.takeIf(::isRemoteHttpUrl)
                 ?.let(sources::add)
         }
@@ -1534,10 +1582,18 @@ class MarkdownPreviewRenderer(
             match.groupValues.getOrNull(2)
                 ?.trim()
                 ?.normalizeHtmlAttribute()
+                ?.resolveImageSource(base)
                 ?.takeIf(::isRemoteHttpUrl)
                 ?.let(sources::add)
         }
         return sources
+    }
+
+    private fun githubRawBase(markdown: String): String {
+        val match = GITHUB_REPO_PATTERN.find(markdown) ?: return ""
+        val owner = match.groupValues[1]
+        val repo = match.groupValues[2].removeSuffix(".git")
+        return "https://raw.githubusercontent.com/$owner/$repo/main/"
     }
 
     private fun isImageLoadRequest(uri: Uri): Boolean =
@@ -1625,6 +1681,7 @@ class MarkdownPreviewRenderer(
         private val EXTERNAL_SCHEMES = setOf("http", "https", "mailto", "tel")
         private val MARKDOWN_IMAGE_PATTERN = Regex("""!\[[^\]]*]\(\s*<?([^\s)>"]+)""")
         private val RAW_IMG_SRC_PATTERN = Regex("""<img\b[^>]*\bsrc\s*=\s*(["'])((?:(?!\1).)*)\1""", RegexOption.IGNORE_CASE)
+        private val GITHUB_REPO_PATTERN = Regex("""https://github\.com/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)(?:/|\b)""", RegexOption.IGNORE_CASE)
     }
 }
 
@@ -1639,6 +1696,15 @@ private fun String.normalizeHtmlAttribute(): String = this
     .replace("&#34;", "\"")
     .replace("&#39;", "'")
     .replace("&apos;", "'")
+
+private fun String.resolveImageSource(githubRawBase: String): String? {
+    val source = trim()
+    if (source.isBlank()) return null
+    if (isRemoteHttpUrl(source)) return source
+    if (source.startsWith("//") || Regex("^[A-Za-z][A-Za-z0-9+.-]*:").containsMatchIn(source)) return null
+    if (githubRawBase.isBlank()) return null
+    return githubRawBase + source.trimStart('/').split('/').joinToString("/") { Uri.encode(it) }
+}
 
 private fun Activity.colorResource(colorRes: Int): String =
     String.format(Locale.US, "#%06X", 0xFFFFFF and getColor(colorRes))

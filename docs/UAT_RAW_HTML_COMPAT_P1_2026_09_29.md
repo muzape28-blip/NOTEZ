@@ -36,6 +36,7 @@ ZCODE adalah IDE Python untuk Android.
 ## Expected — Supported HTML
 
 - Raw tags above are not shown as literal HTML text.
+- Raw README screenshot `<table>`, `<tr>`, and `<td align="center">` blocks render as a table, not escaped text.
 - The main `<div align="center">` content is centered.
 - `<h1>ZCODE</h1>` renders as a heading.
 - `<strong>` renders bold.
@@ -51,20 +52,24 @@ ZCODE adalah IDE Python untuk Android.
 
 Use a small PNG/JPG/WebP/GIF remote image URL for this section.
 
-1. Tap `Load & cache` on a remote image placeholder.
-2. Confirm the dialog shows the source domain and explains one-time internet use.
-3. Tap `Load & cache` in the dialog.
-4. Expected: image downloads, saves locally, and the Reading View rerenders with the cached image.
-5. Turn off network / airplane mode and reopen the note.
-6. Expected: cached image still appears from local cache.
-7. Open Settings → Aplikasi → `Hapus cache gambar online`.
-8. Confirm cache size is shown and clearing cache works.
-9. Reopen note.
-10. Expected: image returns to placeholder state.
+1. Tap the body of a remote image placeholder, not only the small button.
+2. Expected: it behaves like `Load & cache` and shows the confirmation dialog.
+3. Cancel, then tap the explicit `Load & cache` button.
+4. Expected: same confirmation dialog.
+5. Confirm the dialog shows the source domain and explains one-time internet use.
+6. Tap `Load & cache` in the dialog.
+7. Expected: image downloads, saves locally, and the Reading View rerenders with the cached image.
+8. Turn off network / airplane mode and reopen the note.
+9. Expected: cached image still appears from local cache.
+10. Open Settings → Aplikasi → `Hapus cache gambar online`.
+11. Confirm cache size is shown and clearing cache works.
+12. Reopen note.
+13. Expected: image returns to placeholder state.
 
 Notes:
 
 - Remote images must not auto-load just by opening the note.
+- Relative GitHub README image paths may show `Load & cache` when NOTEZ can infer the GitHub repo from links in the same note.
 - SVG badge URLs may remain placeholder if unsupported by current image-cache policy.
 
 ## Expected — Safety
