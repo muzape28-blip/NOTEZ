@@ -1,7 +1,7 @@
 # NOTEZ v0.1.3
 
-**Status:** Release candidate — production release pending.  
-**Target:** Publish signed production APK after CI and production workflow pass.
+**Status:** Production release notes for GitHub Release `v0.1.3`.
+**Version:** `versionName 0.1.3`, `versionCode 4`.
 
 ---
 
@@ -96,4 +96,7 @@ docs/PENDING_FEATURES_AFTER_V0.1.3.md
 
 ## Release verification summary
 
-To be filled after production workflow and GitHub Release publish.
+- Local text/resource checks: PASS (`git diff --check`, XML parse, no `addJavascriptInterface`, no CDN marker).
+- Local Gradle build: unavailable in the sandbox because no Gradle wrapper/global Gradle is present.
+- Main CI and production workflow evidence are recorded in GitHub Actions and the GitHub Release body.
+- Final signed APK asset SHA-256 is recorded in GitHub Release `v0.1.3`.
