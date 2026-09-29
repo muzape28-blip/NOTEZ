@@ -2,7 +2,7 @@
 
 **Tanggal:** 2026-09-29  
 **Scope:** final Markdown batch sebelum device UAT satu kali.  
-**Status:** Draft UAT — belum CI/device verified.
+**Status:** DEVICE VERIFIED / PASS — see `docs/UAT_MARKDOWN_PREVIEW_V4_RESULT_2026_09_29.md`.
 
 ---
 

@@ -1,7 +1,7 @@
 # RFC — NOTEZ Markdown Preview v4 / Markdown Max Tahap 1
 
 **Tanggal:** 2026-09-29  
-**Status:** CI VERIFIED — debug build passed; waiting device UAT
+**Status:** DEVICE VERIFIED / PASS — CI green and user UAT pass
 **Basis:** local commit `8114065 feat: add markdown preview v3`  
 **Tujuan:** menyelesaikan satu batch Markdown yang lebih lengkap dan rapi agar user cukup UAT satu APK final.
 
@@ -129,33 +129,33 @@ Teknik:
 
 ### Product
 
-- [ ] `==penting==` tampil sebagai highlight.
-- [ ] `x^2^` tampil superscript ringan.
-- [ ] `H~2~O` tampil subscript ringan.
-- [ ] Footnote `[^1]` lompat ke catatan kaki bawah.
-- [ ] Definition list tampil sebagai glosarium rapi.
-- [ ] Code block punya badge/highlight lokal.
-- [ ] Table/callout tetap lebih rapi.
-- [ ] Panduan Markdown menjelaskan fitur baru.
+- [x] `==penting==` tampil sebagai highlight.
+- [x] `x^2^` tampil superscript ringan.
+- [x] `H~2~O` tampil subscript ringan.
+- [x] Footnote `[^1]` lompat ke catatan kaki bawah.
+- [x] Definition list tampil sebagai glosarium rapi.
+- [x] Code block punya badge/highlight lokal.
+- [x] Table/callout tetap lebih rapi.
+- [x] Panduan Markdown menjelaskan fitur baru.
 
 ### Security/privacy
 
-- [ ] Tidak ada `android.permission.INTERNET`.
-- [ ] Tidak ada CDN marker.
-- [ ] Tidak ada `addJavascriptInterface`.
-- [ ] `<script>` tidak execute.
-- [ ] `<iframe>` tidak embed.
-- [ ] Raw `<img>` tidak auto-load.
-- [ ] `onclick=`, `style=`, `class=`, `id=`, `javascript:` tidak aktif sebagai raw user capability.
-- [ ] Markdown remote image tetap placeholder/link.
+- [x] Tidak ada `android.permission.INTERNET`.
+- [x] Tidak ada CDN marker.
+- [x] Tidak ada `addJavascriptInterface`.
+- [x] `<script>` tidak execute.
+- [x] `<iframe>` tidak embed.
+- [x] Raw `<img>` tidak auto-load.
+- [x] `onclick=`, `style=`, `class=`, `id=`, `javascript:` tidak aktif sebagai raw user capability.
+- [x] Markdown remote image tetap placeholder/link.
 
 ### Regression
 
-- [ ] Heading anchor / guide TOC tetap jalan.
-- [ ] Task list tetap view-only.
-- [ ] GFM table alignment tetap jalan.
-- [ ] Callout NOTE/TIP/IMPORTANT/WARNING/CAUTION tetap jalan.
-- [ ] Edit mode tetap native EditText dan autosave tidak diubah.
+- [x] Heading anchor / guide TOC tetap jalan.
+- [x] Task list tetap view-only.
+- [x] GFM table alignment tetap jalan.
+- [x] Callout NOTE/TIP/IMPORTANT/WARNING/CAUTION tetap jalan.
+- [x] Edit mode tetap native EditText dan autosave tidak diubah.
 
 ---
 
@@ -183,6 +183,28 @@ Conclusion         : success
 Artifact           : notez-debug
 Artifact id        : 11010543404
 Artifact size      : 8,094,466 bytes
+```
+
+CI verification for latest docs commit `7146fc9`:
+
+```text
+GitHub Actions run : 36516206526
+URL                : https://github.com/muzape28-blip/NOTEZ/actions/runs/36516206526
+Conclusion         : success
+Artifact           : notez-debug
+Artifact id        : 11011126427
+Artifact size      : 8,094,464 bytes
+```
+
+Device UAT on 2026-09-29:
+
+```text
+Result        : PASS / memuaskan
+Evidence      : user reported "Yuuppsss semuanya pass memuaskan" after testing debug artifact
+Screenshots   : Screenshot_20260929-103059.png through Screenshot_20260929-103143.png
+Observed pass : highlight, superscript/subscript, footnotes, definition list, safe HTML,
+                code badges/highlighting, table alignment, callout card, remote image placeholder,
+                and unsafe HTML/link non-execution
 ```
 
 ---

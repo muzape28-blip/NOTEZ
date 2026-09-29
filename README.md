@@ -142,15 +142,15 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
 
 ### UI / appearance
 
-- Theme system v2 baru tahap awal:
-  - theme picker sudah punya preview kecil;
-  - tema curated sudah bertambah, tapi masih lokal/bawaan APK.
+- Tema curated sudah tersedia sebagai bawaan APK dan dipilih lewat preview picker.
+- Belum ada custom theme editor / import theme sendiri.
 - Belum ada theme marketplace/plugin ecosystem.
 - Belum ada arbitrary CSS snippet seperti Obsidian.
+- Belum ada card style/density setting.
 - Future candidate:
   - Material/Obsidian-inspired appearance polish lanjutan;
-  - card style/density setting;
-  - tambahan tema curated seperti NOTEZ Paper.
+  - tambahan tema curated seperti NOTEZ Paper;
+  - opsi card style/density jika benar-benar dibutuhkan.
 
 ### Export / sharing
 
@@ -173,12 +173,14 @@ Arah pengembangan NOTEZ tetap bertahap:
 
 Candidate ke depan:
 
-- Theme System v2 / Appearance Polish.
-- Local attachments.
-- Wikilinks/internal note links.
+- Local attachments / local images yang tetap offline-first.
+- Wikilinks/internal note links ala Obsidian-lite.
+- Tags, folder/notebook, pin/favorite, atau archive.
 - Real Trash / Recently Deleted.
-- Safe HTML allowlist untuk Markdown Preview.
-- Export format tambahan.
+- Export PDF/HTML/Markdown bundle.
+- Share sheet khusus untuk rendered preview.
+- Markdown advanced opsional: LaTeX/math penuh, Mermaid/diagram, emoji shortcode, auto TOC.
+- UI polish lanjutan: card style/density, custom theme editor, tambahan tema curated.
 
 ---
 
@@ -195,6 +197,15 @@ https://github.com/muzape28-blip/NOTEZ/releases
 ## Status teknis
 
 NOTEZ adalah aplikasi Android native Kotlin.
+
+Status source `main` saat ini:
+
+```text
+Settings Page v1       : CI + device UAT PASS
+Theme System v2        : CI + device UAT PASS
+Markdown Preview v4    : CI + device UAT PASS
+Release publik terbaru : tetap sesuai GitHub Releases, belum otomatis berubah hanya karena main sudah update
+```
 
 Kontrak penting yang dijaga:
 
