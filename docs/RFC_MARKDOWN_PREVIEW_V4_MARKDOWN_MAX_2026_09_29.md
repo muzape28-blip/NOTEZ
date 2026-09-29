@@ -1,7 +1,7 @@
 # RFC — NOTEZ Markdown Preview v4 / Markdown Max Tahap 1
 
 **Tanggal:** 2026-09-29  
-**Status:** IMPLEMENTED LOCALLY — static/source checks passed; Android build waits for CI  
+**Status:** CI VERIFIED — debug build passed; waiting device UAT
 **Basis:** local commit `8114065 feat: add markdown preview v3`  
 **Tujuan:** menyelesaikan satu batch Markdown yang lebih lengkap dan rapi agar user cukup UAT satu APK final.
 
@@ -174,7 +174,16 @@ git diff --check                                       : PASS
 Local Android build                                    : NOT RUN — no Gradle wrapper/global gradle in sandbox
 ```
 
-Canonical Android compile/build evidence must come from GitHub Actions CI after push.
+CI verification for implementation commit `1bee29f`:
+
+```text
+GitHub Actions run : 36515946866
+URL                : https://github.com/muzape28-blip/NOTEZ/actions/runs/36515946866
+Conclusion         : success
+Artifact           : notez-debug
+Artifact id        : 11010543404
+Artifact size      : 8,094,466 bytes
+```
 
 ---
 
