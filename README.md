@@ -77,7 +77,7 @@ NOTEZ mendukung Markdown umum untuk catatan rapi:
 - footnote `[^1]` + `[^1]: catatan`;
 - definition list `Istilah` lalu `: definisi`;
 - image placeholder untuk remote image;
-- safe raw HTML allowlist kecil: `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, `<u>`, `<s>`, `<small>`, `<details>`, `<summary>`, `<abbr title="...">`, `<cite>`, `<dl>`, `<dt>`, `<dd>`;
+- safe raw HTML allowlist: tag kecil seperti `<br>`, `<kbd>`, `<mark>`, `<details>`, definition list, plus subset README-style seperti `<div align="center">`, `<h1>`-`<h6>`, `<p>`, `<strong>/<b>`, `<em>/<i>`, `<a href="...">`, dan `<img>` sebagai placeholder;
 - raw HTML di luar allowlist tetap tampil sebagai teks/escaped, bukan dijalankan.
 
 Panduan lengkap tersedia langsung di aplikasi:
@@ -118,11 +118,12 @@ Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target 
 ### Markdown / preview
 
 - Raw HTML bebas/tanpa batas tidak didukung.
-  - Hanya allowlist kecil yang aman yang aktif.
-  - Tag seperti `<script>`, `<style>`, `<iframe>`, `<img>`, `<form>`, event handler `onclick=`, `style=`, `class=`, dan `javascript:` tetap diblok/escaped.
+  - Hanya allowlist aman yang aktif.
+  - README-style `<img>` didukung sebagai placeholder, bukan gambar remote aktif.
+  - Tag seperti `<script>`, `<style>`, `<iframe>`, `<form>`, event handler `onclick=`, `style=`, `class=`, dan `javascript:` tetap diblok/escaped.
 - Remote image belum auto-render.
-  - NOTEZ tetap no `INTERNET`.
-  - Future candidate: local image/file attachment yang tetap offline-first.
+  - NOTEZ tetap no `INTERNET` pada build ini.
+  - Future candidate: optional user-triggered online image loading + local caching, atau local image/file attachment yang tetap offline-first.
 - Checkbox di preview belum interaktif.
   - Untuk mengubah checklist, edit teks Markdown `- [ ]` / `- [x]` langsung.
 - Fitur Markdown lanjutan belum didukung:

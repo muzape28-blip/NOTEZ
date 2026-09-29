@@ -125,25 +125,40 @@ class MarkdownPreviewRenderer(
                   var safeExternalLink = /^(https?:|mailto:|tel:)/i;
                   var safeAnchorLink = /^#[A-Za-z0-9][A-Za-z0-9_-]*$/;
                   var allowedRawHtmlTags = {
-                    br: true,
-                    sub: true,
-                    sup: true,
-                    kbd: true,
-                    mark: true,
-                    u: true,
-                    s: true,
-                    small: true,
-                    details: true,
-                    summary: true,
+                    a: true,
                     abbr: true,
+                    b: true,
+                    br: true,
                     cite: true,
+                    dd: true,
+                    details: true,
+                    div: true,
                     dl: true,
                     dt: true,
-                    dd: true
+                    em: true,
+                    h1: true,
+                    h2: true,
+                    h3: true,
+                    h4: true,
+                    h5: true,
+                    h6: true,
+                    i: true,
+                    img: true,
+                    kbd: true,
+                    mark: true,
+                    p: true,
+                    s: true,
+                    small: true,
+                    strong: true,
+                    sub: true,
+                    summary: true,
+                    sup: true,
+                    u: true
                   };
                   var allowedRenderedTags = {
                     a: true,
                     abbr: true,
+                    b: true,
                     blockquote: true,
                     br: true,
                     cite: true,
@@ -162,6 +177,7 @@ class MarkdownPreviewRenderer(
                     h5: true,
                     h6: true,
                     hr: true,
+                    i: true,
                     kbd: true,
                     li: true,
                     mark: true,
@@ -185,8 +201,15 @@ class MarkdownPreviewRenderer(
                     ul: true
                   };
                   var allowedNotezClasses = {
-                    'notez-image-placeholder': true,
+                    'notez-align-center': true,
+                    'notez-align-justify': true,
+                    'notez-align-left': true,
+                    'notez-align-right': true,
                     'notez-image-kicker': true,
+                    'notez-image-placeholder': true,
+                    'notez-image-placeholder-inline': true,
+                    'notez-image-placeholder-raw': true,
+                    'notez-image-placeholder-sized': true,
                     'notez-unsafe-link': true
                   };
                   var md = window.markdownit({
@@ -230,26 +253,135 @@ class MarkdownPreviewRenderer(
                     return match ? 'text-align:' + match[1].toLowerCase() : '';
                   }
 
+                  function safeAlign(value) {
+                    var align = String(value || '').trim().toLowerCase();
+                    return /^(left|right|center|justify)$/.test(align) ? align : '';
+                  }
+
+                  function isAlignableRawTag(tagName) {
+                    return tagName === 'div' || tagName === 'p' || /^h[1-6]$/.test(tagName);
+                  }
+
+                  function safeDimensionPx(value, max) {
+                    var match = String(value || '').trim().match(/^(\d{1,4})(?:px)?$/i);
+                    if (!match) return '';
+                    var number = Math.max(1, Math.min(parseInt(match[1], 10), max));
+                    return number + 'px';
+                  }
+
+                  function safeWidthDimension(value) {
+                    var raw = String(value || '').trim();
+                    var percent = raw.match(/^(\d{1,3})%$/);
+                    if (percent) {
+                      return Math.max(1, Math.min(parseInt(percent[1], 10), 100)) + '%';
+                    }
+                    return safeDimensionPx(raw, 640);
+                  }
+
+                  function imagePlaceholderStyle(widthValue, heightValue) {
+                    var width = safeWidthDimension(widthValue);
+                    var height = safeDimensionPx(heightValue, 480);
+                    var parts = [];
+                    if (width) {
+                      parts.push('width:' + width);
+                      parts.push('max-width:100%');
+                    }
+                    if (height) {
+                      parts.push('min-height:' + height);
+                    } else if (width) {
+                      parts.push('min-height:56px');
+                    }
+                    return parts.join(';');
+                  }
+
+                  function normalizeImagePlaceholderStyle(value) {
+                    var accepted = [];
+                    String(value || '').split(';').forEach(function (part) {
+                      var item = part.trim().toLowerCase();
+                      var match;
+                      if (!item) return;
+                      match = item.match(/^width:(\d{1,4})px$/);
+                      if (match) {
+                        accepted.push('width:' + Math.max(1, Math.min(parseInt(match[1], 10), 640)) + 'px');
+                        return;
+                      }
+                      match = item.match(/^width:(\d{1,3})%$/);
+                      if (match) {
+                        accepted.push('width:' + Math.max(1, Math.min(parseInt(match[1], 10), 100)) + '%');
+                        return;
+                      }
+                      if (item === 'max-width:100%') {
+                        accepted.push('max-width:100%');
+                        return;
+                      }
+                      match = item.match(/^min-height:(\d{1,4})px$/);
+                      if (match) {
+                        accepted.push('min-height:' + Math.max(1, Math.min(parseInt(match[1], 10), 480)) + 'px');
+                      }
+                    });
+                    return accepted.join(';');
+                  }
+
+                  function shortImageSource(value) {
+                    var source = String(value || '').trim() || '(no source)';
+                    return source.length > 180 ? source.slice(0, 177) + '…' : source;
+                  }
+
+                  function renderImagePlaceholder(rawSrc, alt, widthValue, heightValue, insideLink) {
+                    var href = safeExternalHref(rawSrc);
+                    var style = imagePlaceholderStyle(widthValue, heightValue);
+                    var classes = 'notez-image-placeholder notez-image-placeholder-raw notez-image-placeholder-inline' + (style ? ' notez-image-placeholder-sized' : '');
+                    var title = shortImageSource(rawSrc);
+                    var label = alt || 'image';
+                    var helper = href ? 'Remote image placeholder' : 'Image placeholder';
+                    var attrs = ' class="' + classes + '" title="' + escapeAttribute(title) + '"';
+                    if (style) attrs += ' style="' + escapeAttribute(style) + '"';
+                    var tag = href && !insideLink ? 'a' : 'span';
+                    if (tag === 'a') attrs += ' href="' + escapeAttribute(href) + '" target="_self" rel="nofollow noopener noreferrer"';
+                    return '<' + tag + attrs + '>' +
+                      '<span class="notez-image-kicker">Image</span>' +
+                      '<strong>' + escapeHtml(label) + '</strong>' +
+                      '<small>' + helper + '</small>' +
+                      '</' + tag + '>';
+                  }
+
                   function renderSafeRawAttributes(node, tagName) {
                     var html = '';
+                    var classes = [];
+                    var align = isAlignableRawTag(tagName) ? safeAlign(node.getAttribute('align')) : '';
+                    if (align) classes.push('notez-align-' + align);
+                    if (tagName === 'a') {
+                      var href = safeHref(node.getAttribute('href') || '');
+                      if (href) {
+                        html += ' href="' + escapeAttribute(href) + '" target="_self" rel="nofollow noopener noreferrer"';
+                      } else if (node.hasAttribute('href')) {
+                        classes.push('notez-unsafe-link');
+                      }
+                      if (node.hasAttribute('title')) {
+                        html += ' title="' + escapeAttribute(node.getAttribute('title') || '') + '"';
+                      }
+                    }
                     if (tagName === 'details' && node.hasAttribute('open')) {
                       html += ' open';
                     }
                     if (tagName === 'abbr' && node.hasAttribute('title')) {
                       html += ' title="' + escapeAttribute(node.getAttribute('title') || '') + '"';
                     }
+                    if (classes.length) {
+                      html += ' class="' + classes.join(' ') + '"';
+                    }
                     return html;
                   }
 
-                  function renderSafeRawNodes(nodes) {
+                  function renderSafeRawNodes(nodes, parentTag) {
                     var html = '';
                     Array.prototype.slice.call(nodes).forEach(function (node) {
-                      html += renderSafeRawNode(node);
+                      html += renderSafeRawNode(node, parentTag || '');
                     });
                     return html;
                   }
 
-                  function renderSafeRawNode(node) {
+                  function renderSafeRawNode(node, parentTag) {
                     if (node.nodeType === Node.TEXT_NODE) {
                       return escapeHtml(node.nodeValue || '');
                     }
@@ -266,29 +398,37 @@ class MarkdownPreviewRenderer(
                     if (tagName === 'br') {
                       return '<br>';
                     }
+                    if (tagName === 'img') {
+                      return renderImagePlaceholder(
+                        node.getAttribute('src') || '',
+                        node.getAttribute('alt') || '',
+                        node.getAttribute('width') || '',
+                        node.getAttribute('height') || '',
+                        parentTag === 'a'
+                      );
+                    }
                     return '<' + tagName + renderSafeRawAttributes(node, tagName) + '>' +
-                      renderSafeRawNodes(node.childNodes) +
+                      renderSafeRawNodes(node.childNodes, tagName) +
                       '</' + tagName + '>';
                   }
 
                   function sanitizeRawHtml(raw) {
                     var template = document.createElement('template');
                     template.innerHTML = String(raw || '');
-                    return renderSafeRawNodes(template.content.childNodes);
+                    return renderSafeRawNodes(template.content.childNodes, '');
                   }
 
                   function isSafeRenderedElement(element, tagName) {
-                    if (tagName === 'div') {
-                      return (element.getAttribute('class') || '').split(/\s+/).some(function (name) {
-                        return name === 'notez-image-placeholder';
-                      });
-                    }
-                    if (tagName === 'span') {
-                      return (element.getAttribute('class') || '').split(/\s+/).some(function (name) {
-                        return name === 'notez-image-kicker';
-                      });
-                    }
-                    return true;
+                    if (tagName !== 'div' && tagName !== 'span') return true;
+                    var classes = (element.getAttribute('class') || '').split(/\s+/).filter(Boolean);
+                    if (!classes.length) return tagName === 'div';
+                    return classes.every(function (name) { return !!allowedNotezClasses[name]; });
+                  }
+
+                  function hasClassToken(element, token) {
+                    return (element.getAttribute('class') || '').split(/\s+/).some(function (name) {
+                      return name === token;
+                    });
                   }
 
                   function sanitizeRenderedAttributes(element, tagName) {
@@ -310,9 +450,12 @@ class MarkdownPreviewRenderer(
                       } else if (name === 'style' && (tagName === 'th' || tagName === 'td') && isSafeTextAlign(value)) {
                         keep = true;
                         nextValue = normalizedTextAlign(value);
+                      } else if (name === 'style' && hasClassToken(element, 'notez-image-placeholder')) {
+                        nextValue = normalizeImagePlaceholderStyle(value);
+                        keep = nextValue.length > 0;
                       } else if (name === 'start' && tagName === 'ol' && /^\d{1,6}$/.test(value)) {
                         keep = true;
-                      } else if (name === 'title' && tagName === 'abbr') {
+                      } else if (name === 'title' && (tagName === 'abbr' || tagName === 'a' || hasClassToken(element, 'notez-image-placeholder'))) {
                         keep = true;
                       } else if (name === 'open' && tagName === 'details') {
                         keep = true;
@@ -994,6 +1137,10 @@ class MarkdownPreviewRenderer(
         a { color: var(--notez-accent); text-decoration: none; }
         a:active { opacity: .75; }
         .notez-unsafe-link { color: var(--notez-muted); text-decoration: line-through; }
+        .notez-align-left { text-align: left; }
+        .notez-align-center { text-align: center; }
+        .notez-align-right { text-align: right; }
+        .notez-align-justify { text-align: justify; }
         code {
           font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
           font-size: .92em;
@@ -1119,17 +1266,34 @@ class MarkdownPreviewRenderer(
           color: var(--notez-text);
           background: rgba(255, 255, 255, 0.035);
         }
+        .notez-image-placeholder-inline {
+          display: inline-flex;
+          flex-direction: column;
+          justify-content: center;
+          vertical-align: middle;
+          margin: .18em .3em .18em 0;
+          box-sizing: border-box;
+        }
+        .notez-image-placeholder-sized {
+          align-items: center;
+          text-align: center;
+        }
         .notez-image-placeholder strong,
         .notez-image-placeholder code,
         .notez-image-placeholder small {
           display: block;
           margin-top: 4px;
         }
+        .notez-image-placeholder-inline strong,
+        .notez-image-placeholder-inline small {
+          margin-top: 2px;
+        }
         .notez-image-placeholder code {
           white-space: normal;
           word-break: break-all;
         }
         .notez-image-placeholder small { color: var(--notez-muted); }
+        .notez-image-placeholder-inline small { font-size: .72em; }
         .notez-image-kicker {
           display: inline-block;
           color: var(--notez-muted);

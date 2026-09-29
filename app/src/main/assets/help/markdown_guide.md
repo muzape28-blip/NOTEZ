@@ -837,7 +837,7 @@ Di preview, istilah tampil lebih tegas dan definisinya tampil sebagai penjelasan
 - teks di dalam `[]` adalah *alt text* — deskripsi singkat gambar, berguna untuk aksesibilitas dan tetap muncul kalau gambarnya gagal dimuat;
 - alamat di dalam `()` adalah sumber gambarnya.
 
-**Di NOTEZ:** gambar dari internet (remote) tidak otomatis dimuat, karena NOTEZ offline-first dan tidak mengambil apa pun dari jaringan tanpa kamu minta secara eksplisit. Preview menampilkan placeholder atau link ke gambar tersebut, bukan langsung mengunduh dan menampilkannya di layar.
+**Di NOTEZ:** gambar dari internet (remote) tidak otomatis dimuat. Preview menampilkan placeholder atau link ke gambar tersebut, bukan langsung mengunduh dan menampilkannya di layar. Ini menjaga NOTEZ tetap offline-first dan mencegah catatan mengambil resource jaringan diam-diam.
 
 Contoh penulisan yang tetap berguna meski gambarnya tidak dimuat otomatis:
 
@@ -851,9 +851,9 @@ Alt text `Screenshot halaman login` tetap membantu pembaca tahu gambar itu tenta
 
 ## 18. Raw HTML
 
-Markdown di beberapa tempat, seperti GitHub atau Obsidian, bisa menerima sebagian tag HTML mentah. Di NOTEZ, raw HTML sekarang **tidak bebas**, tapi ada allowlist kecil yang aman untuk kebutuhan menulis.
+Markdown di beberapa tempat, seperti GitHub atau Obsidian, bisa menerima HTML mentah. Di NOTEZ, raw HTML **tidak bebas**, tapi ada allowlist aman supaya catatan hasil copy dari README GitHub tetap lebih kebaca tanpa membuka script/style berbahaya.
 
-Tag kecil yang didukung:
+### 18.1 Tag kecil yang didukung
 
 ```md
 Baris satu<br>Baris dua
@@ -871,27 +871,56 @@ Isi detail yang bisa dibuka.
 <dl><dt>Istilah</dt><dd>Definisi</dd></dl>
 ```
 
-Tag di atas tetap disanitasi. Artinya atribut bebas seperti `style=`, `class=`, `id=`, dan event handler seperti `onclick=` akan dibuang atau dibuat tidak aktif.
+### 18.2 Subset HTML ala README GitHub
 
-Yang tetap **tidak** diizinkan:
+NOTEZ juga mendukung subset struktur yang sering muncul di README:
+
+```html
+<div align="center">
+  <img src="https://example.com/logo.png" alt="Logo" width="112">
+  <h1>Judul Project</h1>
+  <p><strong>Tagline tebal.</strong></p>
+  <p><em>Kalimat miring.</em></p>
+</div>
+<p>
+  <a href="https://example.com"><img src="https://example.com/badge.svg" alt="Badge"></a>
+</p>
+```
+
+Yang dilakukan NOTEZ:
+
+- `<div align="center">`, `left`, `right`, dan `justify` didukung sebagai alignment aman;
+- `<h1>` sampai `<h6>`, `<p>`, `<strong>/<b>`, dan `<em>/<i>` dirender sebagai struktur teks;
+- `<a href="...">` boleh untuk `https:`, `http:`, `mailto:`, `tel:`, dan anchor lokal `#bagian`;
+- `<img>` tidak diunduh otomatis, tapi berubah menjadi placeholder image;
+- atribut ukuran `<img width="112" height="112">` dipakai untuk ukuran placeholder dengan batas aman.
+
+Contoh hasilnya: logo/badge remote tidak langsung muncul sebagai gambar asli, tapi tidak lagi bocor menjadi teks HTML mentah panjang. Ia menjadi kartu/chip placeholder yang menampilkan alt text seperti `Logo` atau `Badge`.
+
+### 18.3 Yang tetap tidak diizinkan
 
 ```md
 <script>alert("hi")</script>
 <style>body { color: red }</style>
 <iframe src="https://contoh.com"></iframe>
-<img src="https://contoh.com/gambar.png">
+<div style="position:fixed; inset:0">overlay</div>
 <div onclick="alert('nope')">klik</div>
 <a href="javascript:alert(1)">bahaya</a>
 ```
 
-Kalau kamu menulis tag yang tidak masuk allowlist, NOTEZ akan menampilkannya sebagai teks biasa/escaped, bukan menjalankannya.
+Tag/atribut di atas tetap diblok, dihapus, atau dibuat tidak aktif. `style=`, `class=`, `id=`, dan event handler seperti `onclick=` tidak dibuka bebas. Untuk alignment sederhana, pakai `align="center"`, bukan `style="text-align:center"`.
 
-Ini bukan bug. Ini adalah keputusan keamanan dan privasi:
+### 18.4 Kenapa `<img>` jadi placeholder?
 
-- catatan hasil copy-paste dari web tidak bisa menjalankan script diam-diam;
-- NOTEZ tetap offline-first dan tidak memuat resource asing;
-- tampilan catatan lebih mudah diprediksi;
-- tag seperti `<script>`, `<style>`, `<iframe>`, remote image HTML `<img>`, event handler `onclick=`, dan link `javascript:` tidak aktif.
+NOTEZ tidak auto-load remote image. Kalau catatan berisi:
+
+```html
+<img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GNU GPLv3">
+```
+
+NOTEZ menampilkan placeholder/chip berdasarkan `alt`, bukan mengambil SVG dari internet. Ini menjaga prinsip offline-first: tidak ada request jaringan hanya karena kamu membuka catatan.
+
+Arah fitur yang sudah dicatat untuk fase berikutnya adalah **optional user-triggered online loading + local caching**. Artinya nanti NOTEZ bisa punya tombol seperti `Load & cache`, tapi hanya setelah user tap dan setuju. Setelah berhasil, gambar disimpan lokal agar bisa dibaca offline lagi. Fitur itu belum bagian dari behavior section ini.
 
 Kalau kamu ingin menulis contoh HTML sebagai dokumentasi, bungkus dengan inline code atau code block:
 
@@ -908,7 +937,7 @@ Atau pakai code block kalau contohnya lebih panjang:
 ```
 ````
 
-Intinya: gunakan Markdown bawaan NOTEZ untuk struktur utama, lalu pakai safe raw HTML kecil hanya saat benar-benar perlu, misalnya `<kbd>`, `<mark>`, `<sub>`, `<sup>`, `<details>`, atau definition list.
+Intinya: gunakan Markdown bawaan NOTEZ untuk struktur utama. Raw HTML didukung hanya sebagai compatibility aman untuk kasus kecil dan README-style yang umum, bukan sebagai browser/CSS bebas.
 
 ---
 
@@ -991,10 +1020,10 @@ Baris `---` adalah penanda wajib yang memberi tahu renderer "baris di atas saya 
 Titik dua di sisi kanan tanda hubung adalah kode alignment. Posisi titik dua (kiri, kanan, atau dua-duanya) menentukan arah rata kolom tersebut.
 
 **Kenapa raw HTML di NOTEZ dibatasi?**
-Untuk keamanan. NOTEZ hanya mengizinkan tag kecil yang aman seperti `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, dan `<details>`. HTML berbahaya seperti `<script>`, `<iframe>`, `<style>`, `onclick=`, `style=`, atau `javascript:` tetap dibuat tidak aktif/escaped.
+Untuk keamanan. NOTEZ mengizinkan subset aman seperti `<br>`, `<sub>`, `<sup>`, `<kbd>`, `<mark>`, `<details>`, serta struktur README umum seperti `<div align="center">`, `<h1>`, `<p>`, `<strong>`, `<em>`, `<a>`, dan `<img>` placeholder. HTML berbahaya seperti `<script>`, `<iframe>`, `<style>`, `onclick=`, `style=`, atau `javascript:` tetap dibuat tidak aktif/escaped.
 
 **Kenapa remote image tidak langsung tampil?**
-NOTEZ dirancang offline-first dan menghormati privasi — aplikasi tidak mengakses jaringan diam-diam hanya karena ada `![...](url)` di catatanmu.
+NOTEZ dirancang offline-first dan menghormati privasi — aplikasi tidak mengakses jaringan diam-diam hanya karena ada `![...](url)` atau `<img src="https://...">` di catatanmu.
 
 **Bagaimana bikin catatan rapi tanpa format ribet?**
 Cukup pakai heading untuk judul bagian, bullet list untuk poin-poin, dan tebal untuk kata kunci penting. Tiga elemen itu saja sudah membuat catatan panjang jauh lebih mudah dibaca ulang.
@@ -1670,8 +1699,8 @@ Coba tulis syntax Markdown untuk masing-masing soal di bawah, baru cocokkan deng
 
 NOTEZ tidak menjalankan semua kemungkinan Markdown yang ada di luar sana. Ini batasan yang disengaja, bukan bug:
 
-- **Raw HTML bebas** tidak aktif — hanya safe allowlist kecil yang didukung; tag berbahaya tetap escaped (bagian 18).
-- **Gambar remote** tidak otomatis dimuat — NOTEZ tidak mengakses internet tanpa izin (bagian 17).
+- **Raw HTML bebas** tidak aktif — hanya safe allowlist yang didukung; subset README-style umum tersedia, tapi tag/atribut berbahaya tetap escaped (bagian 18).
+- **Gambar remote** tidak otomatis dimuat — Markdown image dan raw `<img>` menjadi placeholder/link, bukan request internet diam-diam (bagian 17–18).
 - **Checkbox di preview** cuma tampilan status baca, bukan tombol yang bisa ditap (bagian 10).
 - **Link eksternal** yang ditap dibuka lewat aplikasi lain (browser), bukan di dalam NOTEZ (bagian 13).
 - **Fitur lanjutan berat** seperti rumus matematika/LaTeX penuh, diagram, embed aktif, dan emoji shortcode belum didukung (bagian 20).

@@ -76,7 +76,7 @@ No remote scripts/styles/fonts/images
 No native WebView bridge
 ```
 
-Remote image di Markdown tidak dimuat otomatis. Link eksternal hanya dibuka lewat aplikasi/browser luar saat kamu tap.
+Remote image di Markdown maupun raw HTML `<img>` tidak dimuat otomatis. Ia tampil sebagai placeholder/link; link eksternal hanya dibuka lewat aplikasi/browser luar saat kamu tap.
 
 ---
 
@@ -90,7 +90,7 @@ NOTEZ punya beberapa tema curated bawaan dan theme picker dengan preview kecil. 
 
 Beberapa fitur belum ada dan sengaja dipilih bertahap:
 
-- remote image belum auto-render;
+- remote image belum auto-render; raw `<img>` baru menjadi placeholder aman;
 - checkbox di preview belum interaktif;
 - belum ada LaTeX/math penuh;
 - belum ada Mermaid/diagram;
