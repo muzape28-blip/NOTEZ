@@ -1,7 +1,7 @@
 # RFC — NOTEZ Home Empty State + Tentang NOTEZ v1
 
 **Tanggal:** 2026-09-29  
-**Status:** IMPLEMENTED LOCALLY — static/source checks passed; Android build waits for CI  
+**Status:** CI VERIFIED — debug build passed; waiting device UAT
 **Repo:** NOTEZ  
 **Jenis perubahan:** UX polish kecil + halaman bantuan lokal/offline  
 **Prinsip utama:** home kosong terasa branded, hangat, dan helpful tanpa onboarding popup atau UI ramai.
@@ -558,7 +558,16 @@ git diff --check                                       : PASS
 Local Android build                                    : NOT RUN — no Gradle wrapper/global gradle in sandbox
 ```
 
-Canonical Android compile/build evidence must come from GitHub Actions CI after push.
+CI verification for implementation commit `0a7ea6b`:
+
+```text
+GitHub Actions run : 36522374451
+URL                : https://github.com/muzape28-blip/NOTEZ/actions/runs/36522374451
+Conclusion         : success
+Artifact           : notez-debug
+Artifact id        : 11013099085
+Artifact size      : 8,096,186 bytes
+```
 
 ---
 
