@@ -4,10 +4,11 @@ Status: CI VERIFIED — PENDING DEVICE UAT
 
 ## Build Under Test
 
-- Latest commit: `034dc26 fix: require detected image mime before caching`.
+- Latest commit: `f451d80 fix: support README tables and placeholder tap`.
 - Feature commits: `60f53e9`, `b8618e5`.
-- GitHub Actions run: `36530981167` — `success`.
-- Artifact: `notez-debug`, artifact id `11016099495`, size `8,115,686` bytes.
+- Compile fix commits: `2d63c48`, `034dc26`.
+- GitHub Actions run: `36532925848` — `success`.
+- Artifact: `notez-debug`, artifact id `11017995661`, size `8,118,093` bytes.
 
 ## Test Note
 

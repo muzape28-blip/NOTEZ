@@ -131,9 +131,11 @@ Approved behavior implemented locally:
 - Compile fixes:
   - `2d63c48 fix: repair markdown image source regex`.
   - `034dc26 fix: require detected image mime before caching`.
-- Latest GitHub Actions run: `36530981167` — `success`.
-- Run URL: <https://github.com/muzape28-blip/NOTEZ/actions/runs/36530981167>.
-- Artifact: `notez-debug`, artifact id `11016099495`, size `8,115,686` bytes.
+- README table/tap follow-up commit: `f451d80 fix: support README tables and placeholder tap`.
+- Latest GitHub Actions run: `36532925848` — `success`.
+- Run URL: <https://github.com/muzape28-blip/NOTEZ/actions/runs/36532925848>.
+- Artifact: `notez-debug`, artifact id `11017995661`, size `8,118,093` bytes.
+- Earlier successful implementation run: `36530981167`, artifact id `11016099495`, size `8,115,686` bytes.
 - Failed CI attempts before fixes:
   - `36530289381`: Kotlin parse error in Markdown image regex string.
   - `36530634612`: nullable MIME type compile error before cache write.
