@@ -2,197 +2,180 @@
 
 **NOTEZ** adalah aplikasi Android lokal untuk menyimpan ide, catatan, todo, draft, snippet, dan hal penting lain sebelum lupa.
 
-Fokus NOTEZ:
-
 ```text
 cepat dicatat
 nyaman dibaca
 offline-first
-privasi aman
+online hanya saat user meminta
 Markdown-ready
 ```
 
-NOTEZ tidak mengejar jadi aplikasi cloud besar. Semua fitur inti dirancang tetap jalan tanpa internet.
+NOTEZ tidak mengejar jadi aplikasi cloud besar. Fitur inti tetap dirancang jalan tanpa internet: buat catatan, edit, baca ulang, search, theme, backup/import/export, dan panduan lokal.
 
 ---
 
-## Highlight saat ini
+## Highlight v0.1.3
 
-- Catatan tanpa batas karakter buatan app.
-- Edit mode native Android `EditText`.
-- View mode dengan Markdown Preview v4 berbasis local WebView Reading View.
-- Welcome empty state dengan icon NOTEZ dan link Panduan NOTEZ saat belum ada catatan.
-- Panduan NOTEZ / Tentang NOTEZ lokal/offline.
-- Panduan Markdown lokal/offline dari drawer.
-- Search catatan.
-- Halaman Pengaturan dari drawer.
-- Tema bawaan curated dengan picker preview:
-  - GitHub Dark;
-  - NOTEZ You Dark;
-  - NOTEZ You Warm;
-  - Fade Choco Matcha;
-  - Blue Moon Cheese;
-  - Raspberry Night;
-  - Gloomy Sakura Night;
-  - Gloomy Lavender;
-  - Gloome Dark Sunset;
-  - Dark Forest;
-  - Tokyo Night;
-  - Kawaii Catpucinn;
-  - OLED Black;
-  - Cobalt2.
-- Ekspor/import JSON.
-- Ekspor TXT.
-- Folder backup otomatis.
-- Music drawer/player lokal.
-- Delete note dengan custom trash glyph + undo snackbar.
-- Offline-first dengan optional user-triggered online image cache (`INTERNET` hanya dipakai saat user tap `Load & cache`).
+- Home kosong sekarang punya welcome state NOTEZ yang clean, branded, dan theme-aware.
+- `Panduan NOTEZ` / `Tentang NOTEZ` tersedia lokal/offline dari home kosong dan Settings.
+- Search eye disembunyikan saat total catatan `0`, lalu muncul setelah ada catatan.
+- Theme picker dikelompokkan:
+  - `NOTEZ SIGNATURE`
+  - `GLOOMY SERIES`
+  - `COZY EARTH`
+  - `CODER NIGHT`
+- Markdown Reading View makin kuat:
+  - heading, list, checklist, table, callout, code block, footnote, definition list;
+  - syntax highlighting lokal ringan;
+  - safe raw HTML subset untuk README-style content;
+  - raw `<table>` screenshot README sederhana;
+  - raw `<img>` sebagai placeholder aman.
+- Remote image tetap **tidak auto-load**.
+- User bisa tap `Load & cache` untuk mengambil gambar online secara manual, lalu NOTEZ menyimpannya lokal agar bisa dibaca offline lagi.
+- Settings punya aksi `Hapus cache gambar online`.
+- Splash/launcher/empty-state branding memakai horse crest NOTEZ.
 
 ---
 
-## Markdown Preview
+## Cara pakai cepat
 
-NOTEZ mendukung Markdown umum untuk catatan rapi:
+1. Tap tombol `+` untuk membuat catatan.
+2. Tulis judul dan isi catatan di mode edit native Android `EditText`.
+3. Tap centang untuk masuk Reading View.
+4. Tap pensil untuk edit ulang.
+5. Buka drawer untuk Settings, Panduan Markdown, dan Music drawer lokal.
+
+---
+
+## Markdown support
+
+NOTEZ mendukung format umum untuk catatan rapi:
 
 - heading `#`, `##`, `###`;
-- bold `**teks**`;
-- italic `*teks*`;
-- bold + italic `***teks***`;
-- strikethrough `~~teks~~`;
+- bold, italic, bold+italic, strikethrough;
 - highlight `==teks==` / `<mark>teks</mark>`;
 - superscript/subscript ringan `x^2^` dan `H~2~O`;
-- bullet list dan numbered list;
-- checklist `- [ ]` / `- [x]`;
-- quote `>`;
-- callout:
-  - `NOTE`;
-  - `TIP`;
-  - `IMPORTANT`;
-  - `WARNING`;
-  - `CAUTION`;
-- Markdown link dan bare URL;
-- inline code;
-- fenced code block dengan local syntax highlighting ringan;
-- table dengan alignment `:---`, `:---:`, `---:`;
-- footnote `[^1]` + `[^1]: catatan`;
-- definition list `Istilah` lalu `: definisi`;
-- image placeholder untuk remote image, dengan tombol `Load & cache` manual untuk menyimpan gambar online ke cache lokal;
-- safe raw HTML allowlist: tag kecil seperti `<br>`, `<kbd>`, `<mark>`, `<details>`, definition list, plus subset README-style seperti `<div align="center">`, `<h1>`-`<h6>`, `<p>`, `<strong>/<b>`, `<em>/<i>`, `<a href="...">`, dan `<img>` sebagai placeholder;
-- raw HTML di luar allowlist tetap tampil sebagai teks/escaped, bukan dijalankan.
+- bullet list, numbered list, checklist;
+- quote dan callout `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`;
+- link Markdown dan bare URL;
+- inline code dan fenced code block;
+- table dengan alignment;
+- footnote;
+- definition list;
+- raw HTML aman seperti `<kbd>`, `<mark>`, `<details>`, `<abbr>`, `<cite>`;
+- README-style subset seperti `<div align="center">`, `<h1>`-`<h6>`, `<p>`, `<strong>`, `<em>`, `<a>`, `<table>`, `<tr>`, `<td align="center">`, dan `<img>` placeholder.
 
-Panduan lengkap tersedia langsung di aplikasi:
+Panduan lengkap ada di aplikasi:
 
 ```text
 Drawer → Panduan Markdown
 ```
 
-Panduan ini offline, read-only, dan punya daftar isi clickable untuk lompat ke bagian tertentu.
-
 ---
 
-## Privacy / offline stance
+## Offline-first / privacy stance
 
-NOTEZ tetap offline-first dan menjaga permukaan jaringan tetap kecil:
-
-- `android.permission.INTERNET` hanya dipakai untuk gambar online saat user tap `Load & cache`;
-- tidak memakai CDN;
-- tidak memuat remote script/style/font/iframe;
-- remote image Markdown/raw HTML tidak otomatis diunduh;
-- gambar yang berhasil di-load disimpan lokal agar bisa dibaca offline lagi;
-- Markdown renderer memakai asset lokal dari APK;
-- WebView preview tidak memakai `addJavascriptInterface`;
-- link eksternal dibuka lewat aplikasi/browser luar saat user tap.
-
-Prinsipnya:
+NOTEZ sekarang memakai prinsip:
 
 ```text
-Catatan user tetap lokal.
-Online hanya saat user meminta.
-Konten asing tidak dieksekusi diam-diam.
+Local by default.
+Online only when you ask.
+Offline again after cache.
 ```
 
----
+Detailnya:
 
-## Apa yang belum bisa dilakukan NOTEZ
-
-Beberapa hal di bawah **belum** didukung. Sebagian sudah dicatat sebagai target update, upgrade, atau perbaikan ke depan, tapi tetap akan dipilih satu per satu agar NOTEZ tidak jadi berat dan rawan bug.
-
-### Markdown / preview
-
-- Raw HTML bebas/tanpa batas tidak didukung.
-  - Hanya allowlist aman yang aktif.
-  - README-style `<img>` didukung sebagai placeholder, bukan gambar remote aktif.
-  - Tag seperti `<script>`, `<style>`, `<iframe>`, `<form>`, event handler `onclick=`, `style=`, `class=`, dan `javascript:` tetap diblok/escaped.
-- Remote image tidak auto-render.
-  - User bisa tap `Load & cache` untuk mengambil gambar online sekali lalu menyimpannya lokal.
-  - SVG remote tetap hati-hati; tipe utama yang didukung cache: PNG, JPG/JPEG, WebP, GIF.
-  - Future candidate: local image/file attachment.
-- Checkbox di preview belum interaktif.
-  - Untuk mengubah checklist, edit teks Markdown `- [ ]` / `- [x]` langsung.
-- Fitur Markdown lanjutan belum didukung:
-  - LaTeX/math penuh;
-  - Mermaid/diagram;
-  - emoji shortcode `:smile:`;
-  - auto table-of-contents seperti `[[TOC]]`.
-- Syntax Obsidian-style seperti wikilinks `[[Note]]`, backlinks, graph, dan embeds belum tersedia.
-
-### Notes / organization
-
-- Belum ada tag/label bawaan.
-- Belum ada folder/notebook bawaan.
-- Belum ada pin/favorite/archive.
-- Belum ada real Trash / Recently Deleted.
-  - Delete sekarang memakai undo snackbar.
-- Belum ada sync/cloud account.
-- Belum ada kolaborasi multi-device.
-
-### UI / appearance
-
-- Tema curated sudah tersedia sebagai bawaan APK dan dipilih lewat preview picker.
-- Belum ada custom theme editor / import theme sendiri.
-- Belum ada theme marketplace/plugin ecosystem.
-- Belum ada arbitrary CSS snippet seperti Obsidian.
-- Belum ada card style/density setting.
-- Future candidate:
-  - Material/Obsidian-inspired appearance polish lanjutan;
-  - tambahan tema curated seperti NOTEZ Paper;
-  - opsi card style/density jika benar-benar dibutuhkan.
-
-### Export / sharing
-
-- Export saat ini fokus JSON/TXT.
-- Belum ada export PDF/HTML/Markdown bundle.
-- Belum ada share sheet khusus untuk rendered preview.
+- `android.permission.INTERNET` ada hanya untuk **user-triggered image loading/cache**.
+- Remote image tidak dimuat otomatis saat catatan dibuka.
+- Tap `Load & cache` menampilkan konfirmasi domain sebelum NOTEZ mengambil gambar.
+- Gambar yang berhasil diambil disimpan di private local cache aplikasi.
+- Cached image bisa tampil lagi saat offline.
+- Cache gambar online bisa dihapus dari Settings.
+- Tidak memakai CDN.
+- Tidak memuat remote script/style/font/iframe.
+- WebView Reading View tidak memakai `addJavascriptInterface`.
+- Link eksternal dibuka lewat aplikasi/browser luar saat user tap.
 
 ---
 
-## Roadmap direction
+## Tema bawaan
 
-Arah pengembangan NOTEZ tetap bertahap:
+Theme picker berisi curated themes:
+
+### NOTEZ SIGNATURE
+
+- OLED Black
+- NOTEZ You Dark
+- Cobalt2
+- NOTEZ You Warm
+
+### GLOOMY SERIES
+
+- Gloomy Sakura Night
+- Gloomy Lavender
+- Gloome Dark Sunset
+- Raspberry Night
+
+### COZY EARTH
+
+- Dark Forest
+- Fade Choco Matcha
+- Kawaii Catpucinn
+
+### CODER NIGHT
+
+- GitHub Dark
+- Tokyo Night
+- Blue Moon Cheese
+
+---
+
+## Data, backup, dan export
+
+- Backup/import semua catatan via JSON.
+- Export semua catatan ke TXT.
+- Folder backup otomatis via Android Storage Access Framework.
+- Data catatan tetap lokal di perangkat.
+- Tidak ada sync/cloud/collaboration bawaan.
+
+---
+
+## Batasan saat ini
+
+- Raw HTML tetap allowlist, bukan browser bebas.
+- `style=`, `class=`, `id=`, event handler seperti `onclick=`, `script`, `style`, `iframe`, dan `javascript:` tetap diblok/di-nonaktifkan.
+- Remote SVG badge belum dirender bebas; policy SVG perlu RFC terpisah.
+- Local image/attachment belum ada.
+- Checkbox di preview belum interaktif; ubah `[ ]` / `[x]` dari mode edit.
+- Belum ada tag/folder/notebook/pin/archive.
+- Delete masih undo snackbar, belum real Trash / Recently Deleted.
+- Belum ada PDF/HTML/Markdown bundle export.
+- Belum ada wikilinks/backlinks/graph/embeds.
+- Belum ada Mermaid/LaTeX/emoji shortcode/auto TOC.
+
+---
+
+## Target planning setelah v0.1.3
+
+Lihat dokumen:
 
 ```text
-1. Stabil dulu.
-2. Jaga offline/privacy-first.
-3. Tambah fitur kecil yang benar-benar kepakai.
-4. Hindari scope besar tanpa RFC/UAT.
+docs/PENDING_FEATURES_AFTER_V0.1.3.md
 ```
 
-Candidate ke depan:
+Ringkasannya:
 
-- Local attachments / local images yang tetap offline-first.
-- Wikilinks/internal note links ala Obsidian-lite.
-- Tags, folder/notebook, pin/favorite, atau archive.
+- Local image / attachment support.
 - Real Trash / Recently Deleted.
-- Export PDF/HTML/Markdown bundle.
-- Share sheet khusus untuk rendered preview.
-- Markdown advanced opsional: LaTeX/math penuh, Mermaid/diagram, emoji shortcode, auto TOC.
-- UI polish lanjutan: card style/density, custom theme editor, tambahan tema curated.
+- Card appearance setting.
+- Raw SVG badge policy.
+- NOTEZ Explorer internal / virtual.
 
 ---
 
 ## Release
 
-Rilis APK tersedia di GitHub Releases:
+APK rilis tersedia di GitHub Releases:
 
 ```text
 https://github.com/muzape28-blip/NOTEZ/releases
@@ -204,23 +187,17 @@ https://github.com/muzape28-blip/NOTEZ/releases
 
 NOTEZ adalah aplikasi Android native Kotlin.
 
-Status source `main` saat ini:
-
 ```text
-Settings Page v1       : CI + device UAT PASS
-Theme System v2        : CI + device UAT PASS
-Markdown Preview v4    : CI + device UAT PASS
-Release publik terbaru : tetap sesuai GitHub Releases, belum otomatis berubah hanya karena main sudah update
+Edit mode       : native Android EditText
+Reading View    : local WebView + bundled markdown-it asset
+Network stance  : offline-first, user-triggered online image cache only
+No CDN          : yes
+No WebView bridge: no addJavascriptInterface
 ```
 
-Kontrak penting yang dijaga:
+Evidence utama untuk batch v0.1.3:
 
-```text
-Offline-first with user-triggered INTERNET only
-No CDN
-No remote scripts/styles/fonts/iframes
-No remote image auto-load
-No addJavascriptInterface
-Edit mode native EditText
-View mode local WebView Reading View
-```
+- Home Empty State + Tentang NOTEZ: CI + device PASS.
+- Home/Search/Theme polish: CI + device PASS.
+- Raw HTML + optional image cache: CI + device PASS.
+- Welcome horse no-circle hotfix: CI PASS, device PASS by user report.
