@@ -1,6 +1,6 @@
 # RFC — Home/Search/Theme Polish v1 (2026-09-29)
 
-Status: IMPLEMENTED + CI VERIFIED — DEVICE UAT PENDING
+Status: IMPLEMENTED + CI VERIFIED + DEVICE VERIFIED / PASS
 
 ## Scope
 
@@ -61,4 +61,6 @@ Small visual/behavior polish batch after Home Empty State + Tentang NOTEZ v1.
 
 ## Device UAT
 
-Pending user/device verification.
+- Result: DEVICE VERIFIED / PASS.
+- Reported by user on 2026-09-29: "Semuanya sudah pass koq".
+- Covered scope: Home Empty visual polish, search eye visibility by total notes, and grouped theme picker mini-card previews.

@@ -1,6 +1,6 @@
 # UAT — Home/Search/Theme Polish v1 (2026-09-29)
 
-Status: PENDING DEVICE UAT
+Status: DEVICE VERIFIED / PASS
 
 ## Build Under Test
 
@@ -53,4 +53,10 @@ Expected: theme picker is clearer without removing themes or changing navigation
 
 ## Result
 
-Pending.
+PASS — reported by user on 2026-09-29: "Semuanya sudah pass koq".
+
+Verified scope:
+
+- Home Empty State visual polish passes.
+- Search eye hide/show behavior passes.
+- Theme picker grouping and mini-card previews pass.

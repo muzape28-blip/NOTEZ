@@ -1,21 +1,21 @@
 # UAT — Home Empty State + Tentang NOTEZ v1
 
 **Tanggal:** 2026-09-29  
-**Status:** Draft UAT — belum CI/device verified  
+**Status:** DEVICE VERIFIED / PASS
 **Scope:** empty state home saat NOTEZ kosong dan halaman Tentang NOTEZ lokal/offline.
 
 ---
 
 ## 1. Persiapan
 
-Gunakan APK debug dari CI green untuk commit fitur ini.
+Gunakan APK debug dari CI green. Device PASS dicatat dari konfirmasi user pada 2026-09-29.
 
 Karena fitur ini muncul hanya saat daftar catatan kosong, UAT paling aman dilakukan dengan salah satu cara:
 
 1. install fresh app / clear data; atau
 2. backup catatan dulu, hapus semua catatan sementara, lalu restore setelah test.
 
-Jangan klaim PASS sebelum dicoba di device.
+Device UAT sudah dikonfirmasi PASS oleh user.
 
 ---
 
@@ -56,10 +56,11 @@ Panduan NOTEZ
 
 ## 4. Security/privacy checks expected
 
+Historical feature build did not add INTERNET. Current integrated build intentionally includes `android.permission.INTERNET` only for user-triggered image cache; Home Empty State and Tentang NOTEZ still do not auto-load remote content.
+
 ```text
-No INTERNET permission
 No CDN
-No remote scripts/styles/fonts/images
+No remote scripts/styles/fonts/iframes
 No native WebView bridge
 About content local asset only
 ```
@@ -69,5 +70,7 @@ About content local asset only
 ## 5. Verdict
 
 ```text
-Home Empty State + Tentang NOTEZ v1: PASS / FAIL
+Home Empty State + Tentang NOTEZ v1: PASS
 ```
+
+Reported by user on 2026-09-29: "Semuanya sudah pass koq".

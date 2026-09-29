@@ -1,7 +1,7 @@
 # RFC — NOTEZ Home Empty State + Tentang NOTEZ v1
 
 **Tanggal:** 2026-09-29  
-**Status:** CI VERIFIED — debug build passed; waiting device UAT
+**Status:** CI VERIFIED + DEVICE VERIFIED / PASS
 **Repo:** NOTEZ  
 **Jenis perubahan:** UX polish kecil + halaman bantuan lokal/offline  
 **Prinsip utama:** home kosong terasa branded, hangat, dan helpful tanpa onboarding popup atau UI ramai.
@@ -633,4 +633,11 @@ Home Empty State + Tentang NOTEZ v1
 - no Explorer/database change yet
 ```
 
-Next gate: GitHub Actions CI, then device UAT.
+Gates completed: GitHub Actions CI and device UAT PASS. Note: this feature itself added no network permission; later optional image-cache work intentionally added `INTERNET` for user-triggered remote image caching.
+
+
+## Device UAT
+
+- Result: DEVICE VERIFIED / PASS.
+- Reported by user on 2026-09-29: "Semuanya sudah pass koq".
+- Covered scope: empty welcome state, `Panduan NOTEZ` / local About page, Settings → Tentang NOTEZ, search no-result separation, and regressions listed in UAT checklist.
