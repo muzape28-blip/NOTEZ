@@ -82,8 +82,8 @@ class RemoteImageCache(context: Context) {
                 }
                 output.toByteArray()
             }
-            val mime = normalizeMime(connection.contentType) ?: sniffMime(bytes)
-            if (mime !in ALLOWED_MIME_TYPES) {
+            val detectedMime = normalizeMime(connection.contentType) ?: sniffMime(bytes)
+            if (detectedMime == null || detectedMime !in ALLOWED_MIME_TYPES) {
                 return DownloadResult(
                     false,
                     "Tipe gambar belum didukung. Untuk sekarang pakai PNG, JPG, WebP, atau GIF."
@@ -95,7 +95,7 @@ class RemoteImageCache(context: Context) {
                 dataFile(key).writeBytes(bytes)
                 tmp.delete()
             }
-            mimeFile(key).writeText(mime)
+            mimeFile(key).writeText(detectedMime)
             sourceFile(key).writeText(source)
             DownloadResult(true, "Gambar disimpan lokal dan bisa dibaca offline")
         } catch (_: Exception) {
