@@ -1623,7 +1623,7 @@ class MarkdownPreviewRenderer(
         private const val IMAGE_LOAD_SCHEME = "notez-image"
         private const val IMAGE_LOAD_HOST = "load"
         private val EXTERNAL_SCHEMES = setOf("http", "https", "mailto", "tel")
-        private val MARKDOWN_IMAGE_PATTERN = Regex("!\[[^\]]*]\(\s*<?([^\s)>"]+)")
+        private val MARKDOWN_IMAGE_PATTERN = Regex("""!\[[^\]]*]\(\s*<?([^\s)>"]+)""")
         private val RAW_IMG_SRC_PATTERN = Regex("""<img\b[^>]*\bsrc\s*=\s*(["'])((?:(?!\1).)*)\1""", RegexOption.IGNORE_CASE)
     }
 }
