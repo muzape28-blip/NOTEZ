@@ -1,6 +1,6 @@
 # RFC — Home/Search/Theme Polish v1 (2026-09-29)
 
-Status: IMPLEMENTED LOCALLY — CI PENDING — DEVICE UAT PENDING
+Status: IMPLEMENTED + CI VERIFIED — DEVICE UAT PENDING
 
 ## Scope
 
@@ -53,7 +53,11 @@ Small visual/behavior polish batch after Home Empty State + Tentang NOTEZ v1.
 
 ## CI Evidence
 
-Pending push and GitHub Actions run.
+- Commit: `f8be97a feat: polish home search and theme picker`.
+- GitHub Actions run: `36526954000` — `success` on rerun attempt 2.
+- Run URL: <https://github.com/muzape28-blip/NOTEZ/actions/runs/36526954000>.
+- Artifact: `notez-debug`, artifact id `11015401107`, size `8,099,421` bytes.
+- Note: attempt 1 failed during dependency resolution because Maven Central returned HTTP 403 for Gradle dependencies; attempt 2 completed successfully without code changes.
 
 ## Device UAT
 

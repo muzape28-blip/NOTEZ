@@ -4,9 +4,9 @@ Status: PENDING DEVICE UAT
 
 ## Build Under Test
 
-- Commit: pending.
-- GitHub Actions run: pending.
-- Artifact: pending.
+- Commit: `f8be97a feat: polish home search and theme picker`.
+- GitHub Actions run: `36526954000` — `success` on rerun attempt 2.
+- Artifact: `notez-debug`, artifact id `11015401107`, size `8,099,421` bytes.
 
 ## Checklist
 
