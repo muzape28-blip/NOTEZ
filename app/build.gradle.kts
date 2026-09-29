@@ -4,8 +4,8 @@ plugins {
     id("kotlin-kapt")
 }
 
-val versionName: String = (project.findProperty("notez.versionName") as String? ?: "0.1.4")
-val versionCode: Int = (project.findProperty("notez.versionCode") as String? ?: "5").toInt()
+val notezVersionName: String = (project.findProperty("notez.versionName") as String? ?: "0.1.4")
+val notezVersionCode: Int = (project.findProperty("notez.versionCode") as String? ?: "5").toInt()
 
 android {
     namespace = "com.zaba.notez"
@@ -15,9 +15,9 @@ android {
         applicationId = "com.zaba.notez"
         minSdk = 26
         targetSdk = 34
-        this.versionCode = versionCode
-        this.versionName = versionName
-        resValue("string", "notez_version_name", "\"$versionName\"")
+        versionCode = notezVersionCode
+        versionName = notezVersionName
+        resValue("string", "notez_version_name", "\"$notezVersionName\"")
     }
 
     signingConfigs {

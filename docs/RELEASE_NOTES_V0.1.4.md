@@ -10,6 +10,7 @@
 - Fixed `Pengaturan → Versi` showing `unknown`.
 - The displayed version now has a reliable packaged fallback from the Gradle release version.
 - Aligned `gradle.properties` with the release version so production builds no longer inherit stale version properties.
+- Fixed Gradle Kotlin DSL variable shadowing so APK badging contains `versionName='0.1.4'` / `versionCode='5'`.
 
 ## Scope
 
