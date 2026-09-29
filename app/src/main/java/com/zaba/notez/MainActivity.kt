@@ -6,6 +6,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -39,9 +40,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawer: DrawerLayout
     private lateinit var musicDrawer: MusicDrawerController
     private var collectJob: Job? = null
+    private var notePresenceJob: Job? = null
     private var query = ""
     private var pendingDrawerAction: (() -> Unit)? = null
     private var searchOpen = false
+    private var hasAnyNotes = false
     private var appliedTheme = ThemePref.GITHUB_DARK
     private var startupSplashAnimator: AnimatorSet? = null
     private var startupSplashStatusBarColor: Int? = null
@@ -57,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         setTheme(ThemePref.styleOf(appliedTheme))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        applyHomeSystemBars()
         playStartupSplash(savedInstanceState)
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
@@ -93,6 +97,7 @@ class MainActivity : AppCompatActivity() {
             query = it?.toString().orEmpty()
             observe()
         }
+        observeNotePresence(searchToggle, searchInput)
     }
 
     private fun playStartupSplash(savedInstanceState: Bundle?) {
@@ -160,6 +165,27 @@ class MainActivity : AppCompatActivity() {
         duration = durationMs
         startDelay = delayMs
         interpolator = DecelerateInterpolator()
+    }
+
+    private fun applyHomeSystemBars() {
+        val background = getColor(ThemePref.optionOf(appliedTheme).backgroundColorRes)
+        window.statusBarColor = background
+        window.navigationBarColor = background
+        val lightBars = isLightColor(background)
+        window.decorView.systemUiVisibility = if (lightBars) {
+            window.decorView.systemUiVisibility or
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        } else {
+            window.decorView.systemUiVisibility and
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() and
+                View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.inv()
+        }
+    }
+
+    private fun isLightColor(color: Int): Boolean {
+        val luminance = (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255.0
+        return luminance > 0.62
     }
 
     private fun prepareStartupSplashSystemBars() {
@@ -278,6 +304,25 @@ class MainActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(input.windowToken, 0)
     }
 
+    private fun observeNotePresence(toggle: ImageButton, input: EditText) {
+        notePresenceJob?.cancel()
+        notePresenceJob = lifecycleScope.launch {
+            dao.observeAll().collectLatest { notes ->
+                hasAnyNotes = notes.isNotEmpty()
+                updateSearchAvailability(toggle, input)
+            }
+        }
+    }
+
+    private fun updateSearchAvailability(toggle: ImageButton, input: EditText) {
+        if (hasAnyNotes) {
+            toggle.visibility = View.VISIBLE
+            return
+        }
+        if (searchOpen) closeSearch(toggle, input)
+        toggle.visibility = View.GONE
+    }
+
     override fun onBackPressed() {
         if (drawer.isDrawerVisible(GravityCompat.START)) {
             pendingDrawerAction = null
@@ -307,6 +352,8 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         startupSplashAnimator?.cancel()
         startupSplashAnimator = null
+        notePresenceJob?.cancel()
+        notePresenceJob = null
         if (::musicDrawer.isInitialized) musicDrawer.destroy()
         super.onDestroy()
     }

@@ -22,8 +22,34 @@ import kotlinx.coroutines.launch
 
 class SettingsActivity : AppCompatActivity() {
 
+    private data class ThemeGroup(val title: String, val values: List<Int>)
+
     private lateinit var dao: NoteDao
     private var pendingExport: String? = null
+
+    private val themeGroups = listOf(
+        ThemeGroup(
+            title = "NOTEZ SIGNATURE",
+            values = listOf(ThemePref.OLED, ThemePref.NOTEZ_YOU_DARK, ThemePref.COBALT2, ThemePref.NOTEZ_YOU_WARM)
+        ),
+        ThemeGroup(
+            title = "GLOOMY SERIES",
+            values = listOf(
+                ThemePref.GLOOMY_SAKURA_NIGHT,
+                ThemePref.GLOOMY_LAVENDER,
+                ThemePref.GLOOME_DARK_SUNSET,
+                ThemePref.RASPBERRY_NIGHT
+            )
+        ),
+        ThemeGroup(
+            title = "COZY EARTH",
+            values = listOf(ThemePref.DARK_FOREST, ThemePref.FADE_CHOCO_MATCHA, ThemePref.KAWAII_CATPUCINN)
+        ),
+        ThemeGroup(
+            title = "CODER NIGHT",
+            values = listOf(ThemePref.GITHUB_DARK, ThemePref.TOKYO_NIGHT, ThemePref.BLUE_MOON_CHEESE)
+        )
+    )
 
     private val createDoc = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
         val data = pendingExport ?: return@registerForActivityResult
@@ -99,8 +125,11 @@ class SettingsActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(8), 0, dp(8))
         }
-        ThemePref.OPTIONS.forEach { option ->
-            list.addView(themeOptionRow(option, current))
+        themeGroups.forEachIndexed { index, group ->
+            list.addView(themeGroupHeader(group.title, first = index == 0))
+            group.values.map(ThemePref::optionOf).forEach { option ->
+                list.addView(themeOptionRow(option, current))
+            }
         }
 
         AlertDialog.Builder(this)
@@ -111,6 +140,20 @@ class SettingsActivity : AppCompatActivity() {
                 }
             )
             .show()
+    }
+
+    private fun themeGroupHeader(title: String, first: Boolean): View = TextView(this).apply {
+        text = title
+        setTextColor(getColor(ThemePref.optionOf(ThemePref.get(this@SettingsActivity)).accentColorRes))
+        textSize = 11f
+        typeface = Typeface.DEFAULT_BOLD
+        letterSpacing = 0.08f
+        gravity = Gravity.CENTER_VERTICAL
+        setPadding(dp(16), if (first) dp(6) else dp(16), dp(16), dp(6))
+        layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun themeOptionRow(option: ThemePref.ThemeOption, current: Int): View {
@@ -168,38 +211,47 @@ class SettingsActivity : AppCompatActivity() {
     private fun themePreview(option: ThemePref.ThemeOption): View {
         return LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(7), dp(6), dp(7), dp(6))
+            setPadding(dp(5), dp(5), dp(5), dp(5))
             background = roundedDrawable(
                 fillColor = getColor(option.backgroundColorRes),
                 strokeColor = getColor(option.outlineColorRes),
                 strokeWidth = dp(1),
-                radius = dp(12).toFloat()
+                radius = dp(14).toFloat()
             )
-            layoutParams = LinearLayout.LayoutParams(dp(70), dp(48))
+            layoutParams = LinearLayout.LayoutParams(dp(78), dp(54))
 
             addView(
-                TextView(this@SettingsActivity).apply {
-                    text = "Aa"
-                    setTextColor(getColor(option.textColorRes))
-                    textSize = 12f
-                    typeface = Typeface.DEFAULT_BOLD
-                    includeFontPadding = false
-                }
-            )
-            addView(
-                View(this@SettingsActivity).apply {
-                    background = roundedDrawable(getColor(option.surfaceColorRes), getColor(option.outlineColorRes), dp(1), dp(4).toFloat())
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(10)).apply {
-                        topMargin = dp(4)
-                    }
-                }
-            )
-            addView(
-                View(this@SettingsActivity).apply {
-                    background = roundedDrawable(getColor(option.accentColorRes), getColor(option.accentColorRes), 0, dp(4).toFloat())
-                    layoutParams = LinearLayout.LayoutParams(dp(34), dp(5)).apply {
-                        topMargin = dp(5)
-                    }
+                LinearLayout(this@SettingsActivity).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(7), dp(6), dp(7), dp(6))
+                    background = roundedDrawable(
+                        fillColor = getColor(option.surfaceColorRes),
+                        strokeColor = getColor(option.outlineColorRes),
+                        strokeWidth = dp(1),
+                        radius = dp(10).toFloat()
+                    )
+                    layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+
+                    addView(
+                        TextView(this@SettingsActivity).apply {
+                            text = "Aa"
+                            setTextColor(getColor(option.textColorRes))
+                            textSize = 13f
+                            typeface = Typeface.DEFAULT_BOLD
+                            includeFontPadding = false
+                        }
+                    )
+                    addView(
+                        View(this@SettingsActivity).apply {
+                            background = roundedDrawable(getColor(option.accentColorRes), getColor(option.accentColorRes), 0, dp(4).toFloat())
+                            layoutParams = LinearLayout.LayoutParams(dp(38), dp(5)).apply {
+                                topMargin = dp(7)
+                            }
+                        }
+                    )
                 }
             )
         }
