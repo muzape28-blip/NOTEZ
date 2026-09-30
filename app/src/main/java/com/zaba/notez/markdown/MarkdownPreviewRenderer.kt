@@ -1126,39 +1126,44 @@ class MarkdownPreviewRenderer(
                   }
 
                   function highlightCode(text, language) {
-                    Array.prototype.slice.call(preview.querySelectorAll('pre > code')).forEach(function (code) {
-                      var language = languageFromCodeClass(code);
-                      var pre = code.parentNode;
-                      var rawText = code.textContent || '';
-                  
-                      if (pre.parentNode && pre.parentNode.classList && pre.parentNode.classList.contains('notez-code-card')) {
-                        return;
-                      }
-                  
-                      var card = document.createElemen t('div');
-                      card.className = language ? 'notez-code-card notez-code-card-labeled' : 'notez-code-card';
-                  
-                      if (language) {
-                        var header = document.createElement('div');
-                        header.className = 'notez-code-header';
-                  
-                        var label = document.createElement('span');
-                        label.className = 'notez-code-label';
-                        label.textContent = prettyLanguageName(language);
-                  
-                        header.appendChild(label);
-                        card.appendChild(header);
-                      }
-                  
-                      pre.classList.add('notez-code-scroll');
-                      pre.parentNode.insertBefore(card, pre);
-                      card.appendChild(pre);
-                  
-                      code.classList.add('notez-code-highlighted');
-                      code.innerHTML = highlightCode(rawText, language);
-                    });
+                    var rules = codeRules(language);
+                    return rules.length ? highlightByRules(text, rules) : escapeHtml(text);
                   }
-                  
+
+                  function enhanceCodeBlocks() {
+                    Array.prototype.slice.call(preview.querySelectorAll('pre > code')).forEach(function (code) {
+                    var language = languageFromCodeClass(code);
+                    var pre = code.parentNode;
+                    var rawText = code.textContent || '';
+                
+                    if (pre.parentNode && pre.parentNode.classList && pre.parentNode.classList.contains('notez-code-card')) {
+                      return;
+                    }
+                
+                    var card = document.createElement('div');
+                    card.className = language ? 'notez-code-card notez-code-card-labeled' : 'notez-code-card';
+                
+                    if (language) {
+                      var header = document.createElement('div');
+                      header.className = 'notez-code-header';
+                
+                      var label = document.createElement('span');
+                      label.className = 'notez-code-label';
+                      label.textContent = prettyLanguageName(language);
+                
+                      header.appendChild(label);
+                      card.appendChild(header);
+                    }
+                
+                    pre.classList.add('notez-code-scroll');
+                    pre.parentNode.insertBefore(card, pre);
+                    card.appendChild(pre);
+                
+                    code.classList.add('notez-code-highlighted');
+                    code.innerHTML = highlightCode(rawText, language);
+                  });
+                }
+
                   function enhanceCallouts() {
                     Array.prototype.slice.call(preview.querySelectorAll('blockquote')).forEach(function (block) {
                       var first = block.querySelector('p:first-child');
@@ -1285,7 +1290,7 @@ class MarkdownPreviewRenderer(
         h1 { font-size: 1.75em; padding-bottom: .3em; border-bottom: 1px solid var(--notez-border); }
         h2 { font-size: 1.45em; padding-bottom: .25em; border-bottom: 1px solid var(--notez-border); }
         h3 { font-size: 1.2em; }
-        p, ul, ol, dl, blockquote, notez-code-card, pre, .notez-table-wrap, .notez-image-placeholder, .notez-footnotes { margin: .75em 0; }
+        p, ul, ol, dl, blockquote,.note-code-card, pre, .notez-table-wrap, .notez-image-placeholder, .notez-footnotes { margin: .75em 0; }
         ul, ol { padding-left: 1.45em; }
         li + li { margin-top: .25em; }
         a { color: var(--notez-accent); text-decoration: none; }
@@ -1366,7 +1371,6 @@ class MarkdownPreviewRenderer(
           font-weight: 800;
           letter-spacing: .06em;
         }
-        
         .notez-code-highlighted .ntz-syntax-comment { color: #8B949E; font-style: italic; }
         .notez-code-highlighted .ntz-syntax-keyword { color: #FF7B72; font-weight: 700; }
         .notez-code-highlighted .ntz-syntax-string { color: #A5D6FF; }
