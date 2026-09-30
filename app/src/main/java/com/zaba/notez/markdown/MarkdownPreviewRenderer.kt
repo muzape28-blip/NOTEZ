@@ -1126,27 +1126,39 @@ class MarkdownPreviewRenderer(
                   }
 
                   function highlightCode(text, language) {
-                    var rules = codeRules(language);
-                    return rules.length ? highlightByRules(text, rules) : escapeHtml(text);
-                  }
-
-                  function enhanceCodeBlocks() {
                     Array.prototype.slice.call(preview.querySelectorAll('pre > code')).forEach(function (code) {
                       var language = languageFromCodeClass(code);
                       var pre = code.parentNode;
                       var rawText = code.textContent || '';
-                      pre.classList.add('notez-code-card');
+                  
+                      if (pre.parentNode && pre.parentNode.classList && pre.parentNode.classList.contains('notez-code-card')) {
+                        return;
+                      }
+                  
+                      var card = document.createElemen t('div');
+                      card.className = language ? 'notez-code-card notez-code-card-labeled' : 'notez-code-card';
+                  
                       if (language) {
-                        var label = document.createElement('div');
+                        var header = document.createElement('div');
+                        header.className = 'notez-code-header';
+                  
+                        var label = document.createElement('span');
                         label.className = 'notez-code-label';
                         label.textContent = prettyLanguageName(language);
-                        pre.insertBefore(label, code);
+                  
+                        header.appendChild(label);
+                        card.appendChild(header);
                       }
+                  
+                      pre.classList.add('notez-code-scroll');
+                      pre.parentNode.insertBefore(card, pre);
+                      card.appendChild(pre);
+                  
                       code.classList.add('notez-code-highlighted');
                       code.innerHTML = highlightCode(rawText, language);
                     });
                   }
-
+                  
                   function enhanceCallouts() {
                     Array.prototype.slice.call(preview.querySelectorAll('blockquote')).forEach(function (block) {
                       var first = block.querySelector('p:first-child');
@@ -1257,6 +1269,7 @@ class MarkdownPreviewRenderer(
           font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           font-size: 16px;
           line-height: 1.55;
+          overflow-x: hidden;
           overflow-wrap: anywhere;
         }
         body { padding: 0 0 24px; }
@@ -1272,7 +1285,7 @@ class MarkdownPreviewRenderer(
         h1 { font-size: 1.75em; padding-bottom: .3em; border-bottom: 1px solid var(--notez-border); }
         h2 { font-size: 1.45em; padding-bottom: .25em; border-bottom: 1px solid var(--notez-border); }
         h3 { font-size: 1.2em; }
-        p, ul, ol, dl, blockquote, pre, .notez-table-wrap, .notez-image-placeholder, .notez-footnotes { margin: .75em 0; }
+        p, ul, ol, dl, blockquote, notez-code-card, pre, .notez-table-wrap, .notez-image-placeholder, .notez-footnotes { margin: .75em 0; }
         ul, ol { padding-left: 1.45em; }
         li + li { margin-top: .25em; }
         a { color: var(--notez-accent); text-decoration: none; }
@@ -1298,21 +1311,47 @@ class MarkdownPreviewRenderer(
           padding: 12px;
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
         }
-        pre.notez-code-card {
-          position: relative;
-          padding-top: 38px;
+        .notez-code-card {
+          max-width: 100%;
+          overflow: hidden;
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035));
+          border: 1px solid var(--notez-border);
+          border-radius: 14px;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
         }
-        pre code {
-          display: block;
+        .notez-code-header {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          min-height: 30px;
+          padding: 8px 10px 0;
+        }
+        .notez-code-scroll {
+          max-width: 100%;
+          margin: 0;
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          background: transparent;
+          border: 0;
+          border-radius: 0;
+          padding: 12px;
+          box-shadow: none;
+        }
+        .notez-code-card-labeled .notez-code-scroll {
+          padding-top: 8px;
+        }
+        .notez-code-scroll code {
+          display: inline-block;
+          min-width: 100%;
           padding: 0;
           background: transparent;
           border-radius: 0;
           white-space: pre;
         }
         .notez-code-label {
-          position: absolute;
-          top: 9px;
-          right: 10px;
+          display: inline-flex;
+          align-items: center;
           max-width: 42%;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1327,6 +1366,7 @@ class MarkdownPreviewRenderer(
           font-weight: 800;
           letter-spacing: .06em;
         }
+        
         .notez-code-highlighted .ntz-syntax-comment { color: #8B949E; font-style: italic; }
         .notez-code-highlighted .ntz-syntax-keyword { color: #FF7B72; font-weight: 700; }
         .notez-code-highlighted .ntz-syntax-string { color: #A5D6FF; }
