@@ -261,7 +261,7 @@ class MainActivity : AppCompatActivity() {
     private fun showUndoDeleteSnackbar(note: Note) {
         var undone = false
         Snackbar.make(findViewById(R.id.drawer), "Catatan dihapus", Snackbar.LENGTH_LONG)
-            .setAction("URUNGKAN") {
+            .setAction("BATALKAN") {
                 undone = true
                 lifecycleScope.launch(Dispatchers.IO) { dao.upsert(note) }
             }

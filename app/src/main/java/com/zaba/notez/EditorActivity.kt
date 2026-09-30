@@ -164,7 +164,7 @@ class EditorActivity : AppCompatActivity() {
     }
 
     private fun updateCounter(bodyLength: Int, suffix: String) {
-        counter.text = "$bodyLength karakter (tanpa batas)$suffix"
+        counter.text = "$bodyLength karakter$suffix"
     }
 
     @Synchronized

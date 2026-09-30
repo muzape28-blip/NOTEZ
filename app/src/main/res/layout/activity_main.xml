@@ -136,7 +136,7 @@
                     android:gravity="center"
                     android:paddingStart="28dp"
                     android:paddingEnd="28dp"
-                    android:text="Tidak ada hasil.\nCoba kata kunci lain."
+                    android:text="Tidak ada hasil.\nCoba yang lain atau buat baru."
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="15sp"
                     android:visibility="gone" />
