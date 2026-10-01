@@ -5,7 +5,7 @@ plugins {
 }
 
 val notezVersionName: String = (project.findProperty("notez.versionName") as String? ?: "0.1.6")
-val notezVersionCode: Int = (project.findProperty("notez.versionCode") as String? ?: "6").toInt()
+val notezVersionCode: Int = (project.findProperty("notez.versionCode") as String? ?: "7").toInt()
 
 android {
     namespace = "com.zaba.notez"

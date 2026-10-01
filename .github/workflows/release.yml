@@ -1,4 +1,4 @@
-name: Build NOTEZ Production — v0.1.5
+name: Build NOTEZ Production — v0.1.6
 
 # Satu-satunya jalur rilis signed. Manual + konfirmasi eksplisit.
 on:
