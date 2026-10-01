@@ -71,17 +71,18 @@
                 android:overScrollMode="ifContentScrolls"<
                 
 
-            <EditText
-                android:id="@+id/edit_body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Tulis ide sebelum lupa..."
-                android:textColor="?attr/colorOnSurface"
-                android:textColorHint="?attr/colorOnSurfaceVariant"
-                android:gravity="top"
-                android:inputType="textMultiLine|textNoSuggestions"
-                android:scrollbars="none"
-                android:background="@null" />
+                <EditText
+                    android:id="@+id/edit_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tulis ide sebelum lupa..."
+                    android:textColor="?attr/colorOnSurface"
+                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                    android:gravity="top"
+                    android:inputType="textMultiLine|textNoSuggestions"
+                    android:scrollbars="none"
+                    android:background="@null" />
+              </ScrollView>  
 
             <android.webkit.WebView
                 android:id="@+id/view_body_web"
