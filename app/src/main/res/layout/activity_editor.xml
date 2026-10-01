@@ -82,7 +82,7 @@
                     android:inputType="textMultiLine|textNoSuggestions"
                     android:scrollbars="none"
                     android:background="@null" />
-              </ScrollView>  
+            </ScrollView>  
 
             <android.webkit.WebView
                 android:id="@+id/view_body_web"
