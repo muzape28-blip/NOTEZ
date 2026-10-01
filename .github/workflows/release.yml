@@ -5,12 +5,12 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: 'Ketik BUILD-v0.1.5 untuk konfirmasi'
+        description: 'Ketik BUILD-v0.1.6 untuk konfirmasi'
         required: true
 
 jobs:
   release:
-    if: github.event.inputs.confirm == 'BUILD-v0.1.5'
+    if: github.event.inputs.confirm == 'BUILD-v0.1.6'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -62,5 +62,5 @@ jobs:
       - name: Upload signed APK
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: notez-v0.1.5-release
+          name: notez-v0.1.6-release
           path: app/build/outputs/apk/release/app-release.apk
