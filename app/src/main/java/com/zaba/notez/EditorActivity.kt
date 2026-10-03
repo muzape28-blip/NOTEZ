@@ -1,6 +1,7 @@
 package com.zaba.notez
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -85,16 +86,16 @@ class EditorActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val openTime = intent.getLongExtra(open_started_at, SystemClock.uptimeMillis())
-        noteId = intent.getLongExtra(note_id, -1)
+        val openTime = intent.getLongExtra("open_started_at", SystemClock.uptimeMillis())
+        noteId = intent.getLongExtra("note_id", -1)
         perfTracker = PerfTracker(noteId, openTime)
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
-        perfTracker?.mark(ACTIVITY_CREATED)
+        perfTracker?.mark("ACTIVITY_CREATED")
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
-        drawer.post { perfTracker?.mark(LAYOUT_READY) }
+        drawer.post { perfTracker?.mark("LAYOUT_READY") }
         musicDrawer = MusicDrawerController(
             activity = this,
             root = drawer,
@@ -121,7 +122,7 @@ class EditorActivity : AppCompatActivity() {
         counter = findViewById(R.id.counter)
         editToggle = findViewById(R.id.edit_toggle)
         markdownPreview = MarkdownPreviewRenderer(this, bodyWebView)
-        perfTracker?.mark(WEBVIEW_CREATED)
+        perfTracker?.mark("WEBVIEW_CREATED")
         markdownPreview.perfTracker = perfTracker
 
         lifecycleScope.launch {
@@ -132,7 +133,7 @@ class EditorActivity : AppCompatActivity() {
                 bodyEdit.setText(it.content)
                 updateCounter(it.content.length, "")
             }
-            perfTracker?.mark(NOTE_LOADED)
+            perfTracker?.mark("NOTE_LOADED")
             loaded = true
             applyMode(isEditing)
         }

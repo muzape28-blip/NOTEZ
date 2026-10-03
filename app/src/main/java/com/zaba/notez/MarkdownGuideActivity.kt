@@ -80,9 +80,9 @@ class MarkdownGuideActivity : AppCompatActivity() {
 
             groupSections.forEach { section ->
                 val cardView = layoutInflater.inflate(R.layout.item_note, indexList, false)
-                val titleView = cardView.findViewById<TextView>(R.id.note_title)
-                val bodyView = cardView.findViewById<TextView>(R.id.note_preview)
-                val timeView = cardView.findViewById<TextView>(R.id.note_time)
+                val titleView = cardView.findViewById<TextView>(R.id.item_title)
+                val bodyView = cardView.findViewById<TextView>(R.id.item_preview)
+                val timeView = cardView.findViewById<TextView>(R.id.item_meta)
 
                 titleView.text = section.title
                 bodyView.text = section.content.take(120).replace("\n", " ") + "..."

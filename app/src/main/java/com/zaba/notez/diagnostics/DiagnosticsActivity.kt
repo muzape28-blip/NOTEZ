@@ -81,7 +81,7 @@ class DiagnosticsActivity : AppCompatActivity() {
             val text2 = itemView.findViewById<TextView>(android.R.id.text2)
 
             text1.text = "● ${event.name}"
-            text1.setTextColor(getColor(R.color.github_fg))
+            text1.setTextColor(getColor(R.color.github_text))
             text1.textSize = 15f
 
             text2.text = "+${event.elapsedMs} ms"
