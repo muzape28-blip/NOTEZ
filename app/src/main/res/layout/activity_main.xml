@@ -259,6 +259,20 @@
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="15sp" />
 
+            <TextView
+                android:id="@+id/drawer_diagnostics"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Diagnostics"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
+
             <include layout="@layout/include_music_drawer" />
         </LinearLayout>
     </ScrollView>

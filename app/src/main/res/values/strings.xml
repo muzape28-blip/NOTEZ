@@ -12,4 +12,5 @@
     <string name="markdown_guide_title">Panduan Markdown</string>
     <string name="about_notez_title">Tentang NOTEZ</string>
     <string name="settings_title">Pengaturan</string>
+    <string name="notez_version_name">v0.1.6</string>
 </resources>

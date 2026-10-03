@@ -41,5 +41,8 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
+        <activity
+            android:name=".diagnostics.DiagnosticsActivity"
+            android:exported="false" />
     </application>
 </manifest>
