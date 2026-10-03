@@ -106,8 +106,8 @@ class MarkdownPreviewRenderer(
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
-                if (consoleMessage.message() == NOTEZ_FIRST_PAINT) {
-                    perfTracker?.mark(FIRST_PAINT)
+                if (consoleMessage.message() == "NOTEZ_FIRST_PAINT") {
+                    perfTracker?.mark("FIRST_PAINT")
                     return true
                 }
                 return super.onConsoleMessage(consoleMessage)
@@ -117,13 +117,13 @@ class MarkdownPreviewRenderer(
         webView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
                 super.onPageStarted(view, url, favicon)
-                perfTracker?.mark(HTML_SENT)
+                perfTracker?.mark("HTML_SENT")
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                if (url != about:blank) {
-                    perfTracker?.mark(FULL_RENDER)
+                if (url != "about:blank") {
+                    perfTracker?.mark("FULL_RENDER")
                     perfTracker?.finishSession()
                 }
             }
