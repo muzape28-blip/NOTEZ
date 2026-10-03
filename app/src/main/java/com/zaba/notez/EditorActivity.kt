@@ -1,6 +1,7 @@
 package com.zaba.notez
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -11,6 +12,7 @@ import android.widget.EditText
 import android.webkit.WebView
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -18,6 +20,8 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.zaba.notez.markdown.MarkdownPreviewRenderer
+import com.zaba.notez.diagnostics.PerfTracker
+import android.os.SystemClock
 import com.zaba.notez.music.MusicDrawerController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,6 +44,7 @@ class EditorActivity : AppCompatActivity() {
     private lateinit var drawer: DrawerLayout
     private lateinit var musicDrawer: MusicDrawerController
     private lateinit var markdownPreview: MarkdownPreviewRenderer
+    private var perfTracker: PerfTracker? = null
 
     private lateinit var titleEdit: EditText
     private lateinit var titleView: TextView
@@ -68,17 +73,43 @@ class EditorActivity : AppCompatActivity() {
         if (::musicDrawer.isInitialized) musicDrawer.onMusicPicked(uris)
     }
 
+    private val saveAsLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("text/markdown")) { uri: Uri? ->
+        if (uri == null) return@registerForActivityResult
+        runCatching {
+            contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        }
+        NoteFileTargetStore.setTargetUri(this, noteId, uri)
+        writeToExternalUri(uri)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val openTime = intent.getLongExtra("open_started_at", SystemClock.uptimeMillis())
+        noteId = intent.getLongExtra("note_id", -1)
+        perfTracker = PerfTracker(noteId, openTime)
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editor)
+        perfTracker?.mark("ACTIVITY_CREATED")
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
+        drawer.post { perfTracker?.mark("LAYOUT_READY") }
         musicDrawer = MusicDrawerController(
             activity = this,
             root = drawer,
             onAddMusicRequested = { openMusic.launch(arrayOf("audio/*")) }
         )
+
+        findViewById<View>(R.id.menu_file_save)?.setOnClickListener {
+            drawer.closeDrawer(GravityCompat.START)
+            handleSaveFile()
+        }
+        findViewById<View>(R.id.menu_file_save_as)?.setOnClickListener {
+            drawer.closeDrawer(GravityCompat.START)
+            handleSaveAs()
+        }
         noteId = intent.getLongExtra("note_id", -1)
         isEditing = intent.getBooleanExtra("is_new", false)
 
@@ -91,6 +122,8 @@ class EditorActivity : AppCompatActivity() {
         counter = findViewById(R.id.counter)
         editToggle = findViewById(R.id.edit_toggle)
         markdownPreview = MarkdownPreviewRenderer(this, bodyWebView)
+        perfTracker?.mark("WEBVIEW_CREATED")
+        markdownPreview.perfTracker = perfTracker
 
         lifecycleScope.launch {
             dao.getById(noteId)?.let {
@@ -100,6 +133,7 @@ class EditorActivity : AppCompatActivity() {
                 bodyEdit.setText(it.content)
                 updateCounter(it.content.length, "")
             }
+            perfTracker?.mark("NOTE_LOADED")
             loaded = true
             applyMode(isEditing)
         }
@@ -127,8 +161,10 @@ class EditorActivity : AppCompatActivity() {
         currentContent = bodyEdit.text.toString()
         save(currentTitle, currentContent)
         isEditing = false
-        applyMode(false)
+        titleEdit.clearFocus()
+        bodyEdit.clearFocus()
         hideKeyboard()
+        applyMode(false)
     }
 
     private fun switchToEdit() {
@@ -158,6 +194,9 @@ class EditorActivity : AppCompatActivity() {
             getString(if (editing) R.string.cd_done_editing else R.string.cd_edit_note)
 
         if (!editing) {
+            titleEdit.clearFocus()
+            bodyEdit.clearFocus()
+            hideKeyboard()
             titleView.text = currentTitle.ifBlank { getString(R.string.untitled_note) }
             if (hasContent) {
                 markdownPreview.render(currentContent)
@@ -227,7 +266,43 @@ class EditorActivity : AppCompatActivity() {
 
     private fun hideKeyboard() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(titleEdit.windowToken, 0)
+        val token = currentFocus?.windowToken ?: window.decorView.windowToken
+        imm.hideSoftInputFromWindow(token, 0)
+    }
+
+    private fun handleSaveFile() {
+        val targetUri = NoteFileTargetStore.getTargetUri(this, noteId)
+        if (targetUri != null) {
+            writeToExternalUri(targetUri)
+        } else {
+            handleSaveAs()
+        }
+    }
+
+    private fun handleSaveAs() {
+        val title = if (isEditing) titleEdit.text.toString() else currentTitle
+        val body = if (isEditing) bodyEdit.text.toString() else currentContent
+        val suggestedName = NoteFileTargetStore.suggestFilename(title, body)
+        saveAsLauncher.launch(suggestedName)
+    }
+
+    private fun writeToExternalUri(uri: Uri) {
+        val title = if (isEditing) titleEdit.text.toString() else currentTitle
+        val body = if (isEditing) bodyEdit.text.toString() else currentContent
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                contentResolver.openOutputStream(uri, "wt")?.use { stream ->
+                    stream.write(body.toByteArray(Charsets.UTF_8))
+                }
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@EditorActivity, "File tersimpan", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@EditorActivity, "Gagal menyimpan file: " + e.localizedMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {

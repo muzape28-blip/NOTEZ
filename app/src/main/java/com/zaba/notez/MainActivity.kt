@@ -231,6 +231,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.drawer_settings).setOnClickListener {
             closeDrawerThen { startActivity(Intent(this, SettingsActivity::class.java)) }
         }
+        findViewById<TextView>(R.id.drawer_diagnostics)?.setOnClickListener {
+            closeDrawerThen { startActivity(Intent(this, com.zaba.notez.diagnostics.DiagnosticsActivity::class.java)) }
+        }
         drawer.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
             override fun onDrawerClosed(drawerView: View) {
                 val action = pendingDrawerAction ?: return
@@ -381,6 +384,7 @@ class MainActivity : AppCompatActivity() {
             Intent(this, EditorActivity::class.java)
                 .putExtra("note_id", id)
                 .putExtra("is_new", isNew)
+                .putExtra("open_started_at", android.os.SystemClock.uptimeMillis())
         )
     }
 

@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?attr/colorSurface"
     android:padding="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -29,16 +30,79 @@
             android:paddingEnd="8dp"
             android:text="@string/markdown_guide_title"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/guide_page_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="13sp"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <android.webkit.WebView
-        android:id="@+id/guide_body_web"
+    <ScrollView
+        android:id="@+id/index_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@android:color/transparent"
-        android:overScrollMode="ifContentScrolls"
-        android:scrollbars="vertical" />
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:id="@+id/index_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/reader_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <android.webkit.WebView
+            android:id="@+id/guide_body_web"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:overScrollMode="ifContentScrolls"
+            android:scrollbars="vertical" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btn_prev_section"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="← PREV"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/btn_next_section"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="NEXT →"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
