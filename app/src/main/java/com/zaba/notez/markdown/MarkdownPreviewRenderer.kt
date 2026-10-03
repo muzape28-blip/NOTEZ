@@ -13,6 +13,9 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebChromeClient
+import android.webkit.ConsoleMessage
+import com.zaba.notez.diagnostics.PerfTracker
 import android.widget.Toast
 import com.zaba.notez.R
 import com.zaba.notez.ThemePref
@@ -45,6 +48,7 @@ class MarkdownPreviewRenderer(
     }
     private val remoteImageCache = RemoteImageCache(activity)
     private val imageExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    var perfTracker: PerfTracker? = null
     @Volatile private var destroyed = false
     private var currentMarkdown: String = ""
 
@@ -52,11 +56,15 @@ class MarkdownPreviewRenderer(
         configureWebView()
     }
 
-    fun render(markdown: String) {
+    fun render(markdown: String, tracker: PerfTracker? = null) {
+        if (tracker != null) perfTracker = tracker
         currentMarkdown = markdown
+        perfTracker?.mark("MARKDOWN_PARSED")
+        val html = buildHtml(markdown)
+        perfTracker?.mark("HTML_READY")
         webView.loadDataWithBaseURL(
             NOTEZ_BASE_URL,
-            buildHtml(markdown),
+            html,
             "text/html",
             "UTF-8",
             null
@@ -96,7 +104,29 @@ class MarkdownPreviewRenderer(
             }
         }
 
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                if (consoleMessage.message() == NOTEZ_FIRST_PAINT) {
+                    perfTracker?.mark(FIRST_PAINT)
+                    return true
+                }
+                return super.onConsoleMessage(consoleMessage)
+            }
+        }
+
         webView.webViewClient = object : WebViewClient() {
+            override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                perfTracker?.mark(HTML_SENT)
+            }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                if (url != about:blank) {
+                    perfTracker?.mark(FULL_RENDER)
+                    perfTracker?.finishSession()
+                }
+            }
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val uri = request.url ?: return true
                 if (isImageLoadRequest(uri)) {
@@ -897,15 +927,18 @@ class MarkdownPreviewRenderer(
                     footnoteRefCounts: Object.create(null)
                   };
                   setSafePreviewHtml(md.render(preparedSource, renderEnv));
-                  addHeadingAnchors();
-                  wrapTables();
-                  enhanceTaskLists();
-                  enhanceCodeBlocks();
-                  enhanceCallouts();
-                  enhanceFootnoteRefs();
-                  appendFootnotes(renderEnv);
-                  hardenLinks();
-                  addImagePlaceholderHandlers();
+                  console.log(NOTEZ_FIRST_PAINT);
+                  requestAnimationFrame(function () {
+                    addHeadingAnchors();
+                    wrapTables();
+                    enhanceTaskLists();
+                    enhanceCodeBlocks();
+                    enhanceCallouts();
+                    enhanceFootnoteRefs();
+                    appendFootnotes(renderEnv);
+                    hardenLinks();
+                    addImagePlaceholderHandlers();
+                  });
 
                   function slugifyHeading(text) {
                     var slug = String(text || '').toLowerCase()
