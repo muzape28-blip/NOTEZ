@@ -927,18 +927,16 @@ class MarkdownPreviewRenderer(
                     footnoteRefCounts: Object.create(null)
                   };
                   setSafePreviewHtml(md.render(preparedSource, renderEnv));
-                  console.log(NOTEZ_FIRST_PAINT);
-                  requestAnimationFrame(function () {
-                    addHeadingAnchors();
-                    wrapTables();
-                    enhanceTaskLists();
-                    enhanceCodeBlocks();
-                    enhanceCallouts();
-                    enhanceFootnoteRefs();
-                    appendFootnotes(renderEnv);
-                    hardenLinks();
-                    addImagePlaceholderHandlers();
-                  });
+                  addHeadingAnchors();
+                  wrapTables();
+                  enhanceTaskLists();
+                  enhanceCodeBlocks();
+                  enhanceCallouts();
+                  enhanceFootnoteRefs();
+                  appendFootnotes(renderEnv);
+                  hardenLinks();
+                  addImagePlaceholderHandlers();
+                  console.log("NOTEZ_FIRST_PAINT");
 
                   function slugifyHeading(text) {
                     var slug = String(text || '').toLowerCase()
@@ -1463,11 +1461,16 @@ class MarkdownPreviewRenderer(
           letter-spacing: .04em;
           margin-bottom: .25em;
         }
-        .notez-callout-note { border-left-color: #58A6FF; }
-        .notez-callout-tip { border-left-color: #3FB950; }
-        .notez-callout-important { border-left-color: #A371F7; }
-        .notez-callout-warning { border-left-color: #D29922; }
-        .notez-callout-caution { border-left-color: var(--notez-danger); }
+        .notez-callout-note { border-left-color: #58A6FF; background: rgba(88, 166, 255, 0.1); }
+        .notez-callout-note .notez-callout-title { color: #58A6FF; }
+        .notez-callout-tip { border-left-color: #3FB950; background: rgba(63, 185, 80, 0.1); }
+        .notez-callout-tip .notez-callout-title { color: #3FB950; }
+        .notez-callout-important { border-left-color: #A371F7; background: rgba(163, 113, 247, 0.1); }
+        .notez-callout-important .notez-callout-title { color: #A371F7; }
+        .notez-callout-warning { border-left-color: #D29922; background: rgba(210, 153, 34, 0.1); }
+        .notez-callout-warning .notez-callout-title { color: #D29922; }
+        .notez-callout-caution { border-left-color: var(--notez-danger); background: rgba(255, 84, 112, 0.1); }
+        .notez-callout-caution .notez-callout-title { color: var(--notez-danger); }
         .notez-image-placeholder {
           display: block;
           border: 1px dashed var(--notez-border);
