@@ -1,5 +1,6 @@
 package com.zaba.notez
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
@@ -72,27 +73,24 @@ class MarkdownGuideActivity : AppCompatActivity() {
             val groupHeader = TextView(this).apply {
                 text = groupName
                 setTextColor(getColor(R.color.github_accent))
-                setPadding(8, 24, 8, 12)
-                textSize = 13f
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                setPadding(dp(16), dp(20), dp(16), dp(8))
+                textSize = 12f
+                typeface = Typeface.DEFAULT_BOLD
+                letterSpacing = 0.08f
             }
             indexList.addView(groupHeader)
 
             groupSections.forEach { section ->
-                val cardView = layoutInflater.inflate(R.layout.item_note, indexList, false)
-                val titleView = cardView.findViewById<TextView>(R.id.item_title)
-                val bodyView = cardView.findViewById<TextView>(R.id.item_preview)
-                val timeView = cardView.findViewById<TextView>(R.id.item_meta)
+                val rowView = layoutInflater.inflate(R.layout.item_guide_toc, indexList, false)
+                val titleView = rowView.findViewById<TextView>(R.id.toc_title)
 
                 titleView.text = section.title
-                bodyView.text = section.content.take(120).replace("\n", " ") + "..."
-                timeView.text = "Bagian ${section.index + 1} dari ${sections.size}"
 
-                cardView.setOnClickListener {
-                    openSection(section.index)
+                rowView.setOnClickListener {
+                    openSectionById(section.id)
                 }
 
-                indexList.addView(cardView)
+                indexList.addView(rowView)
             }
         }
 
@@ -105,6 +103,13 @@ class MarkdownGuideActivity : AppCompatActivity() {
         readerContainer.visibility = View.GONE
         pageIndicator.visibility = View.GONE
         guideTitle.text = getString(R.string.markdown_guide_title)
+    }
+
+    private fun openSectionById(id: String) {
+        val idx = sections.indexOfFirst { it.id == id }
+        if (idx >= 0) {
+            openSection(idx)
+        }
     }
 
     private fun openSection(index: Int) {
@@ -122,7 +127,7 @@ class MarkdownGuideActivity : AppCompatActivity() {
         btnPrev.isEnabled = index > 0
         btnNext.isEnabled = index < sections.lastIndex
 
-        markdownPreview.render("## ${section.title}\n\n${section.content}")
+        markdownPreview.render(section.markdown)
     }
 
     private fun handleBackNavigation() {
@@ -136,6 +141,8 @@ class MarkdownGuideActivity : AppCompatActivity() {
     override fun onBackPressed() {
         handleBackNavigation()
     }
+
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     override fun onDestroy() {
         if (::markdownPreview.isInitialized) markdownPreview.destroy()
