@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.zaba.notez.R
 import com.zaba.notez.ThemePref
+import com.zaba.notez.UiStyle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -29,6 +31,7 @@ class DiagnosticsActivity : AppCompatActivity() {
         setTheme(ThemePref.styleOf(ThemePref.get(this)))
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diagnostics)
+        applyScreenPolish()
 
         findViewById<ImageButton>(R.id.btn_back).setOnClickListener { finish() }
 
@@ -46,6 +49,31 @@ class DiagnosticsActivity : AppCompatActivity() {
         }
 
         renderDiagnostics()
+    }
+
+    private fun applyScreenPolish() {
+        findViewById<View>(R.id.diagnostics_toolbar).background =
+            UiStyle.roundedBackground(this, fillAlpha = 78, strokeAlpha = 52, radiusDp = 18f)
+        findViewById<TextView>(R.id.session_meta).background =
+            UiStyle.roundedBackground(this, fillAlpha = 52, strokeAlpha = 42, radiusDp = 16f)
+        findViewById<TextView>(R.id.session_meta).setPadding(
+            UiStyle.dp(this, 14f),
+            UiStyle.dp(this, 12f),
+            UiStyle.dp(this, 14f),
+            UiStyle.dp(this, 12f)
+        )
+        findViewById<TextView>(R.id.empty_diagnostics).background =
+            UiStyle.roundedBackground(this, fillAlpha = 52, strokeAlpha = 42, radiusDp = 18f)
+        findViewById<View>(R.id.diagnostics_actions).background =
+            UiStyle.roundedBackground(this, fillAlpha = 42, strokeAlpha = 34, radiusDp = 16f)
+        findViewById<View>(R.id.diagnostics_actions).setPadding(
+            UiStyle.dp(this, 10f),
+            UiStyle.dp(this, 6f),
+            UiStyle.dp(this, 10f),
+            UiStyle.dp(this, 6f)
+        )
+        findViewById<Button>(R.id.btn_copy).text = "SALIN"
+        findViewById<Button>(R.id.btn_clear).text = "BERSIHKAN"
     }
 
     private fun renderDiagnostics() {
@@ -81,15 +109,32 @@ class DiagnosticsActivity : AppCompatActivity() {
             val text2 = itemView.findViewById<TextView>(android.R.id.text2)
 
             text1.text = "● ${event.name}"
-            text1.setTextColor(getColor(R.color.github_text))
+            text1.setTextColor(getColor(ThemePref.optionOf(ThemePref.get(this)).textColorRes))
             text1.textSize = 15f
 
             text2.text = "+${event.elapsedMs} ms"
-            text2.setTextColor(getColor(R.color.github_accent))
+            text2.setTextColor(UiStyle.primary(this))
             text2.textSize = 13f
 
-            itemView.setPadding(0, 8, 0, 8)
-            timelineContainer.addView(itemView)
+            itemView.background = UiStyle.roundedBackground(
+                this,
+                fillAlpha = 42,
+                strokeAlpha = 34,
+                radiusDp = 14f
+            )
+            itemView.setPadding(
+                UiStyle.dp(this, 14f),
+                UiStyle.dp(this, 10f),
+                UiStyle.dp(this, 14f),
+                UiStyle.dp(this, 10f)
+            )
+            timelineContainer.addView(
+                itemView,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { bottomMargin = UiStyle.dp(this@DiagnosticsActivity, 8f) }
+            )
         }
     }
 
