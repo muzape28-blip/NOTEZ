@@ -95,6 +95,7 @@ class EditorActivity : AppCompatActivity() {
         perfTracker?.mark("ACTIVITY_CREATED")
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
+        UiStyle.applyDrawerGlass(findViewById(R.id.drawer_panel))
         drawer.post { perfTracker?.mark("LAYOUT_READY") }
         musicDrawer = MusicDrawerController(
             activity = this,

@@ -72,7 +72,7 @@ class MarkdownGuideActivity : AppCompatActivity() {
         grouped.forEach { (groupName, groupSections) ->
             val groupHeader = TextView(this).apply {
                 text = groupName
-                setTextColor(getColor(R.color.github_accent))
+                setTextColor(UiStyle.primary(this@MarkdownGuideActivity))
                 setPadding(dp(16), dp(20), dp(16), dp(8))
                 textSize = 12f
                 typeface = Typeface.DEFAULT_BOLD
@@ -83,8 +83,22 @@ class MarkdownGuideActivity : AppCompatActivity() {
             groupSections.forEach { section ->
                 val rowView = layoutInflater.inflate(R.layout.item_guide_toc, indexList, false)
                 val titleView = rowView.findViewById<TextView>(R.id.toc_title)
+                val summaryView = rowView.findViewById<TextView>(R.id.toc_summary)
 
                 titleView.text = section.title
+                summaryView.text = section.summary
+                rowView.background = UiStyle.roundedBackground(
+                    this,
+                    fillAlpha = 58,
+                    strokeAlpha = 42,
+                    radiusDp = 14f
+                )
+                val rippleAttrs = obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
+                rowView.foreground = rippleAttrs.getDrawable(0)
+                rippleAttrs.recycle()
+                (rowView.layoutParams as? LinearLayout.LayoutParams)?.apply {
+                    setMargins(dp(8), 0, dp(8), dp(6))
+                }
 
                 rowView.setOnClickListener {
                     openSectionById(section.id)

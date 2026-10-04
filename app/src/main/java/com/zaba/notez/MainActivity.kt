@@ -64,6 +64,9 @@ class MainActivity : AppCompatActivity() {
         playStartupSplash(savedInstanceState)
         dao = AppDatabase.get(this).noteDao()
         drawer = findViewById(R.id.drawer)
+        UiStyle.applyDrawerGlass(findViewById(R.id.drawer_panel))
+        findViewById<View>(R.id.home_toolbar).background =
+            UiStyle.roundedBackground(this, fillAlpha = 88, strokeAlpha = 56, radiusDp = 18f)
         setupDrawer()
         musicDrawer = MusicDrawerController(
             activity = this,

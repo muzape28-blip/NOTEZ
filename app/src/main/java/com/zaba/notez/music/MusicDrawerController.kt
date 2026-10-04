@@ -18,8 +18,10 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
+import com.google.android.material.card.MaterialCardView
 import com.google.common.util.concurrent.ListenableFuture
 import com.zaba.notez.R
+import com.zaba.notez.UiStyle
 
 /** Reusable drawer controller for NOTEZ local music UI in MainActivity and EditorActivity. */
 class MusicDrawerController(
@@ -34,6 +36,7 @@ class MusicDrawerController(
     private var snapshot: MusicLibrarySnapshot = MusicLibraryStore.load(activity)
     private var expanded = false
 
+    private val musicSection: MaterialCardView = root.findViewById(R.id.music_section)
     private val header: TextView = root.findViewById(R.id.music_header)
     private val subtitle: TextView = root.findViewById(R.id.music_header_subtitle)
     private val submenu: View = root.findViewById(R.id.music_submenu)
@@ -56,6 +59,14 @@ class MusicDrawerController(
     }
 
     init {
+        UiStyle.applyGlassCard(musicSection, alpha = 192, radiusDp = 20f)
+        header.setTextColor(UiStyle.primary(activity))
+        header.textSize = 16f
+        header.setTypeface(header.typeface, android.graphics.Typeface.BOLD)
+        submenu.background = UiStyle.roundedBackground(activity, fillAlpha = 44, strokeAlpha = 52, radiusDp = 16f)
+        modeLabel.setTextColor(UiStyle.primary(activity))
+        previous.setTextColor(UiStyle.primary(activity))
+        next.setTextColor(UiStyle.primary(activity))
         header.setOnClickListener {
             expanded = !expanded
             submenu.visibility = if (expanded) View.VISIBLE else View.GONE
@@ -230,7 +241,10 @@ class MusicDrawerController(
                 setTextColor(resolveColor(android.R.attr.textColorPrimary))
                 textSize = 13f
                 maxLines = 2
-                setPadding(dp(20), dp(9), dp(12), dp(9))
+                minHeight = dp(44)
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                background = UiStyle.roundedBackground(activity, fillAlpha = 54, strokeAlpha = 42, radiusDp = 12f)
+                setPadding(dp(14), dp(8), dp(12), dp(8))
                 setOnClickListener { playTrack(index) }
             }
             libraryList.addView(
@@ -238,7 +252,7 @@ class MusicDrawerController(
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                )
+                ).apply { bottomMargin = dp(6) }
             )
         }
         empty.isVisible = snapshot.tracks.isEmpty()
@@ -248,13 +262,13 @@ class MusicDrawerController(
         val currentTrack = currentTrack()
         subtitle.text = currentTrack?.let {
             if (it.artist.isBlank()) it.title else "${it.title} - ${it.artist}"
-        }.orEmpty()
+        } ?: if (expanded) "Audio lokal • tetap offline" else ""
         subtitle.visibility = if (subtitle.text.isNullOrBlank()) View.GONE else View.VISIBLE
         nowTitle.text = currentTrack?.title ?: "Belum ada musik lokal"
         nowArtist.text = currentTrack?.artist?.takeIf { it.isNotBlank() } ?: currentTrack?.displayName.orEmpty()
         val isPlaying = controller?.isPlaying == true
         playPause.setImageResource(if (isPlaying) R.drawable.ic_music_pause else R.drawable.ic_music_play)
-        playPause.contentDescription = if (isPlaying) "Pause music" else "Play music"
+        playPause.contentDescription = if (isPlaying) "Jeda musik" else "Putar musik"
         mode.setImageResource(
             when (snapshot.playbackMode) {
                 MusicPlaybackMode.LOOP_ALL -> R.drawable.ic_music_loop_all

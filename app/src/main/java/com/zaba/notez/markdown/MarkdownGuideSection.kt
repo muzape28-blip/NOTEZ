@@ -5,5 +5,6 @@ data class MarkdownGuideSection(
     val index: Int,
     val title: String,
     val group: String,
+    val summary: String,
     val markdown: String
 )

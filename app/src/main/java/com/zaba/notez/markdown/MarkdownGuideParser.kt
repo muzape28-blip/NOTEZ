@@ -47,7 +47,7 @@ object MarkdownGuideParser {
             sections.add(currentTitle to currentLines)
         }
 
-        return sections.mapIndexed { idx, (title, contentLines) ->
+        val parsedSections = sections.mapIndexed { idx, (title, contentLines) ->
             val id = slugify(title)
             val group = when {
                 idx <= 5 || title.contains("cheat sheet", ignoreCase = true) -> "DASAR & TEKS"
@@ -56,12 +56,46 @@ object MarkdownGuideParser {
             }
             MarkdownGuideSection(
                 id = id,
-                index = idx,
+                index = idx + 1,
                 title = title,
                 group = group,
+                summary = summaryOf(contentLines, title),
                 markdown = "## $title\n\n" + contentLines.joinToString("\n").trim()
             )
         }
+
+        // The preface used to be discarded, which made the guide start abruptly
+        // at the cheat sheet. Keep it as a real first section so a new user gets
+        // context before being dropped into syntax examples.
+        val introMarkdown = rawMarkdown.substringBefore("\n## Daftar isi").trim()
+        val introLines = introMarkdown.lines().drop(1)
+        val intro = MarkdownGuideSection(
+            id = "mulai-dari-sini",
+            index = 0,
+            title = "Mulai dari sini",
+            group = "MULAI",
+            summary = summaryOf(introLines, "Panduan Markdown"),
+            markdown = introMarkdown
+        )
+        return listOf(intro) + parsedSections
+    }
+
+    private fun summaryOf(lines: List<String>, title: String): String {
+        val candidate = lines.asSequence()
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .filterNot { it == "---" || it.startsWith("```") || it.startsWith("|") }
+            .filterNot { it.startsWith("#") }
+            .firstOrNull()
+            ?: "Panduan praktis tentang $title agar catatanmu tetap rapi."
+
+        return candidate
+            .replace(Regex("\\*\\*|__|`"), "")
+            .replace(Regex("\\[([^]]+)]\\([^)]*\\)"), "\$1")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+            .ifBlank { "Panduan praktis untuk syntax ini di NOTEZ." }
+            .let { text -> if (text.length > 132) text.take(129).trimEnd() + "…" else text }
     }
 
     private fun slugify(text: String): String {
