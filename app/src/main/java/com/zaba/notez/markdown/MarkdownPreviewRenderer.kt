@@ -13,6 +13,9 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebChromeClient
+import android.webkit.ConsoleMessage
+import com.zaba.notez.diagnostics.PerfTracker
 import android.widget.Toast
 import com.zaba.notez.R
 import com.zaba.notez.ThemePref
@@ -45,6 +48,7 @@ class MarkdownPreviewRenderer(
     }
     private val remoteImageCache = RemoteImageCache(activity)
     private val imageExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+    var perfTracker: PerfTracker? = null
     @Volatile private var destroyed = false
     private var currentMarkdown: String = ""
 
@@ -52,11 +56,15 @@ class MarkdownPreviewRenderer(
         configureWebView()
     }
 
-    fun render(markdown: String) {
+    fun render(markdown: String, tracker: PerfTracker? = null) {
+        if (tracker != null) perfTracker = tracker
         currentMarkdown = markdown
+        perfTracker?.mark("MARKDOWN_PARSED")
+        val html = buildHtml(markdown)
+        perfTracker?.mark("HTML_READY")
         webView.loadDataWithBaseURL(
             NOTEZ_BASE_URL,
-            buildHtml(markdown),
+            html,
             "text/html",
             "UTF-8",
             null
@@ -96,7 +104,29 @@ class MarkdownPreviewRenderer(
             }
         }
 
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+                if (consoleMessage.message() == "NOTEZ_FIRST_PAINT") {
+                    perfTracker?.mark("FIRST_PAINT")
+                    return true
+                }
+                return super.onConsoleMessage(consoleMessage)
+            }
+        }
+
         webView.webViewClient = object : WebViewClient() {
+            override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                perfTracker?.mark("HTML_SENT")
+            }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                if (url != "about:blank") {
+                    perfTracker?.mark("FULL_RENDER")
+                    perfTracker?.finishSession()
+                }
+            }
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val uri = request.url ?: return true
                 if (isImageLoadRequest(uri)) {
@@ -906,6 +936,7 @@ class MarkdownPreviewRenderer(
                   appendFootnotes(renderEnv);
                   hardenLinks();
                   addImagePlaceholderHandlers();
+                  console.log("NOTEZ_FIRST_PAINT");
 
                   function slugifyHeading(text) {
                     var slug = String(text || '').toLowerCase()
@@ -1311,17 +1342,18 @@ class MarkdownPreviewRenderer(
         .notez-code-card {
           max-width: 100%;
           overflow: hidden;
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035));
+          background: #0D1117;
           border: 1px solid var(--notez-border);
-          border-radius: 14px;
-          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
+          border-radius: 12px;
+          margin: 1em 0;
         }
         .notez-code-header {
           display: flex;
           justify-content: flex-end;
           align-items: center;
-          min-height: 30px;
-          padding: 8px 10px 0;
+          background: #161B22;
+          padding: 6px 12px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .notez-code-scroll {
           max-width: 100%;
@@ -1329,14 +1361,11 @@ class MarkdownPreviewRenderer(
           overflow-x: auto;
           overflow-y: hidden;
           -webkit-overflow-scrolling: touch;
-          background: transparent;
+          background: #0D1117;
+          color: #C9D1D9;
           border: 0;
           border-radius: 0;
-          padding: 12px;
-          box-shadow: none;
-        }
-        .notez-code-card-labeled .notez-code-scroll {
-          padding-top: 8px;
+          padding: 12px 14px;
         }
         .notez-code-scroll code {
           display: inline-block;
@@ -1345,6 +1374,7 @@ class MarkdownPreviewRenderer(
           background: transparent;
           border-radius: 0;
           white-space: pre;
+          color: #C9D1D9;
         }
         .notez-code-label {
           display: inline-flex;
@@ -1417,24 +1447,31 @@ class MarkdownPreviewRenderer(
         }
         .notez-callout {
           border-left-width: 4px;
+          border-left-style: solid;
           border-radius: 12px;
-          padding: 10px 12px;
+          padding: 12px 14px;
           color: var(--notez-text);
-          background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.032));
+          background: rgba(255, 255, 255, 0.05);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          margin: 1em 0;
         }
         .notez-callout > p { margin: .35em 0 0; }
         .notez-callout-title {
-          font-size: .82em;
+          font-size: .88em;
           font-weight: 800;
-          letter-spacing: .04em;
-          margin-bottom: .25em;
+          letter-spacing: .05em;
+          margin-bottom: .35em;
         }
-        .notez-callout-note { border-left-color: #58A6FF; }
-        .notez-callout-tip { border-left-color: #3FB950; }
-        .notez-callout-important { border-left-color: #A371F7; }
-        .notez-callout-warning { border-left-color: #D29922; }
-        .notez-callout-caution { border-left-color: var(--notez-danger); }
+        .notez-callout-note { border-left-color: #58A6FF; background: rgba(88, 166, 255, 0.12); }
+        .notez-callout-note .notez-callout-title { color: #58A6FF; }
+        .notez-callout-tip { border-left-color: #3FB950; background: rgba(63, 185, 80, 0.12); }
+        .notez-callout-tip .notez-callout-title { color: #3FB950; }
+        .notez-callout-important { border-left-color: #A371F7; background: rgba(163, 113, 247, 0.12); }
+        .notez-callout-important .notez-callout-title { color: #A371F7; }
+        .notez-callout-warning { border-left-color: #D29922; background: rgba(210, 153, 34, 0.12); }
+        .notez-callout-warning .notez-callout-title { color: #D29922; }
+        .notez-callout-caution { border-left-color: var(--notez-danger); background: rgba(255, 84, 112, 0.12); }
+        .notez-callout-caution .notez-callout-title { color: var(--notez-danger); }
         .notez-image-placeholder {
           display: block;
           border: 1px dashed var(--notez-border);

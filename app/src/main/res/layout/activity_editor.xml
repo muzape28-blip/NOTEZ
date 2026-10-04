@@ -110,7 +110,7 @@
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?attr/colorSurface"
+        android:background="@android:color/transparent"
         android:fillViewport="true">
 
         <LinearLayout
@@ -131,6 +131,55 @@
                 android:textColor="?attr/colorPrimary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="8dp"
+                android:text="FILE"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08" />
+
+            <TextView
+                android:id="@+id/menu_file_save"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Simpan file"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/menu_file_save_as"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Simpan sebagai..."
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="?attr/colorOnSurfaceVariant"
+                android:alpha="0.2" />
 
             <include layout="@layout/include_music_drawer" />
         </LinearLayout>

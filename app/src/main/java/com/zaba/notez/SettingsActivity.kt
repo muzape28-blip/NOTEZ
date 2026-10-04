@@ -91,6 +91,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         dao = AppDatabase.get(this).noteDao()
+        applyScreenPolish()
 
         findViewById<ImageButton>(R.id.settings_back).setOnClickListener { finish() }
         findViewById<android.view.View>(R.id.settings_row_theme).setOnClickListener { showThemeDialog() }
@@ -108,7 +109,7 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.settings_row_privacy).setOnClickListener { showPrivacyDialog() }
         findViewById<TextView>(R.id.settings_row_clear_remote_image_cache).setOnClickListener { confirmClearRemoteImageCache() }
 
-                setupExpandableSections()
+        setupExpandableSections()
         updateSummaries()
     }
 
@@ -117,6 +118,44 @@ class SettingsActivity : AppCompatActivity() {
         updateSummaries()
     }
 
+
+    private fun applyScreenPolish() {
+        findViewById<View>(R.id.settings_toolbar).background =
+            UiStyle.roundedBackground(this, fillAlpha = 78, strokeAlpha = 52, radiusDp = 18f)
+
+        val headers = listOf(
+            R.id.section_header_appearance,
+            R.id.section_header_data,
+            R.id.section_header_app
+        )
+        headers.forEach { id ->
+            val header = findViewById<View>(id)
+            header.background = UiStyle.roundedBackground(this, fillAlpha = 78, strokeAlpha = 58, radiusDp = 16f)
+            addRippleForeground(header)
+            (header.layoutParams as? LinearLayout.LayoutParams)?.apply {
+                setMargins(dp(4), dp(8), dp(4), 0)
+            }
+        }
+
+        val contentIds = listOf(
+            R.id.section_content_appearance,
+            R.id.section_content_data,
+            R.id.section_content_app
+        )
+        contentIds.forEach { id ->
+            val content = findViewById<View>(id)
+            content.background = UiStyle.roundedBackground(this, fillAlpha = 34, strokeAlpha = 34, radiusDp = 16f)
+            (content.layoutParams as? LinearLayout.LayoutParams)?.apply {
+                setMargins(dp(4), dp(4), dp(4), 0)
+            }
+        }
+    }
+
+    private fun addRippleForeground(view: View) {
+        val attrs = obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
+        view.foreground = attrs.getDrawable(0)
+        attrs.recycle()
+    }
 
     private fun setupExpandableSections() {
         val headerApp = findViewById<View>(R.id.section_header_appearance)

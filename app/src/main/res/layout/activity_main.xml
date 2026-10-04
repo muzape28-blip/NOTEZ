@@ -9,15 +9,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.zaba.notez.AuroraBackdropView
+            android:id="@+id/home_aurora"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/home_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:background="@android:color/transparent"
+                android:orientation="horizontal"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp">
 
                 <EditText
                     android:id="@+id/search_input"
@@ -57,8 +69,12 @@
                     android:id="@+id/list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
                     android:clipToPadding="false"
-                    android:padding="8dp" />
+                    android:paddingStart="6dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="6dp"
+                    android:paddingBottom="92dp" />
 
                 <LinearLayout
                     android:id="@+id/empty_welcome"
@@ -209,7 +225,7 @@
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?attr/colorSurface"
+        android:background="@android:color/transparent"
         android:fillViewport="true">
 
         <LinearLayout
@@ -256,6 +272,20 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:text="Pengaturan"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/drawer_diagnostics"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:text="Diagnostics"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="15sp" />
 

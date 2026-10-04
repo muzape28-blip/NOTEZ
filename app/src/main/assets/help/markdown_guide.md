@@ -1,11 +1,23 @@
 # Panduan Markdown NOTEZ
 
-Markdown adalah cara menulis teks biasa dengan tanda-tanda sederhana, supaya catatan tetap rapi saat dibaca. Kamu menulis pakai syntax Markdown di mode edit, lalu NOTEZ menampilkan hasil rapinya di mode baca (preview) lewat Markdown Preview v4.
+Markdown itu cara memberi sedikit "petunjuk" pada teks biasa. Tiga tanda pagar bisa menjadi judul, sepasang bintang bisa menebalkan kata, dan tanda `-` bisa mengubah kalimat menjadi daftar. Kamu tetap menulis dengan keyboard seperti biasa; nanti NOTEZ yang merapikan hasilnya di mode baca (Reading View) lewat Markdown Preview v4.
 
-Panduan ini sengaja dibuat lengkap: bukan cuma daftar syntax, tapi juga penjelasan cara pakai, contoh dalam kalimat nyata, kesalahan umum yang sering kejadian, dan jawaban untuk pertanyaan yang biasanya muncul. Kamu tidak perlu membaca semuanya sekali duduk — pakai daftar isi di bawah untuk lompat ke bagian yang kamu butuhkan.
+Kalau baru mulai, tidak perlu menghafal semuanya. Coba tulis catatan kecil dulu, masuk ke mode baca, lalu kembali ke bagian panduan yang hasilnya belum sesuai harapan. Setiap bagian di bawah berusaha menjawab tiga hal: kapan syntax itu berguna, apa yang perlu diketik, dan jebakan kecil apa yang biasanya membuat preview terlihat berbeda.
+
+Panduan ini dibuat untuk pemakaian sehari-hari di layar ponsel, bukan untuk membuatmu menjadi ahli spesifikasi Markdown. Contohnya sengaja memakai situasi yang dekat dengan NOTEZ: rencana kerja, catatan meeting, belajar, jurnal, snippet, dan daftar belanja. Kalau kamu sedang buru-buru, mulai dari **Cheat sheet cepat**, lalu baca bagian detailnya saat memang dibutuhkan.
+
+**Pola belajar yang paling enak:**
+
+1. Tulis isi catatan dulu tanpa memikirkan format.
+2. Tandai struktur besarnya dengan heading, paragraf, dan list.
+3. Tambahkan penekanan, link, atau code block hanya di bagian yang membantu pembaca.
+4. Buka mode baca untuk mengecek jarak, panjang baris, dan apakah syntax-nya benar-benar terbaca.
+
+Di beberapa bagian, contoh dibuat lebih panjang dari yang akan kamu tulis sehari-hari supaya hubungan antara syntax dan hasilnya mudah terlihat. Kamu bebas mengganti semua isinya dengan konteksmu sendiri.
 
 ## Daftar isi
 
+- [Mulai dari sini](#panduan-markdown-notez)
 - [1. Cheat sheet cepat](#1-cheat-sheet-cepat)
 - [2. Teks tebal](#2-teks-tebal)
 - [3. Teks miring](#3-teks-miring)
@@ -268,7 +280,11 @@ Catatan: fitur ini untuk notasi ringan, bukan pengganti LaTeX/math engine penuh.
 
 - wajib ada satu spasi setelah tanda `#` terakhir sebelum teks judul — `#Judul` tanpa spasi umumnya tidak terbaca sebagai heading;
 - heading harus berada di baris sendiri, bukan di tengah paragraf;
-- idealnya satu catatan cukup punya satu heading level 1 sebagai judul utama, lalu level 2 dan 3 untuk sub-bagian, supaya strukturnya tidak berantakan.
+- idealnya satu catatan cukup punya satu heading level 1 sebagai judul utama, lalu level 2 dan 3 untuk sub-bagian, supaya strukturnya tidak berantakan;
+- jangan memilih level heading hanya karena ukuran hurufnya terlihat menarik. Level heading adalah peta catatan: pembaca dan daftar isi manual akan lebih mudah mengikutinya kalau urutannya masuk akal;
+- kalau catatanmu pendek, judul `#` bahkan boleh dilewati. Satu atau dua heading `##` sudah cukup untuk memisahkan topik.
+
+Di layar ponsel, struktur yang sederhana biasanya terasa paling nyaman: satu judul utama, beberapa bagian besar, lalu sub-bagian seperlunya. Kalau setiap kalimat diberi heading, catatan justru terasa seperti daftar menu dan susah dibaca sebagai cerita utuh.
 
 Contoh struktur catatan bertingkat:
 
@@ -305,6 +321,10 @@ Ini baris dua.
 
 Kalau ditulis seperti di atas, hasilnya kemungkinan tampil sebagai satu paragraf menyatu: "Ini baris satu. Ini baris dua." Kalau memang ingin baris baru yang terlihat jelas, selalu kasih satu baris kosong di antaranya, atau — kalau engine-nya mendukung hard break gaya CommonMark — akhiri baris dengan dua spasi sebelum Enter.
 
+Di NOTEZ, baris kosong juga membantu saat kamu menggabungkan paragraf dengan syntax lain. Misalnya, beri jarak sebelum checklist atau code block agar pembaca langsung melihat bahwa itu bagian baru, bukan kelanjutan kalimat sebelumnya. Ini bukan sekadar aturan kosmetik: whitespace yang rapi membuat catatan lebih mudah dipindai ketika kamu sedang membaca cepat.
+
+Kalau kamu ingin menulis alamat, daftar, atau kalimat pendek yang memang masing-masing harus berada di baris terpisah, pertimbangkan memakai list. Memaksa banyak hard break di dalam satu paragraf biasanya lebih rapuh saat isi catatan diedit lagi.
+
 ---
 
 ## 8. Garis pemisah (horizontal rule)
@@ -322,6 +342,8 @@ Bagian bawah.
 ```
 
 Tiga tanda bintang (`***`) atau tiga garis bawah (`___`) di baris sendiri umumnya berfungsi sama. Yang penting tandanya konsisten dan tidak tercampur karakter lain di baris yang sama.
+
+Garis pemisah paling berguna ketika dua bagian masih berada di catatan yang sama, tetapi tidak perlu dibaca sebagai satu alur — misalnya antara ringkasan dan log perubahan. Jangan memakainya setiap beberapa baris; heading atau satu baris kosong biasanya sudah cukup dan terasa lebih ringan. Kalau garis tiba-tiba berubah menjadi heading atau format lain, pastikan ia berdiri sendiri dan tidak ditempelkan ke teks di baris yang sama.
 
 ---
 
@@ -356,6 +378,10 @@ Tiga tanda bintang (`***`) atau tiga garis bawah (`___`) di baris sendiri umumny
 
 **Kesalahan umum:** lupa baris kosong sebelum list yang dimulai tepat setelah paragraf kadang membuat list tidak terbaca sebagai list, melainkan menyatu dengan paragraf di atasnya. Kalau list-mu tidak tampil rapi, coba tambahkan satu baris kosong sebelum baris list pertama.
 
+Pilih jenis list berdasarkan cara pembaca akan memakai catatan itu. Bullet cocok untuk kumpulan ide yang tidak punya urutan, misalnya bahan masakan atau poin hasil brainstorming. Numbered list lebih cocok untuk langkah yang harus diikuti dari atas ke bawah. Kalau urutan tidak penting, jangan memaksa angka hanya karena tampilannya terlihat lebih formal.
+
+Untuk list bersarang, pakai indentasi yang konsisten. Dua spasi sering cukup, tetapi empat spasi lebih aman ketika sub-poin berisi paragraf atau list lain. Saat ada satu item yang tampak "meloncat" ke level yang salah, periksa spasi di awal barisnya sebelum mengubah syntax lain.
+
 ---
 
 ## 10. Checklist / task list
@@ -383,6 +409,10 @@ Contoh checklist bertingkat untuk memecah tugas besar jadi sub-tugas:
   - [ ] Tulis release notes
 ```
 
+Perhatikan jarak di dalam kotak: gunakan `[ ]`, bukan `[]` atau `[ - ]`. Untuk status selesai, bentuk yang paling aman adalah `[x]`. Kalau ingin menandai tugas yang sedang dikerjakan, tulis statusnya di teks item, misalnya `- [ ] Review draft — sedang berjalan`; NOTEZ belum punya status ketiga atau checkbox interaktif.
+
+Checklist bekerja baik ketika satu item berisi satu tindakan yang bisa diverifikasi. `- [ ] Bereskan project` terlalu luas; memecahnya menjadi `- [ ] Tulis draft`, `- [ ] Cek preview`, dan `- [ ] Kirim hasil review` membuat catatan lebih mudah dipakai.
+
 ---
 
 ## 11. Quote
@@ -407,6 +437,17 @@ Quote bisa berisi format lain di dalamnya, misalnya tebal atau link:
 ```md
 > Menurut dokumentasi resmi, **fitur ini masih eksperimental**.
 ```
+
+Quote bukan hanya untuk ucapan orang lain. Di catatan pribadi, ia juga cocok untuk menyimpan kalimat yang ingin kamu ingat, kutipan buku, atau konteks singkat dari keputusan. Namun, jangan menaruh seluruh paragraf biasa di dalam quote hanya agar tampil menjorok; gunakan paragraf normal kalau memang itu isi utama catatan.
+
+Quote bertingkat bisa dibuat dengan menambah tanda `>`:
+
+```md
+> Pendapat pertama.
+>> Balasan atau kutipan di dalam kutipan.
+```
+
+Untuk percakapan panjang, biasanya lebih mudah dibaca kalau setiap pembicara dibuat sebagai paragraf atau bullet terpisah. Quote paling enak dipakai sebagai aksen singkat, bukan sebagai pengganti struktur catatan.
 
 ---
 
@@ -485,6 +526,10 @@ https://github.com
 
 **Kesalahan umum:** lupa `https://` di depan alamat kadang membuat link tidak terdeteksi sebagai URL yang valid. Selalu sertakan skema lengkap (`https://` atau `http://`).
 
+Saat link eksternal diketuk, NOTEZ menyerahkannya ke browser atau aplikasi yang sesuai di perangkat. Link tidak dibuka di dalam Reading View. Ini sengaja: catatan tetap menjadi ruang baca lokal, dan kamu punya kontrol yang jelas kapan harus keluar ke internet.
+
+Untuk link yang sering kamu pakai, label pendek biasanya lebih nyaman di layar ponsel daripada URL panjang. Simpan alamat lengkap di balik label yang menjelaskan tujuannya, seperti `[dokumentasi API](https://contoh.com/docs)`, bukan sekadar `[klik di sini](...)`. Kalau alamatnya memang bagian dari informasi yang perlu disalin, bare URL tetap pilihan yang masuk akal.
+
 ---
 
 ## 14. Inline code
@@ -510,6 +555,10 @@ Variabel `appName` menyimpan nama aplikasi.
 ```md
 Gunakan `` `kode` `` untuk menandai inline code.
 ```
+
+Inline code paling pas untuk sesuatu yang pembaca perlu kenali persis: nama file, command pendek, key konfigurasi, atau nilai yang harus disalin. Jangan membungkus satu paragraf penuh dengan backtick; teks panjang akan sulit dibaca dan tidak memberi informasi tambahan.
+
+Kalau sebuah command memiliki beberapa flag atau lebih dari satu baris, pindahkan ke code block. Dengan begitu, pembaca bisa menyalin potongan itu sebagai satu unit dan spasi di dalamnya tidak membingungkan.
 
 ---
 
@@ -553,6 +602,10 @@ gradle assembleDebug
 **Catatan teknis:** nama bahasa setelah backtick pembuka (`kotlin`, `python`, `bash`, `json`, `html`, `css`, `markdown`, dan sebagainya) sekarang dipakai NOTEZ sebagai label dan syntax highlighting lokal ringan. Kalau tidak yakin bahasanya apa, boleh dikosongkan dan blok kode tetap tampil dengan format monospace.
 
 **Kesalahan umum:** lupa menutup tiga backtick di akhir membuat sisa catatan setelahnya ikut tampil sebagai kode. Selalu pastikan jumlah baris pembuka dan penutup backtick seimbang.
+
+Ada dua kebiasaan yang membuat code block nyaman dibaca. Pertama, beri label bahasa hanya kalau memang tahu bahasanya; label itu membantu NOTEZ memilih warna syntax, tetapi tidak mengubah isi kode. Kedua, jangan menambahkan spasi ekstra di setiap baris hanya karena code block ditulis di dalam list atau quote. Indentasi yang tidak sengaja akan ikut masuk ke hasil preview.
+
+Code block di NOTEZ ditujukan untuk membaca snippet, command, dan log secara offline. Syntax highlighting-nya ringan dan lokal, jadi ia membantu mata menemukan pola tetapi bukan pemeriksa error dan bukan compiler. Kalau warna tidak muncul untuk bahasa tertentu, kodenya tetap aman ditampilkan sebagai teks monospace.
 
 ---
 
@@ -737,6 +790,10 @@ Karena NOTEZ dipakai di HP, layar lebih sempit dibanding desktop. Beberapa kebia
 - **Satu ide per baris di list.** Hindari satu item bullet yang isinya sepanjang paragraf; pecah jadi sub-bullet kalau perlu.
 - **Callout untuk hal yang benar-benar penting saja.** Kalau semua baris ditandai `[!IMPORTANT]`, tidak ada lagi yang terasa "penting" secara relatif.
 
+Satu patokan sederhana: setelah menulis satu layar penuh, coba baca ulang hanya judul, kalimat pertama tiap paragraf, dan bullet-nya. Kalau alurnya masih bisa dipahami, struktur catatanmu sudah bekerja. Kalau tidak, tambahkan heading atau pecah paragraf di tempat pembaca biasanya perlu berhenti.
+
+Tabel lebar dan code block memang bisa membutuhkan scroll horizontal. Itu bukan selalu masalah — data yang benar lebih penting daripada memaksa semuanya masuk satu layar — tetapi letakkan kolom paling penting di sebelah kiri agar informasi utama tetap cepat ditemukan.
+
 ---
 
 ## 16. Table
@@ -782,6 +839,9 @@ Aturan strukturnya:
 
 **Kesalahan umum:** jumlah kolom di baris pemisah (`---`) harus sama dengan jumlah kolom di baris header — kalau jumlahnya beda, tabel bisa tampil tidak sesuai harapan.
 
+Untuk catatan di HP, anggap tabel sebagai ringkasan, bukan tempat menyimpan paragraf panjang. Pakai header yang pendek, taruh informasi terpenting di kiri, dan pecah tabel kalau satu baris sudah terlalu padat. Reading View akan menjaga tabel tetap bisa digeser secara horizontal, tetapi pembaca tetap harus bekerja lebih keras kalau setiap sel berisi banyak kalimat.
+
+Kalau tabel terlihat seperti teks biasa, cek tiga hal secara berurutan: ada tidak baris pemisah di bawah header, jumlah separator-nya seimbang, dan tidak ada baris kosong yang memutus tabel. Setelah itu, lihat apakah karakter `|` di dalam isi sel sudah di-escape.
 
 ---
 
@@ -804,6 +864,10 @@ Keterangan:
 - label tidak harus angka, misalnya `[^sumber]`, tapi angka paling mudah dibaca;
 - footnote cocok untuk sumber, catatan kecil, atau penjelasan tambahan.
 
+Footnote sebaiknya menyimpan konteks yang membantu, bukan informasi utama yang harus dilihat semua orang. Kalau pembaca perlu mengetahui hal itu untuk memahami kalimatnya, tulis langsung di paragraf. Kamu juga bisa memakai label yang lebih deskriptif seperti `[^docs]` saat catatan punya banyak referensi; yang penting label pada pemanggil dan definisinya sama persis.
+
+Kalau angka footnote terlihat tidak berurutan atau catatannya muncul di tempat yang tidak kamu duga, periksa apakah ada label yang sama dipakai dua kali atau definisinya tertulis tanpa format `[^label]:`.
+
 ---
 
 ## 16b. Definition list
@@ -821,6 +885,10 @@ Offline-first
 ```
 
 Di preview, istilah tampil lebih tegas dan definisinya tampil sebagai penjelasan di bawahnya.
+
+Format ini enak untuk glosarium project, daftar singkatan, atau catatan belajar yang berisi banyak istilah. Satu istilah bisa memiliki penjelasan lebih dari satu paragraf, tetapi tetap beri jarak antar-entri supaya batasnya jelas. Kalau isinya sudah berubah menjadi tabel perbandingan dengan banyak atribut, tabel biasa akan lebih mudah dipindai.
+
+Pastikan tanda titik dua berada di awal baris definisi. Spasi sebelum istilah dan indentasi yang tidak konsisten adalah penyebab paling umum definition list jatuh menjadi paragraf biasa. Bila hasilnya belum sesuai, coba mulai dari contoh dua baris di atas lalu tambahkan isi sedikit demi sedikit.
 
 ---
 
@@ -846,6 +914,10 @@ Contoh penulisan yang tetap berguna meski gambarnya tidak dimuat otomatis:
 ```
 
 Alt text `Screenshot halaman login` tetap membantu pembaca tahu gambar itu tentang apa, walau gambarnya sendiri tidak tampil.
+
+Ada dua hal yang perlu diingat sebelum menambahkan banyak gambar. Pertama, remote image baru mengambil jaringan setelah kamu sendiri memilih `Load & cache`; membuka catatan saja tidak melakukan download diam-diam. Kedua, cache gambar adalah cache aplikasi, bukan lampiran yang ikut masuk ke backup catatan JSON. Kalau gambar penting untuk jangka panjang, simpan sumber aslinya di tempat terpisah dan tulis keterangannya di catatan.
+
+Untuk sekarang, path file lokal dan data URL tidak dijadikan gambar bebas di preview. Kalau placeholder muncul, lihat judul sumber dan alt text-nya: sering kali itu sudah cukup untuk menemukan gambar yang dimaksud tanpa membuat Reading View mengambil resource yang tidak kamu kenal.
 
 ---
 
@@ -965,6 +1037,10 @@ Karakter lain yang umum perlu di-escape:
 
 Kapan perlu escape? Biasanya saat kamu membahas Markdown itu sendiri (seperti di panduan ini), menulis rumus matematika dengan tanda bintang sebagai perkalian, atau menyalin teks yang kebetulan mengandung karakter-karakter tersebut secara harfiah.
 
+Tidak perlu meng-escape semua tanda baca secara membabi buta. Tambahkan backslash hanya di depan karakter yang memang sedang kamu tampilkan sebagai teks biasa. Terlalu banyak backslash membuat mode edit terlihat ramai dan bisa membuat pembaca bingung ketika catatan disalin ke aplikasi lain.
+
+Kalau karakter literal berada di dalam code span atau code block, biasanya kamu tidak perlu escape lagi karena isi kode memang sudah diperlakukan sebagai teks. Contohnya, `` `**bukan bold**` `` akan tetap menampilkan bintang tanpa perlu `\\` tambahan.
+
 ---
 
 ## 20. Fitur Markdown umum yang TIDAK didukung NOTEZ
@@ -982,6 +1058,10 @@ Markdown di luar NOTEZ (misalnya di GitHub atau Obsidian) punya beberapa fitur t
 | Table of contents otomatis | `[[TOC]]` atau serupa | Tidak ada otomatis; daftar isi manual dengan link internal bisa dibuat kalau perlu |
 
 Kalau kamu terbiasa menulis Markdown di aplikasi lain dan salah satu fitur di atas tidak tampil seperti biasanya di NOTEZ, itu bukan bug — memang belum didukung. Gunakan alternatif yang sudah didukung: misalnya untuk rumus sederhana, tulis sebagai inline code atau pakai superscript/subscript ringan jika cukup.
+
+Batasan ini adalah pilihan produk, bukan undangan untuk menempelkan HTML atau JavaScript agar hasilnya "dipaksa" muncul. NOTEZ membaca catatan lokal dengan renderer yang sama di setiap perangkat, sehingga konten yang bisa menjalankan script, memuat iframe, atau mengubah CSS bebas sengaja tidak diaktifkan.
+
+Kalau kamu membawa teks dari GitHub, Obsidian, atau editor lain, lakukan pengecekan singkat setelah paste: buka mode baca, cari bagian yang masih tampil sebagai teks mentah, lalu pilih padanan paling sederhana. Sering kali heading, list, quote, table, callout, dan code block sudah cukup untuk mempertahankan maksud catatannya tanpa fitur tambahan.
 
 ---
 

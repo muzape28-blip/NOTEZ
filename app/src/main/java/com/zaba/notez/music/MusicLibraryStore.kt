@@ -35,9 +35,9 @@ enum class MusicPlaybackMode {
     }
 
     fun label(): String = when (this) {
-        LOOP_ALL -> "Loop All"
-        ONCE -> "Once"
-        SHUFFLE -> "Shuffle"
+        LOOP_ALL -> "Ulangi semua"
+        ONCE -> "Sekali"
+        SHUFFLE -> "Acak"
     }
 }
 
