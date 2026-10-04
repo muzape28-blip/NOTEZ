@@ -40,9 +40,9 @@ object UiStyle {
         val context = card.context
         card.setCardBackgroundColor(ColorUtils.setAlphaComponent(surface(context), alpha.coerceIn(0, 255)))
         card.setStrokeColor(ColorUtils.setAlphaComponent(primary(context), 70))
-        card.strokeWidth = dp(context, 1)
+        card.strokeWidth = dp(context, 1f)
         card.setRadius(dp(context, radiusDp).toFloat())
-        card.setCardElevation(dp(context, 2).toFloat())
+        card.setCardElevation(dp(context, 2f).toFloat())
         card.setContentPadding(0, 0, 0, 0)
     }
 
@@ -59,7 +59,7 @@ object UiStyle {
         shape = GradientDrawable.RECTANGLE
         cornerRadius = dp(context, radiusDp).toFloat()
         setColor(ColorUtils.setAlphaComponent(surface(context), fillAlpha.coerceIn(0, 255)))
-        setStroke(dp(context, 1), ColorUtils.setAlphaComponent(primary(context), strokeAlpha.coerceIn(0, 255)))
+        setStroke(dp(context, 1f), ColorUtils.setAlphaComponent(primary(context), strokeAlpha.coerceIn(0, 255)))
     }
 
     fun dp(context: Context, value: Float): Int =
