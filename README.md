@@ -1,205 +1,357 @@
-# NOTEZ
+<!-- Komentar tersembunyi: kalau lo baca ini, berarti lo buka source-nya. Respect. Batu juga suka orang yang penasaran. -->
 
-**NOTEZ** adalah aplikasi Android lokal untuk menyimpan ide, catatan, todo, draft, snippet, dan hal penting lain sebelum lupa.
+# Catat di Atas Batu
 
-**Latest production release:** `v0.1.4` — hotfix tampilan versi aplikasi di Pengaturan. Feature batch utama tetap `v0.1.3`.
+### Kenapa Ide, Rencana, dan Daftar Belanja Lo Pantas Dipahat, Bukan Diketik
 
-```text
-cepat dicatat
-nyaman dibaca
-offline-first
-online hanya saat user meminta
-Markdown-ready
+![Tahan Banting](https://img.shields.io/badge/tahan_banting-10.000_tahun-brightgreen)
+![Baterai](https://img.shields.io/badge/baterai-tidak_perlu-blue)
+![Sinyal](https://img.shields.io/badge/butuh_sinyal-nggak_usah-lightgrey)
+![Langganan](https://img.shields.io/badge/langganan_bulanan-Rp0-orange)
+![Status](https://img.shields.io/badge/status-berat_tapi_worth_it-red)
+
+> Dokumen ini ditulis dengan serius, tapi isinya nggak. Kalau lo merasa tersinggung, silakan catat rasa tersinggung itu di atas batu. Biar abadi.
+
+---
+
+## Daftar Isi
+
+1. [Pendahuluan: Masalahnya Apa Sih](#pendahuluan-masalahnya-apa-sih)
+2. [Tersangka Utama: Kertas dan Aplikasi Note](#tersangka-utama-kertas-dan-aplikasi-note)
+3. [Adu Fitur: Tabel Perbandingan](#adu-fitur-tabel-perbandingan)
+4. [Sepuluh Alasan Batu Menang](#sepuluh-alasan-batu-menang)
+5. [Arsitektur Sistem Pencatatan Batu](#arsitektur-sistem-pencatatan-batu)
+6. [Cara Memulai](#cara-memulai)
+7. [Testimoni Pengguna](#testimoni-pengguna)
+8. [FAQ](#faq)
+9. [Catatan Kaki dan Penutup](#catatan-kaki-dan-penutup)
+
+---
+
+## Pendahuluan: Masalahnya Apa Sih
+
+Pernah nggak lo punya ide brilian jam 2 pagi, lo catat di kertas, terus paginya kertas itu ilang entah ke dimensi mana? Atau lo catat di aplikasi note, terus aplikasinya minta lo login, lo lupa password, reset password, emailnya masuk spam, spam-nya penuh, dan akhirnya lo lupa idenya apa?
+
+Nah. Itu semua terjadi karena lo mencatat di media yang **rapuh**, **fana**, dan **penuh drama**.
+
+Sementara itu, batu:
+
+- Nggak pernah minta lo login.
+- Nggak pernah bilang "Kami telah memperbarui Syarat dan Ketentuan kami".
+- Nggak pernah *crash* pas lo lagi nulis hal penting.
+- Sudah ada sejak zaman dinosaurus dan masih fine-fine aja.
+
+### Tesis Utama
+
+Mencatat di atas batu itu ~~repot~~ **investasi jangka panjang**. Satu catatan, seumur hidup. Bahkan umur anak cucu lo, kalau mereka kuat angkat.
+
+---
+
+## Tersangka Utama: Kertas dan Aplikasi Note
+
+### Kertas
+
+Kertas itu manis di awal, pahit di belakang. Mari kita bedah dosanya.
+
+#### Dosa-dosa kertas
+
+- Mudah **robek**, apalagi kalau ada kucing.
+- Mudah **basah**, apalagi kalau ada kopi.
+- Mudah **hilang**, apalagi kalau ada emak yang lagi beres-beres rumah.
+- Mudah **dialihfungsikan**:
+  - Jadi bungkus gorengan
+  - Jadi pesawat-pesawatan
+  - Jadi alas tumpahan minyak
+    - Termasuk catatan ide startup lo yang bakal jadi unicorn
+
+##### Tingkat kerusakan
+
+###### Dan yang paling parah: rayap. Rayap nggak punya hati.
+
+### Aplikasi Note
+
+Aplikasi note itu seperti pacar yang manis di awal, lalu mulai minta uang.
+
+1. Awalnya gratis.
+2. Terus ada fitur "Premium".
+3. Terus catatan lama lo "diarsipkan" ke tier berbayar.
+4. Terus startup-nya bangkrut.
+5. Terus semua catatan lo ikut menguap bersama server yang dimatikan.
+   1. Lo kirim email ke support.
+   2. Support-nya adalah bot.
+   3. Bot-nya juga udah dimatikan.
+
+---
+
+## Adu Fitur: Tabel Perbandingan
+
+| Fitur                   | Kertas              | Aplikasi Note              | Batu                          |
+|:------------------------|:-------------------:|:--------------------------:|------------------------------:|
+| Daya tahan              | Hitungan bulan      | Selama server hidup        | Ribuan tahun                  |
+| Butuh baterai           | Tidak               | Iya, dan selalu sekarat    | Tidak, tapi butuh otot        |
+| Butuh internet          | Tidak               | Iya                        | Tidak, kecuali mau pamer      |
+| Biaya langganan         | Rp0                 | Rp49.000/bulan             | Rp0 (batu di sungai gratis)   |
+| Fitur *undo*            | Tip-Ex              | `Ctrl+Z`                   | Tidak ada, makanya mikir dulu |
+| Dark mode               | Tidak               | Iya                        | Default dari pabrik alam      |
+| Tahan air               | Tidak               | Tergantung HP lo           | Justru makin estetik          |
+| Tahan api               | Tidak               | Tidak                      | Iya                           |
+| Tahan ditimpa galon     | Tidak               | Tidak                      | Galon-nya yang retak          |
+| Notifikasi mengganggu   | Tidak               | Banyak                     | Nol                           |
+| Autosave                | Tidak               | Iya                        | Iya, permanen                 |
+| Dipakai ganjal pintu    | Bisa, tapi nggak kuat | Nggak masuk akal         | Multifungsi, anjay            |
+
+> Catatan: skor akhir tidak dicantumkan karena batu menang telak dan itu bikin kolom lain sedih.
+
+---
+
+## Sepuluh Alasan Batu Menang
+
+1. **Tidak bisa di-*hack*.** Peretas paling jago sekalipun harus datang langsung ke rumah lo, dan itu terlalu banyak usaha.
+2. **Tidak ada *sync conflict*.** Cuma ada satu versi kebenaran, dan beratnya 14 kilogram.
+3. **Tidak ada *bloatware*.** Batu nggak akan tiba-tiba menawarkan fitur AI untuk "merangkum" catatan lo yang cuma tiga kata.
+4. **Aman dari *shoulder surfing*.** Orang nggak bisa ngintip catatan lo dari belakang kalau lo udah nutupin pakai badan sambil memahat.
+5. **Memaksa lo jadi ringkas.** Nulis "Beli telur" di batu itu capek. Nulis "Hari ini gue merenungkan kehidupan dan juga telur" itu bunuh diri.
+6. **Nilai estetika.** Foto catatan lo di batu bakal dapat lebih banyak *like* daripada foto kopi lo.
+7. **Bonus latihan fisik.** Memahat itu kardio. Mengangkat itu *strength training*. Catatan lo sekalian jadi *gym*.
+8. **Catatan jadi sakral.** Kalau lo udah mau pahat sesuatu, berarti itu beneran penting.
+9. **Warisan.** Anak cucu lo nggak akan nemu folder `catatan_final_v2_REVISI_beneran.docx`. Mereka bakal nemu batu. Dan mereka akan kagum.
+10. **Nggak bisa lupa naruh di mana.** Karena lo nggak bakal sanggup bawa-bawa batu. Jadi dia selalu ada di tempat yang sama. Hebat.
+
+---
+
+## Arsitektur Sistem Pencatatan Batu
+
+Berikut alur kerja standar yang direkomendasikan oleh komunitas pemahat nggak resmi sedunia.
+
+```mermaid
+flowchart TD
+    A[Muncul ide] --> B{Seberapa penting?}
+    B -->|Receh| C[Lupakan saja, aman]
+    B -->|Lumayan| D[Pikir 3 hari]
+    B -->|Mengubah hidup| E[Cari batu]
+    D --> B
+    E --> F[Pahat dengan penuh perasaan]
+    F --> G{Typo?}
+    G -->|Iya| H[Cari batu baru, ulangi, nangis]
+    G -->|Tidak| I[Selesai, foto, pamer]
+    H --> E
 ```
 
-NOTEZ tidak mengejar jadi aplikasi cloud besar. Fitur inti tetap dirancang jalan tanpa internet: buat catatan, edit, baca ulang, search, theme, backup/import/export, dan panduan lokal.
+### Pseudocode
 
----
+Kalau lo programmer dan butuh pendekatan yang familiar:
 
-## Highlight v0.1.3
+```python
+class Catatan:
+    def __init__(self, isi: str, batu: Batu):
+        self.isi = isi
+        self.batu = batu
 
-- Home kosong sekarang punya welcome state NOTEZ yang clean, branded, dan theme-aware.
-- `Panduan NOTEZ` / `Tentang NOTEZ` tersedia lokal/offline dari home kosong dan Settings.
-- Search eye disembunyikan saat total catatan `0`, lalu muncul setelah ada catatan.
-- Theme picker dikelompokkan:
-  - `NOTEZ SIGNATURE`
-  - `GLOOMY SERIES`
-  - `COZY EARTH`
-  - `CODER NIGHT`
-- Markdown Reading View makin kuat:
-  - heading, list, checklist, table, callout, code block, footnote, definition list;
-  - syntax highlighting lokal ringan;
-  - safe raw HTML subset untuk README-style content;
-  - raw `<table>` screenshot README sederhana;
-  - raw `<img>` sebagai placeholder aman.
-- Remote image tetap **tidak auto-load**.
-- User bisa tap `Load & cache` untuk mengambil gambar online secara manual, lalu NOTEZ menyimpannya lokal agar bisa dibaca offline lagi.
-- Settings punya aksi `Hapus cache gambar online`.
-- Splash/launcher/empty-state branding memakai horse crest NOTEZ.
+    def simpan(self):
+        if len(self.isi) > 20:
+            raise Exception("Terlalu panjang. Pangkas atau ganti batu yang lebih gede.")
+        self.batu.pahat(self.isi)
+        return "Tersimpan selamanya. Nggak ada tombol hapus. Selamat."
 
----
-
-## Cara pakai cepat
-
-1. Tap tombol `+` untuk membuat catatan.
-2. Tulis judul dan isi catatan di mode edit native Android `EditText`.
-3. Tap centang untuk masuk Reading View.
-4. Tap pensil untuk edit ulang.
-5. Buka drawer untuk Settings, Panduan Markdown, dan Music drawer lokal.
-
----
-
-## Markdown support
-
-NOTEZ mendukung format umum untuk catatan rapi:
-
-- heading `#`, `##`, `###`;
-- bold, italic, bold+italic, strikethrough;
-- highlight `==teks==` / `<mark>teks</mark>`;
-- superscript/subscript ringan `x^2^` dan `H~2~O`;
-- bullet list, numbered list, checklist;
-- quote dan callout `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`;
-- link Markdown dan bare URL;
-- inline code dan fenced code block;
-- table dengan alignment;
-- footnote;
-- definition list;
-- raw HTML aman seperti `<kbd>`, `<mark>`, `<details>`, `<abbr>`, `<cite>`;
-- README-style subset seperti `<div align="center">`, `<h1>`-`<h6>`, `<p>`, `<strong>`, `<em>`, `<a>`, `<table>`, `<tr>`, `<td align="center">`, dan `<img>` placeholder.
-
-Panduan lengkap ada di aplikasi:
-
-```text
-Drawer → Panduan Markdown
+ide = Catatan("Beli telur", Batu(berat_kg=3))
+print(ide.simpan())
 ```
 
----
+Atau versi shell buat yang suka drama:
 
-## Offline-first / privacy stance
+```bash
+$ cari_batu --ukuran sedang --permukaan rata
+Batu ditemukan di pinggir kali.
 
-NOTEZ sekarang memakai prinsip:
-
-```text
-Local by default.
-Online only when you ask.
-Offline again after cache.
+$ pahat "Jangan lupa bayar listrik" --kedalaman 2cm
+ERROR: Tangan lecet. Lanjut? [y/N]
 ```
 
-Detailnya:
+Perubahan konfigurasi hidup sebelum dan sesudah pindah ke batu:
 
-- `android.permission.INTERNET` ada hanya untuk **user-triggered image loading/cache**.
-- Remote image tidak dimuat otomatis saat catatan dibuka.
-- Tap `Load & cache` menampilkan konfirmasi domain sebelum NOTEZ mengambil gambar.
-- Gambar yang berhasil diambil disimpan di private local cache aplikasi.
-- Cached image bisa tampil lagi saat offline.
-- Cache gambar online bisa dihapus dari Settings.
-- Tidak memakai CDN.
-- Tidak memuat remote script/style/font/iframe.
-- WebView Reading View tidak memakai `addJavascriptInterface`.
-- Link eksternal dibuka lewat aplikasi/browser luar saat user tap.
-
----
-
-## Tema bawaan
-
-Theme picker berisi curated themes:
-
-### NOTEZ SIGNATURE
-
-- OLED Black
-- NOTEZ You Dark
-- Cobalt2
-- NOTEZ You Warm
-
-### GLOOMY SERIES
-
-- Gloomy Sakura Night
-- Gloomy Lavender
-- Gloome Dark Sunset
-- Raspberry Night
-
-### COZY EARTH
-
-- Dark Forest
-- Fade Choco Matcha
-- Kawaii Catpucinn
-
-### CODER NIGHT
-
-- GitHub Dark
-- Tokyo Night
-- Blue Moon Cheese
-
----
-
-## Data, backup, dan export
-
-- Backup/import semua catatan via JSON.
-- Export semua catatan ke TXT.
-- Folder backup otomatis via Android Storage Access Framework.
-- Data catatan tetap lokal di perangkat.
-- Tidak ada sync/cloud/collaboration bawaan.
-
----
-
-## Batasan saat ini
-
-- Raw HTML tetap allowlist, bukan browser bebas.
-- `style=`, `class=`, `id=`, event handler seperti `onclick=`, `script`, `style`, `iframe`, dan `javascript:` tetap diblok/di-nonaktifkan.
-- Remote SVG badge belum dirender bebas; policy SVG perlu RFC terpisah.
-- Local image/attachment belum ada.
-- Checkbox di preview belum interaktif; ubah `[ ]` / `[x]` dari mode edit.
-- Belum ada tag/folder/notebook/pin/archive.
-- Delete masih undo snackbar, belum real Trash / Recently Deleted.
-- Belum ada PDF/HTML/Markdown bundle export.
-- Belum ada wikilinks/backlinks/graph/embeds.
-- Belum ada Mermaid/LaTeX/emoji shortcode/auto TOC.
-
----
-
-## Target planning setelah v0.1.3
-
-Lihat dokumen:
-
-```text
-docs/PENDING_FEATURES_AFTER_V0.1.3.md
+```diff
+- Buka 5 aplikasi note berbeda
+- Login ulang tiap minggu
+- Lupa catatan penting
++ Satu batu
++ Satu catatan
++ Satu penyesalan kalau salah ketik
 ```
 
-Ringkasannya:
+Contoh konfigurasi `batu.yaml`, kalau suatu hari ada yang bikin standar internasionalnya:
 
-- Local image / attachment support.
-- Real Trash / Recently Deleted.
-- Card appearance setting.
-- Raw SVG badge policy.
-- NOTEZ Explorer internal / virtual.
+```yaml
+catatan:
+  media: batu
+  jenis: andesit
+  bahasa: Indonesia
+  fitur_undo: false
+  backup:
+    metode: bikin batu kembar
+    frekuensi: pas lagi rajin
+```
+
+Dan data JSON, supaya terlihat profesional:
+
+```json
+{
+  "judul": "Ide jualan seblak rasa durian",
+  "status": "dipahat",
+  "bisa_dihapus": false,
+  "penyesalan": "tinggi"
+}
+```
+
+Inline code juga boleh: pakai `git commit -m "pahat catatan baru"` kalau lo mau melacak riwayat, tapi yang di-commit ya foto batunya aja.
+
+### Rumus Kebahagiaan
+
+Berat catatan berbanding lurus dengan keseriusan niat lo. Secara matematis:
+
+$$
+K = \frac{I \times B}{L}
+$$
+
+Di mana $K$ adalah keseriusan, $I$ adalah tingkat ide, $B$ adalah berat batu, dan $L$ adalah level kemalasan lo. Kalau $L$ mendekati nol, itu artinya lo orang langka. Hubungi kami.
 
 ---
 
-## Release
+## Cara Memulai
 
-APK rilis tersedia di GitHub Releases:
+### Perlengkapan
 
-```text
-https://github.com/muzape28-blip/NOTEZ/releases
-```
+- [x] Batu (jangan yang udah ada lumutnya, kecuali lo memang mau gaya *vintage*)
+- [x] Pahat atau paku besar
+- [x] Palu (atau batu lain, boleh, dunia ini penuh batu)
+- [x] Kacamata pelindung, karena mata lo cuma dua
+- [ ] Kesabaran (stok sedang habis, cek lagi nanti)
+- [ ] Rencana kalau salah ketik
+
+### Langkah-langkah
+
+1. Pilih batu. Perlakukan seperti memilih semangka: ketuk-ketuk dan tanyakan dalam hati, "Kamu siap menyimpan rahasiaku?"
+2. Bersihkan permukaan.
+3. Tentukan isi catatan. Singkat, padat, jangan curhat.
+4. Pahat pelan-pelan.
+   - Jangan buru-buru.
+   - Jangan melamun.
+   - Jangan pahat sambil nonton drama Korea.
+5. Foto hasilnya sebagai bukti.
+6. Simpan batunya di tempat yang aman, dan jangan sampai kena kaki.
+
+### Pintasan Papan Ketik
+
+Karena kita masih manusia modern yang punya laptop, berikut pintasan yang berguna selama masa transisi:
+
+| Pintasan                              | Fungsi                                      |
+|---------------------------------------|---------------------------------------------|
+| <kbd>Ctrl</kbd> + <kbd>S</kbd>        | Menyimpan. Nggak berlaku di batu.           |
+| <kbd>Ctrl</kbd> + <kbd>Z</kbd>        | Undo. Juga nggak berlaku di batu. Maaf.     |
+| <kbd>Alt</kbd> + <kbd>F4</kbd>        | Menutup jendela, bukan menutup hidup.       |
 
 ---
 
-## Status teknis
+## Testimoni Pengguna
 
-NOTEZ adalah aplikasi Android native Kotlin.
+> "Dulu gue nyatet semua di HP. Sekarang gue nyatet di batu. Hidup gue berubah, dan bahu gue juga."
+>
+> **Budi, 29 tahun, mantan pengguna 7 aplikasi note**
 
-```text
-Edit mode       : native Android EditText
-Reading View    : local WebView + bundled markdown-it asset
-Network stance  : offline-first, user-triggered online image cache only
-No CDN          : yes
-No WebView bridge: no addJavascriptInterface
-```
+> "Aku pernah nyimpen resep rahasia nenek di aplikasi. Aplikasinya tutup. Resepnya hilang. Nenekku marah."
+>
+> > "Kalau dipahat di batu, aku bisa tunjukin ke nenek dengan bangga."
+> >
+> > > "Terus nenekku nimpuk aku pakai batunya."
+>
+> **Sari, 24 tahun, cucu yang kurang beruntung**
 
-Evidence utama untuk batch v0.1.3:
+> "Saya bukan orang teknologi, tapi saya paham batu."
+>
+> **Pak Joko, tukang bangunan, 52 tahun**
 
-- Home Empty State + Tentang NOTEZ: CI + device PASS.
-- Home/Search/Theme polish: CI + device PASS.
-- Raw HTML + optional image cache: CI + device PASS.
-- Welcome horse no-circle hotfix: CI PASS, device PASS by user report.
+---
+
+## FAQ
+
+<details>
+<summary>Gimana kalau gue salah pahat?</summary>
+
+Selamat, lo baru aja belajar pelajaran hidup yang paling mahal. Opsi lo cuma tiga:
+
+1. Ubah salahnya jadi fitur.
+2. Cari batu baru.
+3. Pura-pura itu memang sengaja, dan sebut aja "gaya abstrak".
+
+</details>
+
+<details>
+<summary>Gimana cara nge-share catatan ke teman?</summary>
+
+Ada dua cara: foto lalu kirim via chat, atau kirim batunya via ekspedisi. Cara kedua lebih puitis, tapi ongkirnya dihitung per kilogram.
+
+</details>
+
+<details>
+<summary>Gimana cara nyari catatan lama?</summary>
+
+Fitur pencarian di batu menggunakan teknologi canggih bernama **mata** dan **ingatan**. Kalau gagal, upgrade ke versi **lutut**: jongkok dan cari di kolong.
+
+</details>
+
+<details>
+<summary>Apakah ini serius?</summary>
+
+Sebagian. Bagian yang mana, terserah lo.
+
+</details>
+
+### Daftar Istilah
+
+<dl>
+  <dt>Pahat</dt>
+  <dd>Aksi menyimpan data secara permanen, sambil mempertaruhkan jari.</dd>
+
+  <dt>Backup</dt>
+  <dd>Batu kedua yang isinya sama persis dengan batu pertama, dan sama beratnya.</dd>
+
+  <dt>Cloud</dt>
+  <dd>Tempat yang bukan di batu. Mencurigakan.</dd>
+</dl>
+
+---
+
+## Catatan Kaki dan Penutup
+
+Beberapa hal yang perlu diklarifikasi demi kejelasan ilmiah.[^1] Ada juga beberapa disclaimer yang sengaja ditaruh di bawah, karena kalau ditaruh di atas nggak ada yang baca.[^2]
+
+H<sub>2</sub>O tetap penting, tapi catatan soal H<sub>2</sub>O sebaiknya dipahat di batu yang tahan air. Dan kalau lo menghitung 2<sup>10</sup> batu, itu 1024 batu, yang artinya lo butuh gudang. Teks yang <mark>di-highlight</mark> itu penting, sedangkan teks yang ~~dicoret~~ itu pernah penting. Ada juga teks yang ***tebal dan miring sekaligus***, biasanya untuk hal yang sangat dramatis seperti "BAYAR UTANG".
+
+Kalau lo perlu menulis karakter spesial tanpa dirender, pakai backslash: \*bukan miring\*, \# bukan judul, \[bukan tautan\].
+
+Satu baris di sini  
+dipotong paksa dengan dua spasi,  
+supaya jadi seperti puisi yang nggak punya arah.
+
+### Tautan yang Mungkin Berguna
+
+- Tautan biasa: [Sungai terdekat](https://www.google.com/maps/search/sungai+terdekat)
+- Tautan dengan tooltip: [Toko bangunan](https://www.google.com/maps/search/toko+bangunan "Beli pahat di sini")
+- Tautan referensi: baca [dokumentasi Markdown][md-docs] kalau lo penasaran kenapa README ini rapi.
+- Tautan otomatis: <https://example.com>
+- Gambar yang bisa diklik: [![Batu keren](https://img.shields.io/badge/klik-batunya-grey)](https://example.com)
+
+### Lisensi
+
+Dokumen ini dilisensikan di bawah **Lisensi Batu Bebas** (LBB): lo boleh pakai, ubah, dan sebarkan, asal nggak dilempar ke orang.
+
+---
+
+<p align="center">
+  <i>Dibuat dengan kopi, bosan, dan niat yang agak berlebihan.</i><br>
+  <b>Pahat dulu, nyesel belakangan.</b>
+</p>
+
+[^1]: Tidak ada batu yang disakiti dalam pembuatan dokumen ini. Beberapa jempol, mungkin.
+[^2]: Penulis tidak bertanggung jawab atas jari lecet, batu retak, tetangga yang terganggu suara palu jam 5 pagi, maupun pasangan yang tiba-tiba minta putus karena lo lebih sibuk sama batu.
+
+[md-docs]: https://www.markdownguide.org "Markdown Guide"
